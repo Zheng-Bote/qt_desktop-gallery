@@ -1,7 +1,7 @@
 <div id="top" align="center">
-<h1>GH Repo Template</h1>
+<h1>qt_desktop-gallery</h1>
 
-<p>Template for new Github repos</p>
+<p>Desktop gallery-app for Linux, MacOS, Windows to show/edit Exif/IPTC and export to WebP</p>
 
 [Report Issue](https://github.com/Zheng-Bote/repo-template/issues) [Request Feature](https://github.com/Zheng-Bote/repo-template/pulls)
 
@@ -169,9 +169,22 @@ bla bla ... with a little help from my friends
 ├── LICENSE_GPL-3
 ├── LICENSE_MIT
 ├── README.md
+├── src
+│   ├── CMakeLists.txt
+│   ├── CMakeLists.txt.user
+│   ├── includes
+│   │   ├── rz_photo.cpp
+│   │   └── rz_photo.hpp
+│   ├── main.cpp
+│   ├── mainwindow.cpp
+│   ├── mainwindow.h
+│   ├── mainwindow.ui
+│   ├── picture_widget.cpp
+│   ├── picture_widget.h
+│   └── picture_widget.ui
 └── tree.bak
 
-5 directories, 21 files
+7 directories, 32 files
 ```
 <!-- readme-tree end -->
 
