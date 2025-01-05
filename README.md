@@ -1,7 +1,7 @@
 <div id="top" align="center">
-<h1>GH Repo Template</h1>
+<h1>qt_desktop-gallery</h1>
 
-<p>Template for new Github repos</p>
+<p>Desktop gallery-app for Linux, MacOS, Windows to show/edit Exif/IPTC and export to WebP</p>
 
 [Report Issue](https://github.com/Zheng-Bote/repo-template/issues) [Request Feature](https://github.com/Zheng-Bote/repo-template/pulls)
 
