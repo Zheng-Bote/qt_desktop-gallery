@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 3.23)
 
 project(
   qt_desktop-gallery
-  VERSION 0.1
+  VERSION 0.3.0
+  DESCRIPTION "Desktop gallery-app to show/edit Exif/IPTC and export to WebP"
+  HOMEPAGE_URL "https://github.com/Zheng-Bote/qt_desktop-gallery"
   LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
@@ -13,15 +15,36 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_COMPILER clang++)
 
+set(CMAKE_CXX_CLANG_TIDY clang-tidy;
+                         -header-filter=.;-checks=cppcoreguidelines-*)
+
+set(PROG_EXEC_NAME "${PROJECT_NAME}")
+set(PROG_NAME "Desktop-Gallery")
+set(PROG_VERSION "${PROJECT_VERSION}")
+set(PROG_HOMEPAGE "${PROJECT_HOMEPAGE_URL}")
+set(PROG_DESCRIPTION "${PROJECT_DESCRIPTION}")
+set(PROG_ORGANIZATION_NAME "ZHENG Robert")
+set(PROG_ORGANIZATION_DOMAIN "hase-zheng.net")
+
+configure_file("${CMAKE_SOURCE_DIR}/configure/rz_config.h.in"
+               "${CMAKE_SOURCE_DIR}/includes/rz_config.h")
+
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
 set(PROJECT_SOURCES main.cpp mainwindow.cpp mainwindow.h mainwindow.ui)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-  qt_add_executable(qt_desktop-gallery MANUAL_FINALIZATION ${PROJECT_SOURCES}
-                    includes/rz_photo.cpp includes/rz_photo.hpp
-                    picture_widget.h picture_widget.cpp picture_widget.ui)
+  qt_add_executable(
+    qt_desktop-gallery
+    MANUAL_FINALIZATION
+    ${PROJECT_SOURCES}
+    includes/rz_photo.cpp
+    includes/rz_photo.hpp
+    picture_widget.h
+    picture_widget.cpp
+    picture_widget.ui
+    resources.qrc)
   # Define target properties for Android with Qt 6 as: set_property(TARGET
   # qt_listview APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
   # ${CMAKE_CURRENT_SOURCE_DIR}/android) For more information, see

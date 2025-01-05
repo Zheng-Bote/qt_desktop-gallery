@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QFile>
 #include <QLabel>
 #include <QMainWindow>
 #include <QStandardItemModel>
@@ -21,6 +22,9 @@ public:
 
 private slots:
     void openReadFolder();
+    void openSrcFolder();
+    void openSrcFolderRekursive();
+    void clearSrcAlbum();
     void about();
 
     void on_listView_doubleClicked(const QModelIndex &index);
@@ -35,6 +39,8 @@ private:
     QStringListModel *model;
     QStandardItemModel *mContentItemModel;
     const unsigned int THUMBNAIL_SIZE = 300;
+
+    void fillSrcListView(QFile &srcFile);
 
     QMenu *pictureMenu;
     QAction *showSinglePictureAct;

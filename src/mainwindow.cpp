@@ -1,4 +1,5 @@
 #include <QDir>
+#include <QDirIterator>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QPushButton>
@@ -14,7 +15,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     setFont(*font_12);
-    setWindowTitle(tr("Gallery") + " v0.1.0");
+    //setWindowTitle(tr(qApp->applicationDisplayName().toStdString().c_str()) + " v"
+    //               + qApp->applicationVersion().toStdString().c_str());
     //setWindowIcon(QIcon(":/res/images/icon.png"));
 
     createMenu();
@@ -59,6 +61,61 @@ void MainWindow::openReadFolder()
     }
 }
 
+void MainWindow::openSrcFolder()
+{
+    QString srcPath = QFileDialog::getExistingDirectory(this,
+                                                        tr("Open Folder"),
+                                                        QDir::homePath(),
+                                                        QFileDialog::ShowDirsOnly
+                                                            | QFileDialog::DontResolveSymlinks);
+
+    QDirIterator srcPics(srcPath,
+                         {"*.jpg", "*.jpeg", "*.png", "*.bmp", "*.tiff"},
+                         QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Readable);
+
+    while (srcPics.hasNext()) {
+        QFile srcFile(srcPics.next());
+        fillSrcListView(srcFile);
+    }
+}
+
+void MainWindow::openSrcFolderRekursive()
+{
+    QString srcPath = QFileDialog::getExistingDirectory(this,
+                                                        tr("Open Folder"),
+                                                        QDir::homePath(),
+                                                        QFileDialog::ShowDirsOnly
+                                                            | QFileDialog::DontResolveSymlinks);
+
+    QDirIterator srcPics(srcPath,
+                         {"*.jpg", "*.jpeg", "*.png", "*.bmp", "*.tiff"},
+                         QDir::Files,
+                         QDirIterator::Subdirectories);
+
+    while (srcPics.hasNext()) {
+        QFile srcFile(srcPics.next());
+        fillSrcListView(srcFile);
+    }
+}
+
+void MainWindow::clearSrcAlbum()
+{
+    if (mContentItemModel->rowCount() < 1) {
+        return;
+    }
+    QMessageBox::StandardButton response = QMessageBox::Cancel;
+
+    response = QMessageBox::question(this,
+                                     tr("Confirmation"),
+                                     tr("Are you sure you want to clear the album?"),
+                                     QMessageBox::Yes | QMessageBox::Cancel);
+
+    if (response == QMessageBox::Yes) {
+        mContentItemModel->clear();
+        statusBarLabel->setText("0 " + tr("items"));
+    }
+}
+
 void MainWindow::about()
 {
     QString text = tr("File Encryption and Decryption") + "\n\n";
@@ -91,8 +148,13 @@ void MainWindow::createMenu()
     menuBar()->setNativeMenuBar(false);
 
     // Album
-    ui->actionload_Folder->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_F));
-    connect(ui->actionload_Folder, &QAction::triggered, this, &MainWindow::openReadFolder);
+    ui->actionsingle_Folder->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_F));
+    connect(ui->actionsingle_Folder, &QAction::triggered, this, &MainWindow::openSrcFolder);
+    connect(ui->actionrekursive_Folders,
+            &QAction::triggered,
+            this,
+            &MainWindow::openSrcFolderRekursive);
+    connect(ui->actionclear_Album, &QAction::triggered, this, &MainWindow::clearSrcAlbum);
 
     // Picure
     showSinglePictureAct = new QAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen),
@@ -155,6 +217,28 @@ void MainWindow::on_listView_doubleClicked(const QModelIndex &index)
         QString itemText2 = col2.data(Qt::DisplayRole).toString();
         qDebug() << "selected: " << itemText2 << " col: " << col2.column();
     }
+}
+
+void MainWindow::fillSrcListView(QFile &srcFile)
+{
+    QFileInfo fileInfo(srcFile.fileName());
+
+    QString pathToFile = fileInfo.absolutePath() + "/" + fileInfo.fileName();
+    QPixmap pixmap(pathToFile);
+    QStandardItem *listitem = new QStandardItem();
+    listitem->setIcon(pixmap);
+    listitem->setText(fileInfo.fileName() + "\nschaun wa ma");
+    listitem->setToolTip(pathToFile);
+    listitem->setBackground(Qt::lightGray);
+    listitem->setEditable(false);
+
+    QList<QStandardItem *> items;
+    items.append(listitem);
+    items.append(new QStandardItem(pathToFile));
+    mContentItemModel->appendRow(items);
+
+    int rowCount = mContentItemModel->rowCount();
+    statusBarLabel->setText(QString::number(rowCount) + " " + tr("items"));
 }
 
 void MainWindow::showSinglePicure(QString pathToFile)
