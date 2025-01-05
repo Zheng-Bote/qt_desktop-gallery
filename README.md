@@ -169,9 +169,22 @@ bla bla ... with a little help from my friends
 ├── LICENSE_GPL-3
 ├── LICENSE_MIT
 ├── README.md
+├── src
+│   ├── CMakeLists.txt
+│   ├── CMakeLists.txt.user
+│   ├── includes
+│   │   ├── rz_photo.cpp
+│   │   └── rz_photo.hpp
+│   ├── main.cpp
+│   ├── mainwindow.cpp
+│   ├── mainwindow.h
+│   ├── mainwindow.ui
+│   ├── picture_widget.cpp
+│   ├── picture_widget.h
+│   └── picture_widget.ui
 └── tree.bak
 
-5 directories, 21 files
+7 directories, 32 files
 ```
 <!-- readme-tree end -->
 
