@@ -15,8 +15,7 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_COMPILER clang++)
 
-set(CMAKE_CXX_CLANG_TIDY clang-tidy;
-                         -header-filter=.;-checks=cppcoreguidelines-*)
+#set(CMAKE_CXX_CLANG_TIDY clang-tidy;-header-filter=.;-checks=cppcoreguidelines-*)
 
 set(PROG_EXEC_NAME "${PROJECT_NAME}")
 set(PROG_NAME "Desktop-Gallery")
@@ -31,6 +30,9 @@ configure_file("${CMAKE_SOURCE_DIR}/configure/rz_config.h.in"
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+
+#find_package(exiv2 REQUIRED)
+find_package(exiv2 REQUIRED CONFIG NAMES exiv2)
 
 set(PROJECT_SOURCES main.cpp mainwindow.cpp mainwindow.h mainwindow.ui)
 
@@ -59,8 +61,7 @@ else()
   endif()
 endif()
 
-target_link_libraries(qt_desktop-gallery PRIVATE Qt${QT_VERSION_MAJOR}::Widgets
-                                                 exiv2)
+target_link_libraries(qt_desktop-gallery PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Exiv2::exiv2lib)
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1. If

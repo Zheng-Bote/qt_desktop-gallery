@@ -2,6 +2,7 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include "ui_picture_widget.h"
+
 #include <exiv2/exiv2.hpp>
 
 PictureWidget::PictureWidget(QWidget *parent)
@@ -242,6 +243,8 @@ void PictureWidget::readSrcIptc()
 void PictureWidget::createRotateMenu()
 {
     rotateMnu = new QMenu();
+    //#ifdef __APPLE__
+
     rotate_90 = new QAction(QIcon::fromTheme(QIcon::ThemeIcon::ObjectRotateRight),
                             tr("rotate") + " 90°",
                             this);

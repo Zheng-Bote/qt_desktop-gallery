@@ -3,10 +3,10 @@
 
 <p>Desktop gallery-app for Linux, MacOS, Windows to show/edit Exif/IPTC and export to WebP</p>
 
-[Report Issue](https://github.com/Zheng-Bote/repo-template/issues) [Request Feature](https://github.com/Zheng-Bote/repo-template/pulls)
+[Report Issue](https://github.com/Zheng-Bote/qt_desktop-gallery/issues) [Request Feature](https://github.com/Zheng-Bote/qt_desktop-gallery/pulls)
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
-![GitHub Created At](https://img.shields.io/github/created-at/Zheng-Bote/repo-template)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/Zheng-Bote/qt_desktop-gallery?logo=GitHub)](https://github.com/Zheng-Bote/qt_desktop-gallery/releases)
 
 </div>
 
@@ -14,10 +14,11 @@
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
 **Table of Contents**
 
 - [Description](#description)
-    - [Features](#features)
+  - [Features](#features)
   - [Status](#status)
     - [Application / Tool](#application--tool)
     - [Documentation](#documentation)
@@ -27,25 +28,10 @@
   - [Dependencies](#dependencies)
   - [folder structure](#folder-structure)
   - [Usage/Examples/Tests](#usageexamplestests)
-- [API Reference](#api-reference)
-  - [Inputs](#inputs)
-  - [Outputs](#outputs)
-  - [Parameters](#parameters)
 - [Documentation](#documentation-1)
-  - [Architecture](#architecture)
-    - [Github](#github)
-      - [Github Repo](#github-repo)
-      - [Github Actions / Workflows](#github-actions--workflows)
-  - [Application](#application)
-  - [DevOps](#devops)
-  - [Github Page](#github-page)
-  - [Github Wiki](#github-wiki)
-  - [Comments](#comments)
   - [Screenshots](#screenshots)
 - [Authors and License](#authors-and-license)
   - [License](#license)
-    - [MIT License](#mit-license)
-    - [Apache License](#apache-license)
   - [Authors](#authors)
     - [Code Contributors](#code-contributors)
 
@@ -56,24 +42,16 @@
 # Description
 
 ![QT](https://img.shields.io/badge/Community-6-41CD52?logo=qt)
-![CXX](https://img.shields.io/badge/C++-20-blue?logo=cplusplus)
-![Rust](https://img.shields.io/badge/Rust-Rocket-lightgrey?logo=rust)
-![Expressif](https://img.shields.io/badge/ESP-32-E7352C?logo=espressif)
-![GHA](https://img.shields.io/badge/Github-Action-black?logo=githubactions)
-![Node](https://img.shields.io/badge/Node-20-blue?logo=tsnode)
-![Angular](https://img.shields.io/badge/Angular-18+-red?logo=angular)
-![Vue](https://img.shields.io/badge/Vue-3+-4FC08D?logo=vuedotjs)
-![HTML5](https://img.shields.io/badge/HTML-5+-E34F26?logo=html5)
-![Typescript](https://img.shields.io/badge/TypeScript-5+-3178C6?logo=typescript)
+![CXX](https://img.shields.io/badge/C++-23-blue?logo=cplusplus)
 
-Repo template with README-template and some Github workflows and Github actions.
+Desktop Gallery-Application for Linux, MacOS and Windows to show/edit Exif/IPTC and export to WebP
 
 ### Features
 
 - \[ ] advanced-super-extra-special feature xyz
 
   <br>
-  
+
 - \[x] OSS and license
 - \[x] works as designed
 - \[ ] no bugs
@@ -83,17 +61,16 @@ Repo template with README-template and some Github workflows and Github actions.
 - \[x] some more or less usefull Github Actions for GH-repo, GH-pages, GH-wiki, CI/CD-Pipelines
 - \[ ] Packagemanager
 - \[ ] Installation routine
-- \[ ] portable application 
+- \[ ] portable application
 
 <br>
 
-- \[ ] runs on DOS/Windows
-- \[ ] runs on MacOS
-- \[ ] runs on Linux
+- \[x] runs on DOS/Windows
+- \[x] runs on MacOS
+- \[x] runs on Linux
 - \[ ] runs on iOS
 - \[ ] runs on Android
 - \[ ] runs on HarmonyOS
-
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -102,25 +79,25 @@ Repo template with README-template and some Github workflows and Github actions.
 ### Application / Tool
 
 ![Status](https://img.shields.io/badge/Status-under_construction-red)
-![Status](https://img.shields.io/badge/Status-works-green)
-![GitHub Release Date](https://img.shields.io/github/release-date/Zheng-Bote/repo-template)
+![GitHub Release Date](https://img.shields.io/github/release-date/Zheng-Bote/qt_desktop-gallery)
 
-![GitHub Issues](https://img.shields.io/github/issues/Zheng-Bote/repo-template)
-![GitHub Pull Requests](https://img.shields.io/github/issues-pr/Zheng-Bote/repo-template)
+![GitHub Issues](https://img.shields.io/github/issues/Zheng-Bote/qt_desktop-gallery)
+![GitHub Pull Requests](https://img.shields.io/github/issues-pr/Zheng-Bote/qt_desktop-gallery)
 
 ### Documentation
 
-_see also:_ [Application Documentation](#documentation) 
+_see also:_ [Application Documentation](#documentation)
 
 #### README
-[![Repo - create Repo-Tree in README.md](https://github.com/Zheng-Bote/repo-template/actions/workflows/repo-create_tree_readme.yml/badge.svg)](https://github.com/Zheng-Bote/repo-template/actions/workflows/repo-create_tree_readme.yml)
-[![Repo - add Actions In/Out to README](https://github.com/Zheng-Bote/repo-template/actions/workflows/repo-actions_docu.yml/badge.svg)](https://github.com/Zheng-Bote/repo-template/actions/workflows/repo-actions_docu.yml)
 
-[![Repo - update Readme](https://github.com/Zheng-Bote/repo-template/actions/workflows/repo-call_Readme.yml/badge.svg)](https://github.com/Zheng-Bote/repo-template/actions/workflows/repo-call_Readme.yml)
+[![Repo - create Repo-Tree in README.md](https://github.com/Zheng-Bote/qt_desktop-gallery/actions/workflows/repo-create_tree_readme.yml/badge.svg)](https://github.com/Zheng-Bote/qt_desktop-gallery/actions/workflows/repo-create_tree_readme.yml)
+[![Repo - add Actions In/Out to README](https://github.com/Zheng-Bote/qt_desktop-gallery/actions/workflows/repo-actions_docu.yml/badge.svg)](https://github.com/Zheng-Bote/qt_desktop-gallery/actions/workflows/repo-actions_docu.yml)
+
+[![Repo - update Readme](https://github.com/Zheng-Bote/qt_desktop-gallery/actions/workflows/repo-call_Readme.yml/badge.svg)](https://github.com/Zheng-Bote/qt_desktop-gallery/actions/workflows/repo-call_Readme.yml)
 
 #### other Markdown files
 
-[![Repo - create TOC of Markdown files](https://github.com/Zheng-Bote/repo-template/actions/workflows/repo-create_doctoc_md.yml/badge.svg)](https://github.com/Zheng-Bote/repo-template/actions/workflows/repo-create_doctoc_md.yml)
+[![Repo - create TOC of Markdown files](https://github.com/Zheng-Bote/qt_desktop-gallery/actions/workflows/repo-create_doctoc_md.yml/badge.svg)](https://github.com/Zheng-Bote/qt_desktop-gallery/actions/workflows/repo-create_doctoc_md.yml)
 
 create ToC in Markdown files in folders
 
@@ -142,6 +119,7 @@ bla bla ... with a little help from my friends
 ## folder structure
 
 <!-- readme-tree start -->
+
 ```
 .
 ├── .github
@@ -186,6 +164,7 @@ bla bla ... with a little help from my friends
 
 7 directories, 32 files
 ```
+
 <!-- readme-tree end -->
 
 <p align="right">(<a href="#top">back to top</a>)</p>
@@ -200,146 +179,23 @@ bla bla ... usage is intuitive and runs mostly automatically with no needs of an
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-# API Reference
-
-<hr>
-
-![GHA](https://img.shields.io/badge/Github-Action-black?logo=githubactions)
-
-_Inputs/Outputs will be filled automatically by `.github/workflows/repo-actions_docu.yml`_
-
-## Inputs
-
-## Outputs
-
-<hr>
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-## Parameters
-
-**Workflow or program**
-
-| Parameter    | Type     | Description                          |
-| :----------- | :------- | :----------------------------------- |
-| `name`       | `string` | _Optional_ name-of-copyright-holder  |
-| `created`    | `string` | _Optional_ <YYYY>                    |
-| `version`    | `string` | _Optional_ \<v0.0.0>                 |
-| `link_left`  | `string` | _Optional_ link-to-contact-page      |
-| `link_right` | `string` | _Optional_ link-to-legal-notice-page |
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
 # Documentation
 
 see also: <https://linktodocumentation>
 
-## Architecture
-
-### Github
-
-#### Github Repo
-
-```mermaid
-block-beta
-  columns 4
-  Repo:4
-  block:group1:1
-    columns 1
-    id0[".github"]
-    block:group2:1
-      columns 1
-      id1[["workflows"]]
-      id2[["actions"]]
-    end
-  end
-  docs dist src
-  block:group3:4
-    %% columns auto (default)
-    A["gh-pages"] B["gh-wiki"]
-  end
-```
-
-#### Github Actions / Workflows
-
-```mermaid
-flowchart TD;
-    A[Workflow]-. parameter .->B[[callable Workflow]]
-    B-- parameter -->C[Action]
-    C-->D(README)
-
-    A[Workflow]-. parameter .->E[[callable Workflow]]
-    E-- parameter -->F[Action]
-    F-->J(Markdown files)
-
-    A[Workflow]-->K[[Workflow]]
-    K-->L[Action]
-    L-->M("GH-Pages")
-
-    A[Workflow]-->N[[Workflow]]
-    N-->O[Action]
-    O-->P("GH-Wiki")
-```
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-## Application
-
-```mermaid
-architecture-beta
-    group api(cloud)[API]
-
-    service db(database)[Database] in api
-    service server0(server)[Webserver] in api
-    service disk2(disk)[Storage] in api
-    service server(server)[Appserver] in api
-
-    db:L -- R:server
-    server0:T -- B:server
-    disk2:T -- B:server
-```
-
-## DevOps
-
-```mermaid
-pie title me
-         "ideas" : 90
-         "time for realizations" : 7
-         "money for realizations" : 3
-```
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-## Github Page
-
-[![GH-Page](https://img.shields.io/badge/Github-Pages-black?logo=github)](https://www.github.com/Zheng-Bote)
-
-## Github Wiki
-
-[![GH-Wiki](https://img.shields.io/badge/Github-Wiki-black?logo=github)](https://www.github.com/Zheng-Bote)
-
-## Comments
-
-> \[!NOTE]
-> Useful information that users should know, even when skimming content.
-
-> \[!TIP]
-> Helpful advice for doing things better or more easily.
-
-> \[!IMPORTANT]
-> Key information users need to know to achieve their goal.
-
-> \[!WARNING]
-> Urgent info that needs immediate user attention to avoid problems.
-
-> \[!CAUTION]
-> Advises about risks or negative outcomes of certain actions.
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
 ## Screenshots
 
-![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
+![App Screenshot](./docs/img/00_en.png)
+
+![App Screenshot](./docs/img/01_en.png)
+
+![App Screenshot](./docs/img/exif_en.png)
+
+![App Screenshot](./docs/img/exif_meta_edit.png)
+
+![App Screenshot](./docs/img/rotate_en.png)
+
+![App Screenshot](./docs/img/webp_en.png)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -347,11 +203,7 @@ pie title me
 
 ## License
 
-**This Repo-Template is using the MIT-License**
-
-**_other licenses see files `LICENSE_<name>`\_**
-
-### MIT License
+**MIT License**
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
 
@@ -374,24 +226,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-        https://choosealicense.com/licenses/mit/
-
-### Apache License
-
-[![Apache License](https://img.shields.io/badge/License-Apache_v2.0-green.svg)](<[https://choosealicense.com/licenses/mit/](http://www.apache.org/licenses/LICENSE-2.0)>)
-
-Copyright (c) 2019 ZHENG Robert
-
-Licensed under the **Apache License, Version 2.0** (the "License"); you may not use this file except in compliance with the License.
-
-You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-
-See the License for the specific language governing permissions and limitations under the License.
 
 ## Authors
 

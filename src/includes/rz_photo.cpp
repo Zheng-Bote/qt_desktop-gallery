@@ -1,5 +1,6 @@
 #include "rz_photo.hpp"
 
+#include <chrono>
 #include <exiv2/exiv2.hpp>
 #include <iostream>
 
@@ -57,8 +58,11 @@ bool Photo::checkImgWidth(const QImage &imageInput, const int &targetWidth)
 bool Photo::backupOrigFile()
 {
     using std::chrono::floor;
-
+#ifndef __APPLE__
     auto epoch = std::chrono::utc_clock::now();
+#else
+    auto epoch = std::chrono::system_clock::now();
+#endif
     auto humanTime = floor<std::chrono::seconds>(epoch);
     std::string dt = std::format("{0:%Y-%m-%d_%H-%M-%S}", humanTime);
 
