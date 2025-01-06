@@ -24,7 +24,7 @@
     <item>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="album_label">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -38,7 +38,7 @@
          </size>
         </property>
         <property name="text">
-         <string>TextLabel</string>
+         <string/>
         </property>
        </widget>
       </item>

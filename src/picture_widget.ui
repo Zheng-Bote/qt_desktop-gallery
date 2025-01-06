@@ -20,7 +20,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Picture Details</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -49,50 +49,96 @@
      <property name="frameShadow">
       <enum>QFrame::Shadow::Raised</enum>
      </property>
-     <widget class="QPushButton" name="closeBtn">
+     <widget class="QWidget" name="">
       <property name="geometry">
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>91</width>
-        <height>29</height>
+        <width>422</width>
+        <height>31</height>
        </rect>
       </property>
-      <property name="text">
-       <string>close</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="resizeSmallerImage_Btn">
-      <property name="geometry">
-       <rect>
-        <x>150</x>
-        <y>10</y>
-        <width>91</width>
-        <height>29</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>resize</string>
-      </property>
-      <property name="icon">
-       <iconset theme="QIcon::ThemeIcon::ZoomOut"/>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="resizeBiggerImage_Btn">
-      <property name="geometry">
-       <rect>
-        <x>260</x>
-        <y>10</y>
-        <width>91</width>
-        <height>29</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>resize</string>
-      </property>
-      <property name="icon">
-       <iconset theme="QIcon::ThemeIcon::ZoomIn"/>
-      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <widget class="QPushButton" name="closeBtn">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>29</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>29</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>close</string>
+         </property>
+         <property name="icon">
+          <iconset theme="QIcon::ThemeIcon::GoPrevious"/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Orientation::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="rotateSrcImg_Btn">
+         <property name="minimumSize">
+          <size>
+           <width>148</width>
+           <height>29</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>148</width>
+           <height>29</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>rotate Image</string>
+         </property>
+         <property name="icon">
+          <iconset theme="QIcon::ThemeIcon::SystemReboot"/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="exportSrcToWebp_Btn">
+         <property name="minimumSize">
+          <size>
+           <width>148</width>
+           <height>29</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>148</width>
+           <height>29</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>export to WebP</string>
+         </property>
+         <property name="icon">
+          <iconset theme="QIcon::ThemeIcon::DocumentSend"/>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>

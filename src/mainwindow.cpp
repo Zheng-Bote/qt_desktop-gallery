@@ -15,6 +15,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     setFont(*font_12);
+    ui->album_label->clear();
+
     //setWindowTitle(tr(qApp->applicationDisplayName().toStdString().c_str()) + " v"
     //               + qApp->applicationVersion().toStdString().c_str());
     //setWindowIcon(QIcon(":/res/images/icon.png"));
@@ -98,6 +100,19 @@ void MainWindow::openSrcFolderRekursive()
     }
 }
 
+void MainWindow::loadSingleSrcImg()
+{
+    QString pathToFile = QFileDialog::getOpenFileName(this,
+                                                      tr("Open File"),
+                                                      QDir::homePath(),
+                                                      tr("Image (*.jpg *.jpeg *.png *.bmp *.tiff"));
+
+    if (pathToFile.isEmpty() == false) {
+        QFile srcFile(pathToFile);
+        fillSrcListView(srcFile);
+    }
+}
+
 void MainWindow::clearSrcAlbum()
 {
     if (mContentItemModel->rowCount() < 1) {
@@ -112,7 +127,8 @@ void MainWindow::clearSrcAlbum()
 
     if (response == QMessageBox::Yes) {
         mContentItemModel->clear();
-        statusBarLabel->setText("0 " + tr("items"));
+        //statusBarLabel->setText("0 " + tr("items"));
+        statusBarLabel->setText("v" + qApp->applicationVersion());
     }
 }
 
@@ -130,7 +146,7 @@ void MainWindow::about()
     setInformativeText.append(
         "<br><a href=\"https://github.com/Zheng-Bote/qt_file_encryption-decryption\" alt=\"Github "
         "repository\">");
-    setInformativeText.append(QString("PROG_EXEC_NAME") + " v" + QString("PROG_VERSION") + " "
+    setInformativeText.append(qApp->applicationName() + " v" + qApp->applicationVersion() + " "
                               + tr("at") + " Github</a>");
 
     QMessageBox msgBox(this);
@@ -156,13 +172,9 @@ void MainWindow::createMenu()
             &MainWindow::openSrcFolderRekursive);
     connect(ui->actionclear_Album, &QAction::triggered, this, &MainWindow::clearSrcAlbum);
 
-    // Picure
-    showSinglePictureAct = new QAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen),
-                                       tr("show &Picture"),
-                                       this);
-    //connect(showSinglePictureAct, &QAction::triggered, this, &MainWindow::showSinglePicure);
-    pictureMenu = menuBar()->addMenu(tr("Picture"));
-    pictureMenu->addAction(showSinglePictureAct);
+    // Picture
+    ui->actionload_Picture->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_P));
+    connect(ui->actionload_Picture, &QAction::triggered, this, &MainWindow::loadSingleSrcImg);
 
     // About - Info
     aboutAct = new QAction(QIcon::fromTheme(QIcon::ThemeIcon::HelpAbout), tr("&About"), this);
@@ -193,7 +205,7 @@ void MainWindow::initStatusBar()
     statusBarLabel = new QLabel();
     statusBarLabel->setFont(*font_10);
     statusBarLabel->setAlignment(Qt::AlignCenter);
-    statusBarLabel->setText("status bar");
+    statusBarLabel->setText("v" + qApp->applicationVersion());
     statusBar()->addWidget(statusBarLabel, 1);
 }
 
@@ -236,6 +248,10 @@ void MainWindow::fillSrcListView(QFile &srcFile)
     items.append(listitem);
     items.append(new QStandardItem(pathToFile));
     mContentItemModel->appendRow(items);
+
+    ui->album_label->setFont(*font_10);
+    ui->album_label->setText(tr("Doubleclick on a picture for details. Press CTRL and click to "
+                                "select one or more pictures."));
 
     int rowCount = mContentItemModel->rowCount();
     statusBarLabel->setText(QString::number(rowCount) + " " + tr("items"));

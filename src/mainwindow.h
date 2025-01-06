@@ -24,6 +24,7 @@ private slots:
     void openReadFolder();
     void openSrcFolder();
     void openSrcFolderRekursive();
+    void loadSingleSrcImg();
     void clearSrcAlbum();
     void about();
 
@@ -43,7 +44,7 @@ private:
     void fillSrcListView(QFile &srcFile);
 
     QMenu *pictureMenu;
-    QAction *showSinglePictureAct;
+    QAction *loadSingleSrcImgAct;
     void showSinglePicure(QString pathToFile);
 
     QMenu *infoMenu;
