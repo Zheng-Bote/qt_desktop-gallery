@@ -119,7 +119,6 @@ bla bla ... with a little help from my friends
 ## folder structure
 
 <!-- readme-tree start -->
-
 ```
 .
 ├── .github
@@ -141,16 +140,26 @@ bla bla ... with a little help from my friends
 │       ├── repo-create_doctoc.yml_
 │       ├── repo-create_doctoc_md.yml
 │       └── repo-create_tree_readme.yml
+├── .gitignore
 ├── LICENSE
-├── LICENSE_Apache-2
-├── LICENSE_GPL-2
-├── LICENSE_GPL-3
-├── LICENSE_MIT
 ├── README.md
+├── docs
+│   └── img
+│       ├── 00_en.png
+│       ├── 01_en.png
+│       ├── exif_en.png
+│       ├── exif_meta_edit.png
+│       ├── rotate_en.png
+│       └── webp_en.png
 ├── src
 │   ├── CMakeLists.txt
-│   ├── CMakeLists.txt.user
+│   ├── configure
+│   │   ├── ClangTidy.cmake
+│   │   ├── Doxygen.cmake
+│   │   ├── extra_headers
+│   │   └── rz_config.h.in
 │   ├── includes
+│   │   ├── rz_config.h
 │   │   ├── rz_photo.cpp
 │   │   └── rz_photo.hpp
 │   ├── main.cpp
@@ -159,12 +168,17 @@ bla bla ... with a little help from my friends
 │   ├── mainwindow.ui
 │   ├── picture_widget.cpp
 │   ├── picture_widget.h
-│   └── picture_widget.ui
+│   ├── picture_widget.ui
+│   ├── resources
+│   │   └── img
+│   │       ├── qt_desktop-gallery.jpg
+│   │       ├── qt_desktop-gallery.png
+│   │       └── qt_desktop-gallery_32x31.png
+│   └── resources.qrc
 └── tree.bak
 
-7 directories, 32 files
+12 directories, 43 files
 ```
-
 <!-- readme-tree end -->
 
 <p align="right">(<a href="#top">back to top</a>)</p>
