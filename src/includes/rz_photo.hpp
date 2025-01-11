@@ -36,6 +36,8 @@ public:
 
     QString getSuffix();
 
+    QList<QString> srcPics(QString &srcPath);
+
 private:
     const QList<QString> validMetaImageTypes = {"jpg", "jpeg", "png", "webp", "tiff"};
     bool isValidMetaImageType();

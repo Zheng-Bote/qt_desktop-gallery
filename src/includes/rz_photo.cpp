@@ -4,6 +4,10 @@
 #include <exiv2/exiv2.hpp>
 #include <iostream>
 
+#include <QDir>
+#include <QDirIterator>
+#include <QFileDialog>
+
 Photo::Photo() {}
 
 Photo::Photo(const QString &imageInput)
@@ -185,6 +189,21 @@ QList<int> Photo::getWebSizes()
 QString Photo::getSuffix()
 {
     return imgStruct.fileSuffix;
+}
+
+QList<QString> Photo::srcPics(QString &srcPath)
+{
+    QDirIterator srcPics(srcPath,
+                         {"*.jpg", "*.jpeg", "*.png", "*.bmp", "*.tiff"},
+                         QDir::Files,
+                         QDirIterator::Subdirectories);
+
+    QList<QString> fileList;
+    while (srcPics.hasNext()) {
+        fileList.append(srcPics.next());
+    }
+
+    return fileList;
 }
 
 bool Photo::isValidMetaImageType()

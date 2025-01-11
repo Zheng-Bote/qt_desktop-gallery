@@ -1,7 +1,7 @@
-#include "mainwindow.h"
 #include <QApplication>
 
 #include "includes/rz_config.h"
+#include "mainwindow.h"
 
 int main(int argc, char *argv[])
 {
@@ -14,6 +14,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     QApplication::setWindowIcon(QIcon(":/resources/img/qt_desktop-gallery_32x31.png"));
     MainWindow w;
+
     w.show();
     return a.exec();
 }

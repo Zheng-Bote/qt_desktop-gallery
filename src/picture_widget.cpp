@@ -17,6 +17,8 @@ PictureWidget::PictureWidget(QWidget *parent)
     Exiv2::enableBMFF();
 #endif
 
+    ui->closeBtn->setIcon(QIcon(":/resources/img/icons8-arrow-pointing-left-50.png"));
+    ui->exportSrcToWebp_Btn->setIcon(QIcon(":/resources/img/icons8-send-file-50.png"));
     createRotateMenu();
     createExportMenu();
 }
@@ -29,7 +31,11 @@ PictureWidget::~PictureWidget()
 void PictureWidget::setImage(QString pathToFile)
 {
     pathToImage = pathToFile;
-    ui->filename_label->setText(pathToFile);
+    QFile srcFile(pathToFile);
+    QFileInfo fileInfo(srcFile.fileName());
+
+    ui->filename_label->setText(fileInfo.fileName());
+    ui->filename_label->setToolTip(pathToFile);
     picture = new QPixmap(pathToImage);
 
     ui->picture_label->setPixmap(
@@ -242,27 +248,36 @@ void PictureWidget::readSrcIptc()
 
 void PictureWidget::createRotateMenu()
 {
+    ui->rotateSrcImg_Btn->setIcon(QIcon(":/resources/img/icons8-available-updates-50.png"));
+
     rotateMnu = new QMenu();
     //#ifdef __APPLE__
 
-    rotate_90 = new QAction(QIcon::fromTheme(QIcon::ThemeIcon::ObjectRotateRight),
+    rotate_90 = new QAction(QIcon(":/resources/img/icons8-rotate-right-50.png"),
                             tr("rotate") + " 90°",
                             this);
+    rotate_90->setIconVisibleInMenu(true);
     connect(rotate_90, &QAction::triggered, this, [this] { PictureWidget::rotateSrcImg(90); });
     rotateMnu->addAction(rotate_90);
-    rotate_m90 = new QAction(QIcon::fromTheme(QIcon::ThemeIcon::ObjectRotateLeft),
+
+    rotate_m90 = new QAction(QIcon(":/resources/img/icons8-rotate-left-50.png"),
                              tr("rotate") + " -90°",
                              this);
+    rotate_m90->setIconVisibleInMenu(true);
     connect(rotate_m90, &QAction::triggered, this, [this] { PictureWidget::rotateSrcImg(-90); });
     rotateMnu->addAction(rotate_m90);
-    rotate_120 = new QAction(QIcon::fromTheme(QIcon::ThemeIcon::ObjectRotateRight),
+
+    rotate_120 = new QAction(QIcon(":/resources/img/icons8-rotate-right-50.png"),
                              tr("rotate") + " 120°",
                              this);
+    rotate_120->setIconVisibleInMenu(true);
     connect(rotate_120, &QAction::triggered, this, [this] { PictureWidget::rotateSrcImg(120); });
     rotateMnu->addAction(rotate_120);
-    rotate_m120 = new QAction(QIcon::fromTheme(QIcon::ThemeIcon::ObjectRotateLeft),
+
+    rotate_m120 = new QAction(QIcon(":/resources/img/icons8-rotate-left-50.png"),
                               tr("rotate") + " -120°",
                               this);
+    rotate_m120->setIconVisibleInMenu(true);
     connect(rotate_m120, &QAction::triggered, this, [this] { PictureWidget::rotateSrcImg(-120); });
     rotateMnu->addAction(rotate_m120);
 
@@ -272,38 +287,45 @@ void PictureWidget::createRotateMenu()
 void PictureWidget::createExportMenu()
 {
     exportMnu = new QMenu();
+    exportMnu->setIcon(QIcon(":/resources/img/icons8-send-file-50.png"));
 
-    webp_size_all = new QAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentSend),
-                                tr("export to all sizes"),
-                                this);
-    connect(webp_size_all, &QAction::triggered, this, [this] {
-        PictureWidget::exportSrcImgToWebP();
-    });
-    exportMnu->addAction(webp_size_all);
-
-    webp_size_480 = new QAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentSend),
+    webp_size_480 = new QAction(QIcon(":/resources/img/icons8-ausgang-48.png"),
                                 tr("export to size") + " 480",
                                 this);
+    webp_size_480->setIconVisibleInMenu(true);
     connect(webp_size_480, &QAction::triggered, this, [this] {
         PictureWidget::exportSrcImgToWebP(480);
     });
     exportMnu->addAction(webp_size_480);
 
-    webp_size_640 = new QAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentSend),
+    webp_size_640 = new QAction(QIcon(":/resources/img/icons8-ausgang-48.png"),
                                 tr("export to size") + " 640",
                                 this);
+    webp_size_640->setIconVisibleInMenu(true);
     connect(webp_size_640, &QAction::triggered, this, [this] {
         PictureWidget::exportSrcImgToWebP(640);
     });
     exportMnu->addAction(webp_size_640);
 
-    webp_size_800 = new QAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentSend),
+    webp_size_800 = new QAction(QIcon(":/resources/img/icons8-ausgang-48.png"),
                                 tr("export to size") + " 800",
                                 this);
+    webp_size_800->setIconVisibleInMenu(true);
     connect(webp_size_800, &QAction::triggered, this, [this] {
         PictureWidget::exportSrcImgToWebP(800);
     });
     exportMnu->addAction(webp_size_800);
+
+    exportMnu->addSeparator();
+
+    webp_size_all = new QAction(QIcon(":/resources/img/icons8-send-file-50.png"),
+                                tr("export to all sizes"),
+                                this);
+    webp_size_all->setIconVisibleInMenu(true);
+    connect(webp_size_all, &QAction::triggered, this, [this] {
+        PictureWidget::exportSrcImgToWebP();
+    });
+    exportMnu->addAction(webp_size_all);
 
     ui->exportSrcToWebp_Btn->setMenu(exportMnu);
 }

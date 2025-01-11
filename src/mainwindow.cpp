@@ -6,8 +6,13 @@
 
 #include "./picture_widget.h"
 #include "./ui_mainwindow.h"
+#include "includes/rz_config.h"
 #include "includes/rz_photo.hpp"
 #include "mainwindow.h"
+
+#include <QThread>
+#include <QThreadPool>
+#include <QtConcurrent>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -83,6 +88,8 @@ void MainWindow::openSrcFolder()
 
 void MainWindow::openSrcFolderRekursive()
 {
+    //    qInfo() << "openSrcFolderRekursive on: " << QThread::currentThread();
+
     QString srcPath = QFileDialog::getExistingDirectory(this,
                                                         tr("Open Folder"),
                                                         QDir::homePath(),
@@ -102,10 +109,11 @@ void MainWindow::openSrcFolderRekursive()
 
 void MainWindow::loadSingleSrcImg()
 {
-    QString pathToFile = QFileDialog::getOpenFileName(this,
-                                                      tr("Open File"),
-                                                      QDir::homePath(),
-                                                      tr("Image (*.jpg *.jpeg *.png *.bmp *.tiff"));
+    QString pathToFile
+        = QFileDialog::getOpenFileName(this,
+                                       tr("Open File"),
+                                       QDir::homePath(),
+                                       tr("Image (*.jpg *.jpeg *.png *.bmp *.tiff)"));
 
     if (pathToFile.isEmpty() == false) {
         QFile srcFile(pathToFile);
@@ -126,7 +134,12 @@ void MainWindow::clearSrcAlbum()
                                      QMessageBox::Yes | QMessageBox::Cancel);
 
     if (response == QMessageBox::Yes) {
-        mContentItemModel->clear();
+        try {
+            mContentItemModel->clear();
+        } catch (...) {
+            qDebug() << "clearSrcAlbum: something went wrong";
+        }
+
         //statusBarLabel->setText("0 " + tr("items"));
         statusBarLabel->setText("v" + qApp->applicationVersion());
     }
@@ -134,23 +147,19 @@ void MainWindow::clearSrcAlbum()
 
 void MainWindow::about()
 {
-    QString text = tr("File Encryption and Decryption") + "\n\n";
-    QString setInformativeText = "<p><ul><li>" + tr("Encryption") + ": AES-256 CBC</li><li>"
-                                 + tr("Password") + ": SHA256, " + tr("5 to 32 characters")
-                                 + "</li><li>initialization vector: MD5</li></ul></p>";
-    setInformativeText.append("<p><ul><li>" + QString("PROG_EXEC_NAME") + " v "
-                              + QString("PROG_VERSION") + "</li><li>"
-                              + tr("Desktop application for Linux, MacOS and Windows")
-                              + "</li><li>Copyright (c) 2024 ZHENG Robert</li><li>OSS MIT "
-                              + tr("license") + "</li></ul></p>");
-    setInformativeText.append(
-        "<br><a href=\"https://github.com/Zheng-Bote/qt_file_encryption-decryption\" alt=\"Github "
-        "repository\">");
+    QString text = tr(qApp->applicationDisplayName().toStdString().c_str()) + "\n\n";
+    QString setInformativeText = "<p>" + qApp->applicationName() + " v" + qApp->applicationVersion()
+                                 + "</p>";
+    setInformativeText.append("<p>" + tr(PROG_DESCRIPTION) + "<p>");
+    setInformativeText.append("<p>Copyright (c) 2024 ZHENG Robert</p>");
+    setInformativeText.append("<br><a href=\"");
+    setInformativeText.append(PROG_HOMEPAGE);
+    setInformativeText.append("\" alt=\"Github repository\">");
     setInformativeText.append(qApp->applicationName() + " v" + qApp->applicationVersion() + " "
                               + tr("at") + " Github</a>");
 
     QMessageBox msgBox(this);
-    msgBox.setWindowTitle(tr("About") + " " + tr("PROG_NAME"));
+    msgBox.setWindowTitle(tr("About") + " " + qApp->applicationDisplayName());
     msgBox.setIcon(QMessageBox::Information);
     msgBox.setTextFormat(Qt::RichText);
     msgBox.setText(text);
@@ -164,20 +173,33 @@ void MainWindow::createMenu()
     menuBar()->setNativeMenuBar(false);
 
     // Album
+    ui->menuload_Folder->setIcon(QIcon(":/resources/img/icons8-images-folder-50.png"));
+
+    ui->actionsingle_Folder->setIcon(QIcon(":/resources/img/icons8-opened-folder-50.png"));
+    ui->actionsingle_Folder->setIconVisibleInMenu(true);
     ui->actionsingle_Folder->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_F));
     connect(ui->actionsingle_Folder, &QAction::triggered, this, &MainWindow::openSrcFolder);
+
+    ui->actionrekursive_Folders->setIcon(QIcon(":/resources/img/icons8-file-submodule-50.png"));
+    ui->actionrekursive_Folders->setIconVisibleInMenu(true);
     connect(ui->actionrekursive_Folders,
             &QAction::triggered,
             this,
             &MainWindow::openSrcFolderRekursive);
+
+    ui->actionclear_Album->setIcon(QIcon(":/resources/img/icons8-delete-list-50.png"));
+    ui->actionclear_Album->setIconVisibleInMenu(true);
     connect(ui->actionclear_Album, &QAction::triggered, this, &MainWindow::clearSrcAlbum);
 
     // Picture
+    ui->actionload_Picture->setIcon(QIcon(":/resources/img/icons8-image-file-add-50"));
+    ui->actionload_Picture->setIconVisibleInMenu(true);
     ui->actionload_Picture->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_P));
     connect(ui->actionload_Picture, &QAction::triggered, this, &MainWindow::loadSingleSrcImg);
 
     // About - Info
-    aboutAct = new QAction(QIcon::fromTheme(QIcon::ThemeIcon::HelpAbout), tr("&About"), this);
+    aboutAct = new QAction(QIcon(":/resources/img/icons8-info-48.png"), tr("&About"), this);
+    aboutAct->setIconVisibleInMenu(true);
     aboutAct->setShortcuts(QKeySequence::WhatsThis);
     connect(aboutAct, &QAction::triggered, this, &MainWindow::about);
     infoMenu = menuBar()->addMenu(tr("&Info"));

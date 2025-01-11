@@ -30,6 +30,7 @@ configure_file("${CMAKE_SOURCE_DIR}/configure/rz_config.h.in"
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Concurrent)
 
 #find_package(exiv2 REQUIRED)
 find_package(exiv2 REQUIRED CONFIG NAMES exiv2)
@@ -61,7 +62,7 @@ else()
   endif()
 endif()
 
-target_link_libraries(qt_desktop-gallery PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Exiv2::exiv2lib)
+target_link_libraries(qt_desktop-gallery PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Exiv2::exiv2lib Qt${QT_VERSION_MAJOR}::Concurrent)
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1. If
