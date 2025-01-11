@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.23)
 
 project(
   qt_desktop-gallery
-  VERSION 0.4.0
+  VERSION 0.5.0
   DESCRIPTION "Desktop gallery-app to show/edit Exif/IPTC and export to WebP"
   HOMEPAGE_URL "https://github.com/Zheng-Bote/qt_desktop-gallery"
   LANGUAGES CXX)
@@ -15,7 +15,11 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_COMPILER clang++)
 
-#set(CMAKE_CXX_CLANG_TIDY clang-tidy;-header-filter=.;-checks=cppcoreguidelines-*)
+# set(CMAKE_CXX_CLANG_TIDY
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  set(CMAKE_CXX_CLANG_TIDY clang-tidy; -header-filter=.;
+                           -checks=cppcoreguidelines-*)
+endif()
 
 set(PROG_EXEC_NAME "${PROJECT_NAME}")
 set(PROG_NAME "Desktop-Gallery")
@@ -28,12 +32,11 @@ set(PROG_ORGANIZATION_DOMAIN "hase-zheng.net")
 configure_file("${CMAKE_SOURCE_DIR}/configure/rz_config.h.in"
                "${CMAKE_SOURCE_DIR}/includes/rz_config.h")
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
-find_package(Qt6 REQUIRED COMPONENTS Concurrent)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Gui)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Gui)
 
-#find_package(exiv2 REQUIRED)
-find_package(exiv2 REQUIRED CONFIG NAMES exiv2)
+# find_package(exiv2 REQUIRED)
+find_package(exiv2lib REQUIRED CONFIG NAMES exiv2)
 
 set(PROJECT_SOURCES main.cpp mainwindow.cpp mainwindow.h mainwindow.ui)
 
@@ -62,7 +65,14 @@ else()
   endif()
 endif()
 
-target_link_libraries(qt_desktop-gallery PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Exiv2::exiv2lib Qt${QT_VERSION_MAJOR}::Concurrent)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  target_link_libraries(
+    qt_desktop-gallery PRIVATE Qt${QT_VERSION_MAJOR}::Widgets exiv2lib Qt6::Gui)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+  target_link_libraries(qt_desktop-gallery
+                        PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Exiv2::exiv2lib)
+endif()
+
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1. If

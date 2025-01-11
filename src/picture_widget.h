@@ -48,7 +48,9 @@ private:
     const QList<QString> validMetaImageTypes = {"jpg", "jpeg", "png", "webp", "tiff"};
     bool checkValidMetaImg();
     void readSrcExif();
+    void markExifCopyrightCell();
     void readSrcIptc();
+    void markIptcCopyrightCell();
 
     void createRotateMenu();
     QMenu *rotateMnu;

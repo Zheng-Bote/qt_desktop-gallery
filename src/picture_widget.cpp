@@ -175,7 +175,41 @@ void PictureWidget::readSrcExif()
 
     ui->tabWidget->adjustSize();
     file.close();
-    //markExifCopyrightCell();
+    markExifCopyrightCell();
+}
+
+void PictureWidget::markExifCopyrightCell()
+{
+    QList<QTableWidgetItem *> LTempTable = ui->exifTableWidget->findItems("Copyright",
+                                                                          Qt::MatchEndsWith);
+
+    if (LTempTable.isEmpty()) {
+        ui->exifTableWidget->insertRow(ui->exifTableWidget->rowCount());
+
+        ui->exifTableWidget->setItem(ui->exifTableWidget->rowCount() - 1,
+                                     0,
+                                     new QTableWidgetItem("Exif.Image.Copyright"));
+
+        QTableWidgetItem *tlbCol2val = new QTableWidgetItem();
+        tlbCol2val->setText("");
+        //tlbCol2val->setTextAlignment(Qt::AlignRight);
+        ui->exifTableWidget->setItem(ui->exifTableWidget->rowCount() - 1, 1, tlbCol2val);
+        tlbCol2val = nullptr;
+        ui->exifTableWidget->resizeColumnsToContents();
+    }
+
+    QTableWidgetItem *rowPtr = new QTableWidgetItem();
+    LTempTable = ui->exifTableWidget->findItems("Copyright", Qt::MatchEndsWith);
+    foreach (rowPtr, LTempTable) {
+        //rowPtr->setBackground(Qt::red);
+        int rowNumber = rowPtr->row();
+        ui->exifTableWidget->item(rowNumber, 0)->setForeground(Qt::red);
+
+        if (ui->exifTableWidget->item(rowNumber, 1)->text().length() < 1) {
+            ui->exifTableWidget->item(rowNumber, 1)->setBackground(Qt::red);
+            ui->exifTableWidget->item(rowNumber, 1)->setForeground(Qt::black);
+        }
+    }
 }
 
 void PictureWidget::readSrcIptc()
@@ -243,7 +277,42 @@ void PictureWidget::readSrcIptc()
 
     ui->tabWidget->adjustSize();
     file.close();
-    //markIptcCopyrightCell();
+    markIptcCopyrightCell();
+}
+
+void PictureWidget::markIptcCopyrightCell()
+{
+    QList<QTableWidgetItem *> LTempTable = ui->iptcTableWidget->findItems("Copyright",
+                                                                          Qt::MatchEndsWith);
+
+    if (LTempTable.isEmpty()) {
+        ui->iptcTableWidget->insertRow(ui->iptcTableWidget->rowCount());
+
+        ui->iptcTableWidget->setItem(ui->iptcTableWidget->rowCount() - 1,
+                                     0,
+                                     new QTableWidgetItem("Iptc.Application2.Copyright"));
+
+        QTableWidgetItem *tlbCol2val = new QTableWidgetItem();
+        tlbCol2val->setText("");
+        //tlbCol2val->setTextAlignment(Qt::AlignRight);
+        ui->iptcTableWidget->setItem(ui->iptcTableWidget->rowCount() - 1, 1, tlbCol2val);
+
+        tlbCol2val = nullptr;
+        ui->iptcTableWidget->resizeColumnsToContents();
+    }
+
+    QTableWidgetItem *rowPtr = new QTableWidgetItem();
+    LTempTable = ui->iptcTableWidget->findItems("Copyright", Qt::MatchEndsWith);
+    foreach (rowPtr, LTempTable) {
+        //rowPtr->setBackground(Qt::red);
+        int rowNumber = rowPtr->row();
+        ui->iptcTableWidget->item(rowNumber, 0)->setForeground(Qt::red);
+
+        if (ui->iptcTableWidget->item(rowNumber, 1)->text().length() < 1) {
+            ui->iptcTableWidget->item(rowNumber, 1)->setBackground(Qt::red);
+            ui->iptcTableWidget->item(rowNumber, 1)->setForeground(Qt::black);
+        }
+    }
 }
 
 void PictureWidget::createRotateMenu()

@@ -6,6 +6,8 @@
 #include <QStandardItemModel>
 #include <QStringListModel>
 
+#include <QMouseEvent>
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -30,6 +32,8 @@ private slots:
 
     void on_listView_doubleClicked(const QModelIndex &index);
 
+    void on_listView_clicked(const QModelIndex &index);
+
 private:
     Ui::MainWindow *ui;
 
@@ -43,9 +47,12 @@ private:
 
     void fillSrcListView(QFile &srcFile);
 
-    QMenu *pictureMenu;
     QAction *loadSingleSrcImgAct;
     void showSinglePicure(QString pathToFile);
+
+    QMenu *pictureMenu;
+    QAction *removeImageAct;
+    void removeSelectedImages();
 
     QMenu *infoMenu;
     QAction *aboutAct;

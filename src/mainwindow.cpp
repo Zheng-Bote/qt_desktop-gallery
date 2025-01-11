@@ -10,10 +10,6 @@
 #include "includes/rz_photo.hpp"
 #include "mainwindow.h"
 
-#include <QThread>
-#include <QThreadPool>
-#include <QtConcurrent>
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -191,18 +187,26 @@ void MainWindow::createMenu()
     ui->actionclear_Album->setIconVisibleInMenu(true);
     connect(ui->actionclear_Album, &QAction::triggered, this, &MainWindow::clearSrcAlbum);
 
-    // Picture
     ui->actionload_Picture->setIcon(QIcon(":/resources/img/icons8-image-file-add-50"));
     ui->actionload_Picture->setIconVisibleInMenu(true);
     ui->actionload_Picture->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_P));
     connect(ui->actionload_Picture, &QAction::triggered, this, &MainWindow::loadSingleSrcImg);
 
+    // Picture
+    pictureMenu = menuBar()->addMenu(tr("Picture"));
+
+    removeImageAct = new QAction(QIcon(":/resources/img/icons8-delete-list-50.png"),
+                                 tr("remove selected"),
+                                 this);
+    connect(removeImageAct, &QAction::triggered, this, &MainWindow::removeSelectedImages);
+    pictureMenu->addAction(removeImageAct);
+
     // About - Info
-    aboutAct = new QAction(QIcon(":/resources/img/icons8-info-48.png"), tr("&About"), this);
+    aboutAct = new QAction(QIcon(":/resources/img/icons8-info-48.png"), tr("About"), this);
     aboutAct->setIconVisibleInMenu(true);
     aboutAct->setShortcuts(QKeySequence::WhatsThis);
     connect(aboutAct, &QAction::triggered, this, &MainWindow::about);
-    infoMenu = menuBar()->addMenu(tr("&Info"));
+    infoMenu = menuBar()->addMenu(tr("Info"));
     infoMenu->addAction(aboutAct);
 }
 
@@ -284,4 +288,58 @@ void MainWindow::showSinglePicure(QString pathToFile)
     PictureWidget *pictureWidget = new PictureWidget();
     pictureWidget->setImage(pathToFile);
     pictureWidget->show();
+}
+
+// TODO: clean up
+void MainWindow::removeSelectedImages()
+{
+    QModelIndexList selected = ui->listView->selectionModel()->selectedIndexes();
+    QList<QString> selectedImages;
+
+    for (QModelIndex i : selected) {
+        int row = i.row();
+        QModelIndex col2 = mContentItemModel->index(row, 1);
+        QString itemText2 = col2.data(Qt::DisplayRole).toString();
+        qDebug() << "to remove: " << itemText2 << " col: " << col2.column();
+        selectedImages.append(itemText2);
+    }
+
+    //mContentItemModel->removeRow(i.row());
+    QListIterator<QString> intItem(selectedImages);
+    while (intItem.hasNext()) {
+        QString item = intItem.next();
+        qInfo() << "has: " << item;
+        QList<QStandardItem *> items = mContentItemModel->findItems(item, Qt::MatchExactly, 1);
+        foreach (auto i, items) {
+            qInfo() << "found: " << i->row();
+            mContentItemModel->removeRow(i->row());
+        }
+    }
+
+    int rowCount = mContentItemModel->rowCount();
+    statusBarLabel->setText(QString::number(rowCount) + " " + tr("items"));
+}
+
+// TODO
+void MainWindow::on_listView_clicked(const QModelIndex &index)
+{
+    qInfo() << "on_listView_clicked: " << Qt::MouseButtons().toInt();
+
+    if (QMouseEvent::ContextMenu & Qt::LeftButton) {
+        qInfo() << "on_listView_clicked contextMenu";
+    }
+    if (Qt::MouseButtons().toInt() & Qt::RightButton) {
+        qInfo() << "on_listView_clicked context Menu mouse";
+    }
+
+    int row = index.row();
+    QModelIndex col2 = mContentItemModel->index(row, 1);
+    QString itemText2 = col2.data(Qt::DisplayRole).toString();
+    qDebug() << "clicked: " << itemText2 << " col: " << col2.column();
+    if (Qt::LeftButton) {
+        qInfo() << "left Button click: " << Qt::LeftButton;
+    }
+    if (Qt::RightButton) {
+        qInfo() << "right Button click " << Qt::RightButton;
+    }
 }
