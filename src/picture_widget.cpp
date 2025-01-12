@@ -109,9 +109,15 @@ bool PictureWidget::checkValidMetaImg()
     return ret;
 }
 
+void PictureWidget::disableMetaTabs(int tab)
+{
+    ui->tabWidget->setTabVisible(tab, false);
+}
+
 void PictureWidget::readSrcExif()
 {
     if (!checkValidMetaImg()) {
+        disableMetaTabs(1);
         return;
     }
 
@@ -127,6 +133,7 @@ void PictureWidget::readSrcExif()
     ui->exifTableWidget->insertRow(0);
     ui->exifTableWidget->insertColumn(0);
     ui->exifTableWidget->insertColumn(1);
+    ui->exifTableWidget->insertColumn(2);
 
     QTableWidgetItem *tlbCol1 = new QTableWidgetItem();
     tlbCol1->setText("EXIF key");
@@ -141,6 +148,13 @@ void PictureWidget::readSrcExif()
     tlbCol2->setFont(font_11_bold);
     tlbCol2->setTextAlignment(Qt::AlignCenter);
     ui->exifTableWidget->setHorizontalHeaderItem(1, tlbCol2);
+
+    QTableWidgetItem *tlbCol3 = new QTableWidgetItem();
+    tlbCol3->setText("EXIF description");
+    tlbCol3->setBackground(Qt::lightGray);
+    tlbCol3->setFont(font_11_bold);
+    tlbCol3->setTextAlignment(Qt::AlignCenter);
+    ui->exifTableWidget->setHorizontalHeaderItem(2, tlbCol3);
 
     ui->exifTableWidget->removeRow(0);
 
@@ -167,20 +181,38 @@ void PictureWidget::readSrcExif()
 
             ui->exifTableWidget->setItem(ui->exifTableWidget->rowCount() - 1, 1, tlbCol2val);
             tlbCol2val = nullptr;
+
+            if (exifMetaTags.contains(md->key().c_str())) {
+                QTableWidgetItem *tlbCol3val = new QTableWidgetItem();
+                tlbCol3val->setText(exifMetaTags.value(md->key().c_str(), ""));
+                ui->iptcTableWidget->setItem(ui->iptcTableWidget->rowCount() - 1, 2, tlbCol3val);
+                tlbCol3val = nullptr;
+            }
         }
     }
 
+    // check and set default meta tags, if missing
+    for (auto i = exifMetaTags.cbegin(), end = exifMetaTags.cend(); i != end; ++i) {
+        markExif(i.key());
+        //i.value()
+    }
+
+    // cleanup
+    tlbCol1 = nullptr;
+    tlbCol2 = nullptr;
+    tlbCol3 = nullptr;
+    file.close();
+
     ui->exifTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->exifTableWidget->resizeColumnsToContents();
+    ui->exifTableWidget->resizeRowsToContents();
 
     ui->tabWidget->adjustSize();
-    file.close();
-    markExifCopyrightCell();
 }
 
-void PictureWidget::markExifCopyrightCell()
+void PictureWidget::markExif(QString searchFor)
 {
-    QList<QTableWidgetItem *> LTempTable = ui->exifTableWidget->findItems("Copyright",
+    QList<QTableWidgetItem *> LTempTable = ui->exifTableWidget->findItems(searchFor,
                                                                           Qt::MatchEndsWith);
 
     if (LTempTable.isEmpty()) {
@@ -188,18 +220,24 @@ void PictureWidget::markExifCopyrightCell()
 
         ui->exifTableWidget->setItem(ui->exifTableWidget->rowCount() - 1,
                                      0,
-                                     new QTableWidgetItem("Exif.Image.Copyright"));
+                                     new QTableWidgetItem(searchFor));
 
         QTableWidgetItem *tlbCol2val = new QTableWidgetItem();
         tlbCol2val->setText("");
         //tlbCol2val->setTextAlignment(Qt::AlignRight);
         ui->exifTableWidget->setItem(ui->exifTableWidget->rowCount() - 1, 1, tlbCol2val);
         tlbCol2val = nullptr;
-        ui->exifTableWidget->resizeColumnsToContents();
+
+        if (exifMetaTags.contains(searchFor)) {
+            QTableWidgetItem *tlbCol3val = new QTableWidgetItem();
+            tlbCol3val->setText(exifMetaTags.value(searchFor, ""));
+            ui->exifTableWidget->setItem(ui->exifTableWidget->rowCount() - 1, 2, tlbCol3val);
+            tlbCol3val = nullptr;
+        }
     }
 
     QTableWidgetItem *rowPtr = new QTableWidgetItem();
-    LTempTable = ui->exifTableWidget->findItems("Copyright", Qt::MatchEndsWith);
+    LTempTable = ui->exifTableWidget->findItems(searchFor, Qt::MatchEndsWith);
     foreach (rowPtr, LTempTable) {
         //rowPtr->setBackground(Qt::red);
         int rowNumber = rowPtr->row();
@@ -215,6 +253,7 @@ void PictureWidget::markExifCopyrightCell()
 void PictureWidget::readSrcIptc()
 {
     if (!checkValidMetaImg()) {
+        disableMetaTabs(2);
         return;
     }
     QFile file(pathToImage);
@@ -229,6 +268,7 @@ void PictureWidget::readSrcIptc()
     ui->iptcTableWidget->insertRow(0);
     ui->iptcTableWidget->insertColumn(0);
     ui->iptcTableWidget->insertColumn(1);
+    ui->iptcTableWidget->insertColumn(2);
 
     QTableWidgetItem *tlbCol1 = new QTableWidgetItem();
     tlbCol1->setText("IPTC key");
@@ -243,6 +283,13 @@ void PictureWidget::readSrcIptc()
     tlbCol2->setFont(font_11_bold);
     tlbCol2->setTextAlignment(Qt::AlignCenter);
     ui->iptcTableWidget->setHorizontalHeaderItem(1, tlbCol2);
+
+    QTableWidgetItem *tlbCol3 = new QTableWidgetItem();
+    tlbCol3->setText("IPTC description");
+    tlbCol3->setBackground(Qt::lightGray);
+    tlbCol3->setFont(font_11_bold);
+    tlbCol3->setTextAlignment(Qt::AlignCenter);
+    ui->iptcTableWidget->setHorizontalHeaderItem(2, tlbCol3);
 
     ui->iptcTableWidget->removeRow(0);
 
@@ -269,15 +316,73 @@ void PictureWidget::readSrcIptc()
 
             ui->iptcTableWidget->setItem(ui->iptcTableWidget->rowCount() - 1, 1, tlbCol2val);
             tlbCol2val = nullptr;
+
+            if (iptcMetaTags.contains(md->key().c_str())) {
+                QTableWidgetItem *tlbCol3val = new QTableWidgetItem();
+                tlbCol3val->setText(iptcMetaTags.value(md->key().c_str(), ""));
+                ui->iptcTableWidget->setItem(ui->iptcTableWidget->rowCount() - 1, 2, tlbCol3val);
+                tlbCol3val = nullptr;
+            }
         }
     }
 
+    // check and set default meta tags, if missing
+    for (auto i = iptcMetaTags.cbegin(), end = iptcMetaTags.cend(); i != end; ++i) {
+        markIptc(i.key());
+        //i.value()
+    }
+
+    // cleanup
+    tlbCol1 = nullptr;
+    tlbCol2 = nullptr;
+    tlbCol3 = nullptr;
+    file.close();
+
     ui->iptcTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->iptcTableWidget->resizeColumnsToContents();
+    ui->iptcTableWidget->resizeRowsToContents();
 
     ui->tabWidget->adjustSize();
-    file.close();
-    markIptcCopyrightCell();
+}
+
+void PictureWidget::markIptc(QString searchFor)
+{
+    QList<QTableWidgetItem *> LTempTable = ui->iptcTableWidget->findItems(searchFor,
+                                                                          Qt::MatchEndsWith);
+
+    if (LTempTable.isEmpty()) {
+        ui->iptcTableWidget->insertRow(ui->iptcTableWidget->rowCount());
+
+        ui->iptcTableWidget->setItem(ui->iptcTableWidget->rowCount() - 1,
+                                     0,
+                                     new QTableWidgetItem(searchFor));
+
+        QTableWidgetItem *tlbCol2val = new QTableWidgetItem();
+        tlbCol2val->setText("");
+        //tlbCol2val->setTextAlignment(Qt::AlignRight);
+        ui->iptcTableWidget->setItem(ui->iptcTableWidget->rowCount() - 1, 1, tlbCol2val);
+        tlbCol2val = nullptr;
+
+        if (iptcMetaTags.contains(searchFor)) {
+            QTableWidgetItem *tlbCol3val = new QTableWidgetItem();
+            tlbCol3val->setText(iptcMetaTags.value(searchFor, ""));
+            ui->iptcTableWidget->setItem(ui->iptcTableWidget->rowCount() - 1, 2, tlbCol3val);
+            tlbCol3val = nullptr;
+        }
+    }
+
+    QTableWidgetItem *rowPtr = new QTableWidgetItem();
+    LTempTable = ui->iptcTableWidget->findItems(searchFor, Qt::MatchEndsWith);
+    foreach (rowPtr, LTempTable) {
+        //rowPtr->setBackground(Qt::red);
+        int rowNumber = rowPtr->row();
+        ui->iptcTableWidget->item(rowNumber, 0)->setForeground(Qt::red);
+
+        if (ui->iptcTableWidget->item(rowNumber, 1)->text().length() < 1) {
+            ui->iptcTableWidget->item(rowNumber, 1)->setBackground(Qt::red);
+            ui->iptcTableWidget->item(rowNumber, 1)->setForeground(Qt::black);
+        }
+    }
 }
 
 void PictureWidget::markIptcCopyrightCell()
@@ -455,7 +560,14 @@ void PictureWidget::on_iptcTableWidget_itemDoubleClicked(QTableWidgetItem *item)
     int row = item->row();
     qDebug() << "row: " << row << " val 0: " << ui->iptcTableWidget->item(row, 0)->text();
 
-    //setOkButtonText("save");
+    /* KISS
+    QInputDialog inDialog(this);
+    inDialog.setOkButtonText("save");
+    inDialog.setLabelText(ui->iptcTableWidget->item(row, 0)->text());
+    inDialog.setTextValue(ui->iptcTableWidget->item(row, 1)->text());
+    inDialog.setTextEchoMode(QLineEdit::Normal);
+    */
+
     QString text = QInputDialog::getText(this,
                                          tr("Edit Metadata"),
                                          tr("Please enter the new value for") + " "
