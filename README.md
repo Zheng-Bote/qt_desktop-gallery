@@ -14,22 +14,20 @@
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
 **Table of Contents**
 
 - [Description](#description)
-  - [Features](#features)
+    - [Features](#features)
   - [Status](#status)
     - [Application / Tool](#application--tool)
-    - [Documentation](#documentation)
-      - [README](#readme)
-      - [other Markdown files](#other-markdown-files)
-- [Installation](#installation)
-  - [Dependencies](#dependencies)
-  - [folder structure](#folder-structure)
-  - [Usage/Examples/Tests](#usageexamplestests)
-- [Documentation](#documentation-1)
+- [Documentation](#documentation)
   - [Screenshots](#screenshots)
+    - [Album view](#album-view)
+    - [Image detail view](#image-detail-view)
+      - [Image rotate](#image-rotate)
+      - [Image export to WebP](#image-export-to-webp)
+      - [Image Exif data show/edit _(double click a row to edit/modify value)_](#image-exif-data-showedit-double-click-a-row-to-editmodify-value)
+      - [Image IPTC data show/edit _(double click a row to edit/modify value)_](#image-iptc-data-showedit-double-click-a-row-to-editmodify-value)
 - [Authors and License](#authors-and-license)
   - [License](#license)
   - [Authors](#authors)
