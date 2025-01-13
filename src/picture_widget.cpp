@@ -5,6 +5,11 @@
 
 #include <exiv2/exiv2.hpp>
 
+#include <QFuture>
+#include <QFutureWatcher>
+#include <QThread>
+#include <QtConcurrent>
+
 PictureWidget::PictureWidget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::PictureWidget)
@@ -41,8 +46,10 @@ void PictureWidget::setImage(QString pathToFile)
     ui->picture_label->setPixmap(
         picture->scaled(ui->picture_label->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
-    readSrcExif();
-    readSrcIptc();
+    QFuture<void> futureExif = QtConcurrent::run(&PictureWidget::readSrcExif, this);
+    QFuture<void> futureIptc = QtConcurrent::run(&PictureWidget::readSrcIptc, this);
+    //readSrcExif();
+    //readSrcIptc();
     ui->tabWidget->setCurrentWidget(0);
 }
 
@@ -114,7 +121,7 @@ void PictureWidget::disableMetaTabs(int tab)
     ui->tabWidget->setTabVisible(tab, false);
 }
 
-void PictureWidget::readSrcExif()
+const void PictureWidget::readSrcExif()
 {
     if (!checkValidMetaImg()) {
         disableMetaTabs(1);
@@ -250,7 +257,7 @@ void PictureWidget::markExif(QString searchFor)
     }
 }
 
-void PictureWidget::readSrcIptc()
+const void PictureWidget::readSrcIptc()
 {
     if (!checkValidMetaImg()) {
         disableMetaTabs(2);
@@ -434,19 +441,21 @@ void PictureWidget::createRotateMenu()
     connect(rotate_90, &QAction::triggered, this, [this] { PictureWidget::rotateSrcImg(90); });
     rotateMnu->addAction(rotate_90);
 
-    rotate_m90 = new QAction(QIcon(":/resources/img/icons8-rotate-left-50.png"),
-                             tr("rotate") + " -90°",
-                             this);
-    rotate_m90->setIconVisibleInMenu(true);
-    connect(rotate_m90, &QAction::triggered, this, [this] { PictureWidget::rotateSrcImg(-90); });
-    rotateMnu->addAction(rotate_m90);
-
     rotate_120 = new QAction(QIcon(":/resources/img/icons8-rotate-right-50.png"),
                              tr("rotate") + " 120°",
                              this);
     rotate_120->setIconVisibleInMenu(true);
     connect(rotate_120, &QAction::triggered, this, [this] { PictureWidget::rotateSrcImg(120); });
     rotateMnu->addAction(rotate_120);
+
+    rotateMnu->addSeparator();
+
+    rotate_m90 = new QAction(QIcon(":/resources/img/icons8-rotate-left-50.png"),
+                             tr("rotate") + " -90°",
+                             this);
+    rotate_m90->setIconVisibleInMenu(true);
+    connect(rotate_m90, &QAction::triggered, this, [this] { PictureWidget::rotateSrcImg(-90); });
+    rotateMnu->addAction(rotate_m90);
 
     rotate_m120 = new QAction(QIcon(":/resources/img/icons8-rotate-left-50.png"),
                               tr("rotate") + " -120°",
@@ -497,7 +506,7 @@ void PictureWidget::createExportMenu()
                                 this);
     webp_size_all->setIconVisibleInMenu(true);
     connect(webp_size_all, &QAction::triggered, this, [this] {
-        PictureWidget::exportSrcImgToWebP();
+        PictureWidget::exportSrcImgToWebpThread();
     });
     exportMnu->addAction(webp_size_all);
 
@@ -610,7 +619,7 @@ void PictureWidget::exportSrcImgToWebP()
     QMessageBox msgBox(this);
     msgBox.setTextFormat(Qt::RichText);
     QString text = tr("WebP export to subfolder WebP");
-
+    /*
     Photo *photo = new Photo(pathToImage);
     if (!photo->convertImages()) {
         msgBox.setWindowTitle(tr("Error"));
@@ -626,6 +635,34 @@ void PictureWidget::exportSrcImgToWebP()
     msgBox.setFixedWidth(900);
     msgBox.exec();
     photo = nullptr;
+*/
+}
+
+void PictureWidget::exportSrcImgToWebpThread()
+{
+    bool oknok{false};
+    //Photo *photo = new Photo(pathToImage);
+    Photo phot(pathToImage);
+    QFuture<bool> future = QtConcurrent::run(&Photo::convertImages, phot, 75);
+
+    oknok = future.result();
+
+    QMessageBox msgBox(this);
+    msgBox.setTextFormat(Qt::RichText);
+    QString text = tr("WebP export to subfolder WebP");
+    if (!oknok) {
+        msgBox.setWindowTitle(tr("Error"));
+        msgBox.setIcon(QMessageBox::Warning);
+        text += " " + tr("failed");
+    } else {
+        msgBox.setWindowTitle(tr("Success"));
+        msgBox.setIcon(QMessageBox::Information);
+        text += " " + tr("successfull");
+    }
+    msgBox.setText(text);
+    msgBox.setInformativeText("<i>" + pathToImage + "</i>");
+    msgBox.setFixedWidth(900);
+    msgBox.exec();
 }
 
 void PictureWidget::exportSrcImgToWebP(int size)

@@ -2,6 +2,7 @@
 
 #include <QFile>
 #include <QLabel>
+#include <QList>
 #include <QMainWindow>
 #include <QStandardItemModel>
 #include <QStringListModel>
@@ -45,7 +46,8 @@ private:
     QStandardItemModel *mContentItemModel;
     const unsigned int THUMBNAIL_SIZE = 300;
 
-    void fillSrcListView(QFile &srcFile);
+    const void fillSrcListView(QFile &srcFile);
+    const void fillSrcListViewThread(const QList<QString> &srcFiles);
 
     QAction *loadSingleSrcImgAct;
     void showSinglePicure(QString pathToFile);
@@ -60,4 +62,6 @@ private:
 
     void initListview();
     void initStatusBar();
+
+    QAction *readRekFolderTest;
 };

@@ -32,10 +32,26 @@ private slots:
 
     void rotateSrcImg(int val);
     void exportSrcImgToWebP();
+    void exportSrcImgToWebpThread();
     void exportSrcImgToWebP(int size);
 
 private:
     Ui::PictureWidget *ui;
+
+    void createRotateMenu();
+    QMenu *rotateMnu;
+    QAction *rotate_90;
+    QAction *rotate_m90;
+    QAction *rotate_120;
+    QAction *rotate_m120;
+
+    void createExportMenu();
+    QMenu *exportMnu;
+    QAction *webp_size_all;
+    QAction *webp_size_480;
+    QAction *webp_size_640;
+    QAction *webp_size_800;
+
     void resizeEvent(QResizeEvent *event);
     void closeEvent(QCloseEvent *event);
 
@@ -48,7 +64,12 @@ private:
     const QList<QString> validMetaImageTypes = {"jpg", "jpeg", "png", "webp", "tiff"};
     bool checkValidMetaImg();
     void disableMetaTabs(int tab);
-    void readSrcExif();
+    const void readSrcExif();
+    void markIptc(QString searchFor);
+    void markIptcCopyrightCell();
+    void markExif(QString searchFor);
+    const void readSrcIptc();
+
     const QMap<QString, QString> exifMetaTags{
         {"Exif.Image.DocumentName",
          "The name of the document from which this image was scanned."
@@ -154,9 +175,7 @@ private:
          "This tag records the name of the photographer."
          "\n"
          "(Ascii)"}};
-    void markExif(QString searchFor);
 
-    void readSrcIptc();
     const QMap<QString, QString> iptcMetaTags{
         {"Iptc.Application2.Subject",
          "The Subject Reference is a structured definition of the subject matter."
@@ -271,20 +290,4 @@ private:
          "e.g. to various editorial desks."
          "\n"
          "(3B)"}};
-    void markIptc(QString searchFor);
-    void markIptcCopyrightCell();
-
-    void createRotateMenu();
-    QMenu *rotateMnu;
-    QAction *rotate_90;
-    QAction *rotate_m90;
-    QAction *rotate_120;
-    QAction *rotate_m120;
-
-    void createExportMenu();
-    QMenu *exportMnu;
-    QAction *webp_size_all;
-    QAction *webp_size_480;
-    QAction *webp_size_640;
-    QAction *webp_size_800;
 };

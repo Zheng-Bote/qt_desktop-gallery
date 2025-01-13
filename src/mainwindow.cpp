@@ -10,6 +10,11 @@
 #include "includes/rz_photo.hpp"
 #include "mainwindow.h"
 
+#include <QFuture>
+#include <QFutureWatcher>
+#include <QThread>
+#include <QtConcurrent>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -32,36 +37,31 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::openReadFolder()
+void MainWindow::openSrcFolderRekursive()
 {
-    QDir dir = QFileDialog::getExistingDirectory(this,
-                                                 tr("Open Folder"),
-                                                 QDir::homePath(),
-                                                 QFileDialog::ShowDirsOnly
-                                                     | QFileDialog::DontResolveSymlinks);
+    //statusBarLabel->setText("openReadFolder");
+    QString dir = QFileDialog::getExistingDirectory(this,
+                                                    tr("Open Folder"),
+                                                    QDir::homePath(),
+                                                    QFileDialog::ShowDirsOnly
+                                                        | QFileDialog::DontResolveSymlinks);
 
-    QStringList filenames = dir.entryList(QStringList() << "*.jpg" << "*.jpeg" << "*.png" << "*.bmp"
-                                                        << "*.tiff",
-                                          QDir::Files | QDir::NoSymLinks | QDir::NoDot
-                                              | QDir::Readable);
-    if (!filenames.isEmpty()) {
-        for (auto filename : filenames) {
-            QPixmap pixmap(dir.absoluteFilePath(filename));
-            QStandardItem *listitem = new QStandardItem();
-            listitem->setIcon(pixmap);
-            listitem->setText(filename + "\nschaun wa ma");
-            listitem->setToolTip(filename);
-            listitem->setBackground(Qt::lightGray);
-            listitem->setEditable(false);
+    Photo phot;
+    QFutureWatcher<QList<QString>> watcher;
+    QFuture<QList<QString>> future = QtConcurrent::run(&Photo::srcPicsRecursive, phot, dir);
+    watcher.setFuture(future);
+    watcher.waitForFinished();
+    QList<QString> result = future.result();
 
-            QList<QStandardItem *> items;
-            items.append(listitem);
-            items.append(new QStandardItem(dir.absoluteFilePath(filename)));
-            mContentItemModel->appendRow(items);
+    qDebug() << "found: " << result.size();
+    ui->album_label->setText(tr("processing") + " " + QString::number(result.size()) + " "
+                             + tr("items") + "...");
+    statusBarLabel->setText(tr("processing") + " " + QString::number(result.size()) + " "
+                            + tr("items") + "...");
 
-            //mContentItemModel->appendRow(listitem);
-        }
-    }
+    QFuture<void> futureListView = QtConcurrent::run(&MainWindow::fillSrcListViewThread,
+                                                     this,
+                                                     result);
 }
 
 void MainWindow::openSrcFolder()
@@ -72,6 +72,24 @@ void MainWindow::openSrcFolder()
                                                         QFileDialog::ShowDirsOnly
                                                             | QFileDialog::DontResolveSymlinks);
 
+    Photo phot;
+    QFutureWatcher<QList<QString>> watcher;
+    QFuture<QList<QString>> future = QtConcurrent::run(&Photo::srcPics, phot, srcPath);
+    watcher.setFuture(future);
+    watcher.waitForFinished();
+    QList<QString> result = future.result();
+
+    qDebug() << "found: " << result.size();
+    ui->album_label->setText(tr("processing") + " " + QString::number(result.size()) + " "
+                             + tr("items") + "...");
+    statusBarLabel->setText(tr("processing") + " " + QString::number(result.size()) + " "
+                            + tr("items") + "...");
+
+    QFuture<void> futureListView = QtConcurrent::run(&MainWindow::fillSrcListViewThread,
+                                                     this,
+                                                     result);
+
+    /*
     QDirIterator srcPics(srcPath,
                          {"*.jpg", "*.jpeg", "*.png", "*.bmp", "*.tiff"},
                          QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Readable);
@@ -80,9 +98,10 @@ void MainWindow::openSrcFolder()
         QFile srcFile(srcPics.next());
         fillSrcListView(srcFile);
     }
+    */
 }
 
-void MainWindow::openSrcFolderRekursive()
+void MainWindow::openReadFolder()
 {
     //    qInfo() << "openSrcFolderRekursive on: " << QThread::currentThread();
 
@@ -97,8 +116,12 @@ void MainWindow::openSrcFolderRekursive()
                          QDir::Files,
                          QDirIterator::Subdirectories);
 
+    qDebug() << "QDiroperator: " << srcPath;
+
     while (srcPics.hasNext()) {
         QFile srcFile(srcPics.next());
+        qDebug() << "while: " << srcFile.fileName();
+        statusBarLabel->setText("loading " + srcFile.fileName());
         fillSrcListView(srcFile);
     }
 }
@@ -194,6 +217,7 @@ void MainWindow::createMenu()
 
     // Picture
     pictureMenu = menuBar()->addMenu(tr("Picture"));
+    pictureMenu->addAction(ui->actionload_Picture);
 
     removeImageAct = new QAction(QIcon(":/resources/img/icons8-delete-list-50.png"),
                                  tr("remove selected"),
@@ -257,7 +281,7 @@ void MainWindow::on_listView_doubleClicked(const QModelIndex &index)
     }
 }
 
-void MainWindow::fillSrcListView(QFile &srcFile)
+const void MainWindow::fillSrcListView(QFile &srcFile)
 {
     QFileInfo fileInfo(srcFile.fileName());
 
@@ -275,6 +299,39 @@ void MainWindow::fillSrcListView(QFile &srcFile)
     items.append(new QStandardItem(pathToFile));
     mContentItemModel->appendRow(items);
 
+    ui->album_label->setFont(*font_10);
+    ui->album_label->setText(tr("Doubleclick on a picture for details. Press CTRL and click to "
+                                "select one or more pictures."));
+
+    int rowCount = mContentItemModel->rowCount();
+    statusBarLabel->setText(QString::number(rowCount) + " " + tr("items"));
+}
+
+const void MainWindow::fillSrcListViewThread(const QList<QString> &srcFiles)
+{
+    QListIterator<QString> i(srcFiles);
+    while (i.hasNext()) {
+        QFile srcFile(i.next());
+
+        qDebug() << "MainWindow::fillSrcListViewTest: " << srcFile.fileName();
+        statusBarLabel->setText(tr("add") + srcFile.fileName());
+
+        QFileInfo fileInfo(srcFile.fileName());
+
+        QString pathToFile = fileInfo.absolutePath() + "/" + fileInfo.fileName();
+        QPixmap pixmap(pathToFile);
+        QStandardItem *listitem = new QStandardItem();
+        listitem->setIcon(pixmap);
+        listitem->setText(fileInfo.fileName() + "\nschaun wa ma");
+        listitem->setToolTip(pathToFile);
+        listitem->setBackground(Qt::lightGray);
+        listitem->setEditable(false);
+
+        QList<QStandardItem *> items;
+        items.append(listitem);
+        items.append(new QStandardItem(pathToFile));
+        mContentItemModel->appendRow(items);
+    }
     ui->album_label->setFont(*font_10);
     ui->album_label->setText(tr("Doubleclick on a picture for details. Press CTRL and click to "
                                 "select one or more pictures."));

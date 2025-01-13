@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.23)
 
 project(
   qt_desktop-gallery
-  VERSION 0.6.0
+  VERSION 0.7.0
   DESCRIPTION "Desktop gallery-app to show/edit Exif/IPTC and export to WebP"
   HOMEPAGE_URL "https://github.com/Zheng-Bote/qt_desktop-gallery"
   LANGUAGES CXX)
@@ -17,8 +17,8 @@ set(CMAKE_CXX_COMPILER clang++)
 
 # set(CMAKE_CXX_CLANG_TIDY
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  set(CMAKE_CXX_CLANG_TIDY clang-tidy; -header-filter=.;
-                           -checks=cppcoreguidelines-*)
+  # set(CMAKE_CXX_CLANG_TIDY clang-tidy; -header-filter=.;
+  # -checks=cppcoreguidelines-*)
 endif()
 
 set(PROG_EXEC_NAME "${PROJECT_NAME}")
@@ -34,6 +34,7 @@ configure_file("${CMAKE_SOURCE_DIR}/configure/rz_config.h.in"
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Gui)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Gui)
+find_package(Qt6 REQUIRED COMPONENTS Concurrent)
 
 # find_package(exiv2 REQUIRED)
 find_package(exiv2lib REQUIRED CONFIG NAMES exiv2)
@@ -67,10 +68,12 @@ endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   target_link_libraries(
-    qt_desktop-gallery PRIVATE Qt${QT_VERSION_MAJOR}::Widgets exiv2lib Qt6::Gui)
+    qt_desktop-gallery PRIVATE Qt${QT_VERSION_MAJOR}::Widgets exiv2lib Qt6::Gui
+                               Qt6::Concurrent)
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-  target_link_libraries(qt_desktop-gallery
-                        PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Exiv2::exiv2lib)
+  target_link_libraries(
+    qt_desktop-gallery PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Exiv2::exiv2lib
+                               Qt6::Concurrent)
 endif()
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)

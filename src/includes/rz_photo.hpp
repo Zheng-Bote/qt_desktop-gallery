@@ -30,13 +30,14 @@ public:
     ~Photo();
 
     bool convertImage(const int &targetSize, const int &quality = 75);
-    bool convertImages(const int &quality = 75);
+    const bool convertImages(const int &quality = 75);
     bool rotateImage(const int &turn);
     QList<int> getWebSizes();
 
     QString getSuffix();
 
-    QList<QString> srcPics(QString &srcPath);
+    QList<QString> srcPics(const QString &srcPath);
+    QList<QString> srcPicsRecursive(const QString &srcPath);
 
 private:
     const QList<QString> validMetaImageTypes = {"jpg", "jpeg", "png", "webp", "tiff"};

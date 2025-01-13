@@ -14,10 +14,11 @@
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
 **Table of Contents**
 
 - [Description](#description)
-    - [Features](#features)
+  - [Features](#features)
   - [Status](#status)
     - [Application / Tool](#application--tool)
     - [Documentation](#documentation)
@@ -45,13 +46,15 @@
 
 Desktop Gallery-Application for Linux, MacOS and Windows to show/edit Exif/IPTC and export to WebP
 
+Optimized for large Albums (multithreaded iterations)
+
 ### Features
 
 - \[ ] advanced-super-extra-special feature xyz
 
   <br>
 
-- \[x] OSS and license
+- \[x] FOSS and license
 - \[x] works as designed
 - \[ ] no bugs
 
@@ -70,6 +73,7 @@ Desktop Gallery-Application for Linux, MacOS and Windows to show/edit Exif/IPTC 
 - \[ ] runs on iOS
 - \[ ] runs on Android
 - \[ ] runs on HarmonyOS
+- \[ ] Muli-Language support (i18n)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -83,132 +87,43 @@ Desktop Gallery-Application for Linux, MacOS and Windows to show/edit Exif/IPTC 
 ![GitHub Issues](https://img.shields.io/github/issues/Zheng-Bote/qt_desktop-gallery)
 ![GitHub Pull Requests](https://img.shields.io/github/issues-pr/Zheng-Bote/qt_desktop-gallery)
 
-### Documentation
-
-_see also:_ [Application Documentation](#documentation)
-
-#### README
-
-[![Repo - create Repo-Tree in README.md](https://github.com/Zheng-Bote/qt_desktop-gallery/actions/workflows/repo-create_tree_readme.yml/badge.svg)](https://github.com/Zheng-Bote/qt_desktop-gallery/actions/workflows/repo-create_tree_readme.yml)
-[![Repo - add Actions In/Out to README](https://github.com/Zheng-Bote/qt_desktop-gallery/actions/workflows/repo-actions_docu.yml/badge.svg)](https://github.com/Zheng-Bote/qt_desktop-gallery/actions/workflows/repo-actions_docu.yml)
-
-[![Repo - update Readme](https://github.com/Zheng-Bote/qt_desktop-gallery/actions/workflows/repo-call_Readme.yml/badge.svg)](https://github.com/Zheng-Bote/qt_desktop-gallery/actions/workflows/repo-call_Readme.yml)
-
-#### other Markdown files
-
-[![Repo - create TOC of Markdown files](https://github.com/Zheng-Bote/qt_desktop-gallery/actions/workflows/repo-create_doctoc_md.yml/badge.svg)](https://github.com/Zheng-Bote/qt_desktop-gallery/actions/workflows/repo-create_doctoc_md.yml)
-
-create ToC in Markdown files in folders
-
-- .github/actions/\*\*
-- .github/workflows/\*\*
-- dist/\*\*
-- docs/\*\*
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-# Installation
-
-bla bla ... everything easy and green with No Code/Low code and without any costs
-
-## Dependencies
-
-bla bla ... with a little help from my friends
-
-## folder structure
-
-<!-- readme-tree start -->
-```
-.
-├── .github
-│   ├── actions
-│   │   └── doctoc
-│   │       ├── README.md
-│   │       ├── action.yml
-│   │       └── dist
-│   │           ├── index.js
-│   │           ├── index.js.map
-│   │           ├── licenses.txt
-│   │           └── sourcemap-register.js
-│   └── workflows
-│       ├── ghp-call_Readme.yml
-│       ├── ghp-create_doctoc.yml
-│       ├── ghp-markdown_index.yml
-│       ├── repo-actions_docu.yml
-│       ├── repo-call_Readme.yml
-│       ├── repo-create_doctoc.yml_
-│       ├── repo-create_doctoc_md.yml
-│       └── repo-create_tree_readme.yml
-├── .gitignore
-├── LICENSE
-├── README.md
-├── docs
-│   └── img
-│       ├── 00_en.png
-│       ├── 01_en.png
-│       ├── exif_en.png
-│       ├── exif_meta_edit.png
-│       ├── rotate_en.png
-│       └── webp_en.png
-├── src
-│   ├── CMakeLists.txt
-│   ├── configure
-│   │   ├── ClangTidy.cmake
-│   │   ├── Doxygen.cmake
-│   │   ├── extra_headers
-│   │   └── rz_config.h.in
-│   ├── includes
-│   │   ├── rz_config.h
-│   │   ├── rz_photo.cpp
-│   │   └── rz_photo.hpp
-│   ├── main.cpp
-│   ├── mainwindow.cpp
-│   ├── mainwindow.h
-│   ├── mainwindow.ui
-│   ├── picture_widget.cpp
-│   ├── picture_widget.h
-│   ├── picture_widget.ui
-│   ├── resources
-│   │   └── img
-│   │       ├── qt_desktop-gallery.jpg
-│   │       ├── qt_desktop-gallery.png
-│   │       └── qt_desktop-gallery_32x31.png
-│   └── resources.qrc
-└── tree.bak
-
-12 directories, 43 files
-```
-<!-- readme-tree end -->
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-## Usage/Examples/Tests
-
-bla bla ... usage is intuitive and runs mostly automatically with no needs of any knowledge
-
-```HTML
-<mark> under construction </mark>
-```
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
 # Documentation
 
-see also: <https://linktodocumentation>
-
 ## Screenshots
+
+### Album view
 
 ![App Screenshot](./docs/img/00_en.png)
 
 ![App Screenshot](./docs/img/01_en.png)
 
-![App Screenshot](./docs/img/exif_en.png)
+![App Screenshot](./docs/img/00_en_linux.png)
 
-![App Screenshot](./docs/img/exif_meta_edit.png)
+### Image detail view
+
+#### Image rotate
 
 ![App Screenshot](./docs/img/rotate_en.png)
 
+#### Image export to WebP
+
 ![App Screenshot](./docs/img/webp_en.png)
+
+#### Image Exif data show/edit _(double click a row to edit/modify value)_
+
+![App Screenshot](./docs/img/exif_en.png)
+
+**mark important fields, with explanation**
+
+![App Screenshot](./docs/img/exif_en_2.png)
+
+#### Image IPTC data show/edit _(double click a row to edit/modify value)_
+
+![App Screenshot](./docs/img/exif_meta_edit.png)
+
+**mark important fields, with explanation** _(double click a row to edit/modify value)_
+
+![App Screenshot](./docs/img/iptc_en_1.png)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 

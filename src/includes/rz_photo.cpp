@@ -8,6 +8,8 @@
 #include <QDirIterator>
 #include <QFileDialog>
 
+#include <QMessageBox>
+
 Photo::Photo() {}
 
 Photo::Photo(const QString &imageInput)
@@ -143,7 +145,7 @@ bool Photo::convertImage(const int &targetSize, const int &quality)
     return true;
 }
 
-bool Photo::convertImages(const int &quality)
+const bool Photo::convertImages(const int &quality)
 {
     bool ret{false};
     for (const auto &size : imgStruct.webpSizes) {
@@ -191,7 +193,21 @@ QString Photo::getSuffix()
     return imgStruct.fileSuffix;
 }
 
-QList<QString> Photo::srcPics(QString &srcPath)
+QList<QString> Photo::srcPics(const QString &srcPath)
+{
+    QDirIterator srcPics(srcPath,
+                         {"*.jpg", "*.jpeg", "*.png", "*.bmp", "*.tiff"},
+                         QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Readable);
+
+    QList<QString> fileList;
+    while (srcPics.hasNext()) {
+        fileList.append(srcPics.next());
+    }
+
+    return fileList;
+}
+
+QList<QString> Photo::srcPicsRecursive(const QString &srcPath)
 {
     QDirIterator srcPics(srcPath,
                          {"*.jpg", "*.jpeg", "*.png", "*.bmp", "*.tiff"},
