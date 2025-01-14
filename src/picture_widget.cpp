@@ -35,13 +35,19 @@ PictureWidget::~PictureWidget()
 
 void PictureWidget::setImage(QString pathToFile)
 {
+    QString pictureData{};
+
     pathToImage = pathToFile;
     QFile srcFile(pathToFile);
     QFileInfo fileInfo(srcFile.fileName());
 
-    ui->filename_label->setText(fileInfo.fileName());
-    ui->filename_label->setToolTip(pathToFile);
     picture = new QPixmap(pathToImage);
+
+    pictureData = fileInfo.fileName() + " \n(" + QString::number(picture->width()) + "x"
+                  + QString::number(picture->height()) + " "
+                  + QString::number(fileInfo.size() / 1024) + " KiB)";
+    ui->filename_label->setText(pictureData);
+    ui->filename_label->setToolTip(pathToFile);
 
     ui->picture_label->setPixmap(
         picture->scaled(ui->picture_label->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
@@ -102,10 +108,10 @@ bool PictureWidget::checkValidMetaImg()
     Photo *photo = new Photo(pathToImage);
     QString photoExtension = photo->getSuffix().toLower();
 
-    qDebug() << "checkValidMetaImg Extension: " << photoExtension;
+    //qDebug() << "checkValidMetaImg Extension: " << photoExtension;
 
     if (validMetaImageTypes.contains(photoExtension)) {
-        qDebug() << "checkValidMetaImg has: " << photoExtension;
+        //  qDebug() << "checkValidMetaImg has: " << photoExtension;
         ret = true;
     } else {
         qDebug() << "checkValidMetaImg has no: " << photoExtension;
@@ -513,7 +519,7 @@ void PictureWidget::createExportMenu()
     ui->exportSrcToWebp_Btn->setMenu(exportMnu);
 }
 
-void PictureWidget::on_resizeSmallerImage_Btn_clicked()
+void PictureWidget::_on_resizeSmallerImage_Btn_clicked()
 {
     /*
     int wSize = ui->picture_label->width();
@@ -526,7 +532,7 @@ void PictureWidget::on_resizeSmallerImage_Btn_clicked()
     resize(width() - 100, height() - 100);
 }
 
-void PictureWidget::on_resizeBiggerImage_Btn_clicked()
+void PictureWidget::_on_resizeBiggerImage_Btn_clicked()
 {
     resize(width() + 100, height() + 100);
 }

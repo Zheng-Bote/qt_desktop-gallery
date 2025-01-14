@@ -24,8 +24,8 @@ public:
 private slots:
     void on_closeBtn_clicked();
 
-    void on_resizeSmallerImage_Btn_clicked();
-    void on_resizeBiggerImage_Btn_clicked();
+    void _on_resizeSmallerImage_Btn_clicked();
+    void _on_resizeBiggerImage_Btn_clicked();
 
     void on_exifTableWidget_itemDoubleClicked(QTableWidgetItem *item);
     void on_iptcTableWidget_itemDoubleClicked(QTableWidgetItem *item);

@@ -28,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
     //setWindowIcon(QIcon(":/res/images/icon.png"));
 
     createMenu();
+    createLanguageMenu();
     initListview();
     initStatusBar();
 }
@@ -54,6 +55,10 @@ void MainWindow::openSrcFolderRekursive()
     QList<QString> result = future.result();
 
     qDebug() << "found: " << result.size();
+    if (result.size() > ALBUM_LIMIT) {
+        showAlbumLimitMsg(result.size());
+        return;
+    }
     ui->album_label->setText(tr("processing") + " " + QString::number(result.size()) + " "
                              + tr("items") + "...");
     statusBarLabel->setText(tr("processing") + " " + QString::number(result.size()) + " "
@@ -80,6 +85,11 @@ void MainWindow::openSrcFolder()
     QList<QString> result = future.result();
 
     qDebug() << "found: " << result.size();
+    if (result.size() > ALBUM_LIMIT) {
+        showAlbumLimitMsg(result.size());
+        return;
+    }
+
     ui->album_label->setText(tr("processing") + " " + QString::number(result.size()) + " "
                              + tr("items") + "...");
     statusBarLabel->setText(tr("processing") + " " + QString::number(result.size()) + " "
@@ -155,13 +165,19 @@ void MainWindow::clearSrcAlbum()
     if (response == QMessageBox::Yes) {
         try {
             mContentItemModel->clear();
+            resetDefaultMeta();
+            refreshStatusBar();
         } catch (...) {
             qDebug() << "clearSrcAlbum: something went wrong";
         }
-
-        //statusBarLabel->setText("0 " + tr("items"));
-        statusBarLabel->setText("v" + qApp->applicationVersion());
     }
+}
+
+void MainWindow::removeSelectedImageFromAlbum(const QModelIndex &index)
+{
+    mContentItemModel->removeRow(index.row());
+    resetDefaultMeta();
+    refreshStatusBar();
 }
 
 void MainWindow::about()
@@ -215,15 +231,61 @@ void MainWindow::createMenu()
     ui->actionload_Picture->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_P));
     connect(ui->actionload_Picture, &QAction::triggered, this, &MainWindow::loadSingleSrcImg);
 
-    // Picture
-    pictureMenu = menuBar()->addMenu(tr("Picture"));
-    pictureMenu->addAction(ui->actionload_Picture);
+    // Pictures
+    pictureMenu = menuBar()->addMenu(tr("Pictures"));
+    //pictureMenu->addAction(ui->actionload_Picture);
 
-    removeImageAct = new QAction(QIcon(":/resources/img/icons8-delete-list-50.png"),
-                                 tr("remove selected"),
-                                 this);
-    connect(removeImageAct, &QAction::triggered, this, &MainWindow::removeSelectedImages);
-    pictureMenu->addAction(removeImageAct);
+    showDefaultExifAct = new QAction(QIcon(":/resources/img/icons8-edit-file-50.png"),
+                                     tr("show default Exif meta data"),
+                                     this);
+    //showDefaultExifAct->setDisabled(true);
+    connect(showDefaultExifAct, &QAction::triggered, this, &MainWindow::showDefaultExifMeta);
+    pictureMenu->addAction(showDefaultExifAct);
+
+    clearDefaultExifAct = new QAction(QIcon(":/resources/img/icons8-file-elements-50.png"),
+                                      tr("clear default Exif meta data"),
+                                      this);
+    connect(clearDefaultExifAct, &QAction::triggered, this, &MainWindow::clearDefaultExifMeta);
+    pictureMenu->addAction(clearDefaultExifAct);
+
+    pictureMenu->addSeparator();
+
+    showDefaultIptcAct = new QAction(QIcon(":/resources/img/icons8-edit-file-50.png"),
+                                     tr("show default IPTC meta data"),
+                                     this);
+    //showDefaultIptcAct->setDisabled(true);
+    connect(showDefaultIptcAct, &QAction::triggered, this, &MainWindow::showDefaultIptcMeta);
+    pictureMenu->addAction(showDefaultIptcAct);
+
+    clearDefaultIptcAct = new QAction(QIcon(":/resources/img/icons8-file-elements-50.png"),
+                                      tr("clear default Exif meta data"),
+                                      this);
+    connect(clearDefaultIptcAct, &QAction::triggered, this, &MainWindow::clearDefaultIptcMeta);
+    pictureMenu->addAction(clearDefaultIptcAct);
+
+    pictureMenu->addSeparator();
+
+    selectAllImagesAct = new QAction(QIcon(":/resources/img/icons8-image-file-add-50.png"),
+                                     tr("select all Pictures"),
+                                     this);
+    //selectAllImagesAct->setDisabled(true);
+    connect(selectAllImagesAct, &QAction::triggered, this, &MainWindow::selectAllImages);
+    pictureMenu->addAction(selectAllImagesAct);
+
+    writeDefaultMetaToSelectedImagesAct
+        = new QAction(QIcon(":/resources/img/icons8-send-file-50.png"),
+                      tr("write default Meta to selected Pictures"),
+                      this);
+    writeDefaultMetaToSelectedImagesAct->setDisabled(true);
+    pictureMenu->addAction(writeDefaultMetaToSelectedImagesAct);
+
+    pictureMenu->addSeparator();
+
+    removeImagesAct = new QAction(QIcon(":/resources/img/icons8-image-file-remove-50.png"),
+                                  tr("remove selected Pictures from Album"),
+                                  this);
+    connect(removeImagesAct, &QAction::triggered, this, &MainWindow::removeSelectedImages);
+    pictureMenu->addAction(removeImagesAct);
 
     // About - Info
     aboutAct = new QAction(QIcon(":/resources/img/icons8-info-48.png"), tr("About"), this);
@@ -232,6 +294,13 @@ void MainWindow::createMenu()
     connect(aboutAct, &QAction::triggered, this, &MainWindow::about);
     infoMenu = menuBar()->addMenu(tr("Info"));
     infoMenu->addAction(aboutAct);
+}
+
+void MainWindow::createLanguageMenu()
+{
+    i18nMenu = menuBar()->addMenu("六A");
+    //i18nMenu->setIcon(QIcon(":/resources/img/translate.png"));
+    i18nMenu->setDisabled(true);
 }
 
 void MainWindow::initListview()
@@ -248,6 +317,12 @@ void MainWindow::initListview()
     ui->listView->setResizeMode(QListView::Adjust);
     ui->listView->setFlow(QListView::LeftToRight);
     ui->listView->setIconSize(QSize(THUMBNAIL_SIZE, THUMBNAIL_SIZE));
+
+    ui->listView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->listView,
+            SIGNAL(customContextMenuRequested(QPoint)),
+            this,
+            SLOT(showViewContextMenu(QPoint)));
 }
 
 void MainWindow::initStatusBar()
@@ -259,26 +334,194 @@ void MainWindow::initStatusBar()
     statusBar()->addWidget(statusBarLabel, 1);
 }
 
+void MainWindow::refreshStatusBar()
+{
+    int rowCount = mContentItemModel->rowCount();
+    if (rowCount > 0) {
+        statusBarLabel->setText(QString::number(rowCount) + " " + tr("items"));
+    } else {
+        statusBarLabel->setText("v" + qApp->applicationVersion());
+    }
+}
+
 void MainWindow::on_listView_doubleClicked(const QModelIndex &index)
 {
     // alles OK!!
 
+    /*
     QString itemText = index.data(Qt::DisplayRole).toString();
     qDebug() << "doubleclicked: " << itemText << " col: " << index.column();
+    */
 
     int row = index.row();
     QModelIndex col2 = mContentItemModel->index(row, 1);
     QString itemText2 = col2.data(Qt::DisplayRole).toString();
-    qDebug() << "doubleclicked: " << itemText2 << " col: " << col2.column();
-    showSinglePicure(itemText2);
+    //qDebug() << "doubleclicked: " << itemText2 << " col: " << col2.column();
+    showSinglePicture(itemText2);
 
+    /*
     QModelIndexList selected = ui->listView->selectionModel()->selectedIndexes();
     for (QModelIndex i : selected) {
         int row = i.row();
         QModelIndex col2 = mContentItemModel->index(row, 1);
         QString itemText2 = col2.data(Qt::DisplayRole).toString();
-        qDebug() << "selected: " << itemText2 << " col: " << col2.column();
+        //qDebug() << "selected: " << itemText2 << " col: " << col2.column();
     }
+    */
+}
+
+void MainWindow::showViewContextMenu(const QPoint &pt)
+{
+    qInfo() << "showViewContextMenu";
+
+    QModelIndex idx = ui->listView->indexAt(pt);
+
+    QString itemText = idx.data(Qt::DisplayRole).toString();
+    qDebug() << "clicked: " << itemText << " col: " << idx.column();
+
+    int row = idx.row();
+    QModelIndex col2 = mContentItemModel->index(row, 1);
+    QString itemText2 = col2.data(Qt::DisplayRole).toString();
+    qDebug() << "clicked: " << itemText2;
+
+    //modelIndexForContextMenu = idx; // optional, to let slots know what index is the base for the context menu
+    QMenu menu;
+
+    contextShowPictureDetailsAct = new QAction(QIcon(":/resources/img/icons8-view-50.png"),
+                                               tr("show Picture details"),
+                                               this);
+    contextShowPictureDetailsAct->setIconVisibleInMenu(true);
+    connect(contextShowPictureDetailsAct, &QAction::triggered, this, [this, itemText2] {
+        MainWindow::showSinglePicture(itemText2);
+    });
+
+    contextSetExifAsDefaultAct = new QAction(QIcon(
+                                                 ":/resources/img/icons8-regular-document-50.png"),
+                                             tr("set this red Exif data as default"),
+                                             this);
+    connect(contextSetExifAsDefaultAct, &QAction::triggered, this, [this, idx] {
+        MainWindow::setDefaultExifMeta(idx);
+    });
+
+    contextSetIptcAsDefaultAct = new QAction(QIcon(
+                                                 ":/resources/img/icons8-regular-document-50.png"),
+                                             tr("set this red IPTC data as default"),
+                                             this);
+    connect(contextSetIptcAsDefaultAct, &QAction::triggered, this, [this, idx] {
+        MainWindow::setDefaultIptcMeta(idx);
+    });
+
+    contextRemovePictureFromAlbumAct = new QAction(QIcon(
+                                                       ":/resources/img/icons8-delete-list-50.png"),
+                                                   tr("remove this Picture from Album"),
+                                                   this);
+    connect(contextRemovePictureFromAlbumAct, &QAction::triggered, this, [this, idx] {
+        MainWindow::removeSelectedImageFromAlbum(idx);
+    });
+
+    contextShowPictureDetailsAct->setEnabled(idx.column() == 0);
+    contextSetExifAsDefaultAct->setEnabled(idx.column() == 0);
+    contextSetIptcAsDefaultAct->setEnabled(idx.column() == 0);
+    contextRemovePictureFromAlbumAct->setEnabled(idx.column() == 0);
+
+    menu.addAction(contextShowPictureDetailsAct);
+    menu.addSeparator();
+    menu.addAction(contextSetExifAsDefaultAct);
+    menu.addAction(contextSetIptcAsDefaultAct);
+    menu.addSeparator();
+    menu.addAction(contextRemovePictureFromAlbumAct);
+
+    menu.exec(ui->listView->viewport()->mapToGlobal(pt));
+}
+
+void MainWindow::setDefaultExifMeta(const QModelIndex &index)
+{
+    rowWithDefaultExifMeta = index;
+    hasDefaultExifMeta = true;
+}
+
+void MainWindow::setDefaultIptcMeta(const QModelIndex &index)
+{
+    rowWithDefaultIptcMeta = index;
+    hasDefaultIptcMeta = true;
+}
+
+void MainWindow::resetDefaultMeta()
+{
+    //rowWithDefaultExifMeta = -0;
+    //rowWithDefaultIptcMeta = -0;
+    hasDefaultExifMeta = false;
+    hasDefaultIptcMeta = false;
+}
+
+void MainWindow::showDefaultExifMeta()
+{
+    if (!hasDefaultExifMeta) {
+        QMessageBox msgBox(this);
+        msgBox.setWindowTitle(tr("Exif Meta"));
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.setTextFormat(Qt::RichText);
+        QString text = tr("No default Exif meta data set.");
+        QString setInformativeText = tr("In Album view, select a picture and open the context menu "
+                                        "to define the default meta.");
+        msgBox.setText(text);
+        msgBox.setInformativeText(setInformativeText);
+        msgBox.setFixedWidth(900);
+        msgBox.exec();
+    } else {
+        int row = rowWithDefaultExifMeta.row();
+        QModelIndex col2 = mContentItemModel->index(row, 1);
+        QString itemText2 = col2.data(Qt::DisplayRole).toString();
+        showSinglePicture(itemText2);
+    }
+}
+
+void MainWindow::clearDefaultExifMeta()
+{
+    hasDefaultExifMeta = false;
+}
+
+void MainWindow::showDefaultIptcMeta()
+{
+    if (!hasDefaultIptcMeta) {
+        QMessageBox msgBox(this);
+        msgBox.setWindowTitle(tr("IPTC Meta"));
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.setTextFormat(Qt::RichText);
+        QString text = tr("No default IPTC meta data set.");
+        QString setInformativeText = tr("In Album view, select a picture and open the context menu "
+                                        "to define the default meta.");
+        msgBox.setText(text);
+        msgBox.setInformativeText(setInformativeText);
+        msgBox.setFixedWidth(900);
+        msgBox.exec();
+    } else {
+        int row = rowWithDefaultIptcMeta.row();
+        QModelIndex col2 = mContentItemModel->index(row, 1);
+        QString itemText2 = col2.data(Qt::DisplayRole).toString();
+        showSinglePicture(itemText2);
+    }
+}
+
+void MainWindow::clearDefaultIptcMeta()
+{
+    hasDefaultIptcMeta = false;
+}
+
+void MainWindow::showAlbumLimitMsg(int resultCount)
+{
+    QMessageBox msgBox(this);
+    msgBox.setWindowTitle(tr("Critical"));
+    msgBox.setIcon(QMessageBox::Information);
+    msgBox.setTextFormat(Qt::RichText);
+    QString text = QString::number(resultCount) + " " + tr("pictures found") + " " + tr("but") + " "
+                   + tr("Album limit are") + " " + QString::number(ALBUM_LIMIT) + " "
+                   + tr("pictures");
+    QString setInformativeText = tr("Please choose folders with lesser picture content.");
+    msgBox.setText(text);
+    msgBox.setInformativeText(setInformativeText);
+    msgBox.setFixedWidth(900);
+    msgBox.exec();
 }
 
 const void MainWindow::fillSrcListView(QFile &srcFile)
@@ -312,11 +555,13 @@ const void MainWindow::fillSrcListViewThread(const QList<QString> &srcFiles)
     QListIterator<QString> i(srcFiles);
     while (i.hasNext()) {
         QFile srcFile(i.next());
-
-        qDebug() << "MainWindow::fillSrcListViewTest: " << srcFile.fileName();
-        statusBarLabel->setText(tr("add") + srcFile.fileName());
-
         QFileInfo fileInfo(srcFile.fileName());
+
+        if (fileInfo.size() < 1) {
+            continue;
+        }
+
+        statusBarLabel->setText(tr("add") + srcFile.fileName());
 
         QString pathToFile = fileInfo.absolutePath() + "/" + fileInfo.fileName();
         QPixmap pixmap(pathToFile);
@@ -340,7 +585,7 @@ const void MainWindow::fillSrcListViewThread(const QList<QString> &srcFiles)
     statusBarLabel->setText(QString::number(rowCount) + " " + tr("items"));
 }
 
-void MainWindow::showSinglePicure(QString pathToFile)
+void MainWindow::showSinglePicture(QString pathToFile)
 {
     PictureWidget *pictureWidget = new PictureWidget();
     pictureWidget->setImage(pathToFile);
@@ -350,6 +595,7 @@ void MainWindow::showSinglePicure(QString pathToFile)
 // TODO: clean up
 void MainWindow::removeSelectedImages()
 {
+    // selectedRows() ???
     QModelIndexList selected = ui->listView->selectionModel()->selectedIndexes();
     QList<QString> selectedImages;
 
@@ -357,7 +603,7 @@ void MainWindow::removeSelectedImages()
         int row = i.row();
         QModelIndex col2 = mContentItemModel->index(row, 1);
         QString itemText2 = col2.data(Qt::DisplayRole).toString();
-        qDebug() << "to remove: " << itemText2 << " col: " << col2.column();
+        //qDebug() << "to remove: " << itemText2 << " col: " << col2.column();
         selectedImages.append(itemText2);
     }
 
@@ -365,38 +611,43 @@ void MainWindow::removeSelectedImages()
     QListIterator<QString> intItem(selectedImages);
     while (intItem.hasNext()) {
         QString item = intItem.next();
-        qInfo() << "has: " << item;
+        //qInfo() << "has: " << item;
         QList<QStandardItem *> items = mContentItemModel->findItems(item, Qt::MatchExactly, 1);
         foreach (auto i, items) {
-            qInfo() << "found: " << i->row();
+            //  qInfo() << "found: " << i->row();
             mContentItemModel->removeRow(i->row());
         }
     }
 
-    int rowCount = mContentItemModel->rowCount();
-    statusBarLabel->setText(QString::number(rowCount) + " " + tr("items"));
+    refreshStatusBar();
+    resetDefaultMeta();
+}
+
+void MainWindow::selectAllImages()
+{
+    ui->listView->selectAll();
 }
 
 // TODO
-void MainWindow::on_listView_clicked(const QModelIndex &index)
+void MainWindow::_on_listView_clicked(const QModelIndex &index)
 {
     qInfo() << "on_listView_clicked: " << Qt::MouseButtons().toInt();
 
-    if (QMouseEvent::ContextMenu & Qt::LeftButton) {
-        qInfo() << "on_listView_clicked contextMenu";
+    if (QMouseEvent::ContextMenu && Qt::LeftButton) {
+        qInfo() << "on_listView_clicked left contextMenu";
     }
     if (Qt::MouseButtons().toInt() & Qt::RightButton) {
-        qInfo() << "on_listView_clicked context Menu mouse";
+        qInfo() << "on_listView_clicked right context Menu mouse";
     }
 
     int row = index.row();
     QModelIndex col2 = mContentItemModel->index(row, 1);
     QString itemText2 = col2.data(Qt::DisplayRole).toString();
-    qDebug() << "clicked: " << itemText2 << " col: " << col2.column();
-    if (Qt::LeftButton) {
-        qInfo() << "left Button click: " << Qt::LeftButton;
-    }
-    if (Qt::RightButton) {
-        qInfo() << "right Button click " << Qt::RightButton;
-    }
+    qDebug() << "clicked: " << itemText2;
+
+    /* Create menu and insert some actions */
+    QMenu rightClickMenu(ui->listView);
+    rightClickMenu.addAction("context1");
+    rightClickMenu.addAction("context2");
+    rightClickMenu.exec(ui->listView->viewport()->mapToGlobal(pos()));
 }

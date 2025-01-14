@@ -27,5 +27,6 @@
         <file>resources/img/icons8-trash-can-50.png</file>
         <file>resources/img/icons8-view-50.png</file>
         <file>resources/img/icons8-ausgang-48.png</file>
+        <file>resources/img/translate.png</file>
     </qresource>
 </RCC>
