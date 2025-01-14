@@ -14,22 +14,20 @@
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
 **Table of Contents**
 
 - [Description](#description)
-  - [Features](#features)
+    - [Features](#features)
   - [Status](#status)
     - [Application / Tool](#application--tool)
-    - [Documentation](#documentation)
-      - [README](#readme)
-      - [other Markdown files](#other-markdown-files)
-- [Installation](#installation)
-  - [Dependencies](#dependencies)
-  - [folder structure](#folder-structure)
-  - [Usage/Examples/Tests](#usageexamplestests)
-- [Documentation](#documentation-1)
+- [Documentation](#documentation)
   - [Screenshots](#screenshots)
+    - [Album view](#album-view)
+    - [Image detail view](#image-detail-view)
+      - [Image rotate](#image-rotate)
+      - [Image export to WebP](#image-export-to-webp)
+      - [Image Exif data show/edit _(double click a row to edit/modify value)_](#image-exif-data-showedit-double-click-a-row-to-editmodify-value)
+      - [Image IPTC data show/edit _(double click a row to edit/modify value)_](#image-iptc-data-showedit-double-click-a-row-to-editmodify-value)
 - [Authors and License](#authors-and-license)
   - [License](#license)
   - [Authors](#authors)
@@ -169,4 +167,93 @@ SOFTWARE.
 
 :vulcan_salute:
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+<!-- readme-tree start -->
+```
+.
+├── .github
+│   ├── actions
+│   │   └── doctoc
+│   │       ├── README.md
+│   │       ├── action.yml
+│   │       └── dist
+│   │           ├── index.js
+│   │           ├── index.js.map
+│   │           ├── licenses.txt
+│   │           └── sourcemap-register.js
+│   └── workflows
+│       ├── ghp-call_Readme.yml
+│       ├── ghp-create_doctoc.yml
+│       ├── ghp-markdown_index.yml
+│       ├── repo-actions_docu.yml
+│       ├── repo-call_Readme.yml
+│       ├── repo-create_doctoc.yml_
+│       ├── repo-create_doctoc_md.yml
+│       └── repo-create_tree_readme.yml
+├── .gitignore
+├── LICENSE
+├── README.md
+├── docs
+│   └── img
+│       ├── 00_en.png
+│       ├── 00_en_linux.png
+│       ├── 01_en.png
+│       ├── exif_en.png
+│       ├── exif_en_2.png
+│       ├── exif_meta_edit.png
+│       ├── iptc_en_1.png
+│       ├── rotate_en.png
+│       └── webp_en.png
+├── src
+│   ├── CMakeLists.txt
+│   ├── configure
+│   │   ├── ClangTidy.cmake
+│   │   ├── Doxygen.cmake
+│   │   ├── extra_headers
+│   │   └── rz_config.h.in
+│   ├── includes
+│   │   ├── rz_config.h
+│   │   ├── rz_photo.cpp
+│   │   └── rz_photo.hpp
+│   ├── main.cpp
+│   ├── mainwindow.cpp
+│   ├── mainwindow.h
+│   ├── mainwindow.ui
+│   ├── picture_widget.cpp
+│   ├── picture_widget.h
+│   ├── picture_widget.ui
+│   ├── resources
+│   │   └── img
+│   │       ├── icons8-add-file-50.png
+│   │       ├── icons8-arrow-pointing-left-50.png
+│   │       ├── icons8-ausgang-48.png
+│   │       ├── icons8-available-updates-50.png
+│   │       ├── icons8-delete-file-50.png
+│   │       ├── icons8-delete-folder-50.png
+│   │       ├── icons8-delete-list-50.png
+│   │       ├── icons8-edit-file-50.png
+│   │       ├── icons8-file-elements-50.png
+│   │       ├── icons8-file-submodule-50.png
+│   │       ├── icons8-image-file-50.png
+│   │       ├── icons8-image-file-add-50.png
+│   │       ├── icons8-image-file-remove-50.png
+│   │       ├── icons8-images-folder-50.png
+│   │       ├── icons8-info-48.png
+│   │       ├── icons8-opened-folder-50.png
+│   │       ├── icons8-page-orientation-50.png
+│   │       ├── icons8-regular-document-50.png
+│   │       ├── icons8-rotate-left-50.png
+│   │       ├── icons8-rotate-right-50.png
+│   │       ├── icons8-security-document-50.png
+│   │       ├── icons8-send-file-50.png
+│   │       ├── icons8-symlink-file-50.png
+│   │       ├── icons8-trash-can-50.png
+│   │       ├── icons8-view-50.png
+│   │       ├── qt_desktop-gallery.jpg
+│   │       ├── qt_desktop-gallery.png
+│   │       └── qt_desktop-gallery_32x31.png
+│   └── resources.qrc
+└── tree.bak
+
+13 directories, 71 files
+```
+<!-- readme-tree end -->
