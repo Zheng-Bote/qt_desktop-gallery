@@ -28,5 +28,6 @@
         <file>resources/img/icons8-view-50.png</file>
         <file>resources/img/icons8-ausgang-48.png</file>
         <file>resources/img/translate.png</file>
+        <file>resources/img/reduced_copy.png</file>
     </qresource>
 </RCC>

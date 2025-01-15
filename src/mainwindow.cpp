@@ -7,6 +7,7 @@
 #include "./picture_widget.h"
 #include "./ui_mainwindow.h"
 #include "includes/rz_config.h"
+#include "includes/rz_hwinfo.h"
 #include "includes/rz_photo.hpp"
 #include "mainwindow.h"
 
@@ -57,13 +58,17 @@ void MainWindow::openSrcFolderRekursive()
     qDebug() << "found: " << result.size();
     if (result.size() > ALBUM_LIMIT) {
         showAlbumLimitMsg(result.size());
-        return;
+        ui->album_label->setText(tr("processing") + " " + QString::number(ALBUM_LIMIT) + " of "
+                                 + QString::number(result.size()) + " " + tr("items") + "...");
+        //return;
+    } else {
+        ui->album_label->setText(tr("processing") + " " + QString::number(result.size()) + " "
+                                 + tr("items") + "...");
     }
-    ui->album_label->setText(tr("processing") + " " + QString::number(result.size()) + " "
-                             + tr("items") + "...");
     statusBarLabel->setText(tr("processing") + " " + QString::number(result.size()) + " "
                             + tr("items") + "...");
 
+    //QThreadPool::globalInstance()->setMaxThreadCount(1);
     QFuture<void> futureListView = QtConcurrent::run(&MainWindow::fillSrcListViewThread,
                                                      this,
                                                      result);
@@ -87,11 +92,13 @@ void MainWindow::openSrcFolder()
     qDebug() << "found: " << result.size();
     if (result.size() > ALBUM_LIMIT) {
         showAlbumLimitMsg(result.size());
-        return;
+        ui->album_label->setText(tr("processing") + " " + QString::number(ALBUM_LIMIT) + " of "
+                                 + QString::number(result.size()) + " " + tr("items") + "...");
+        //return;
+    } else {
+        ui->album_label->setText(tr("processing") + " " + QString::number(result.size()) + " "
+                                 + tr("items") + "...");
     }
-
-    ui->album_label->setText(tr("processing") + " " + QString::number(result.size()) + " "
-                             + tr("items") + "...");
     statusBarLabel->setText(tr("processing") + " " + QString::number(result.size()) + " "
                             + tr("items") + "...");
 
@@ -288,12 +295,63 @@ void MainWindow::createMenu()
     pictureMenu->addAction(removeImagesAct);
 
     // About - Info
+    infoMenu = menuBar()->addMenu(tr("Info"));
+
     aboutAct = new QAction(QIcon(":/resources/img/icons8-info-48.png"), tr("About"), this);
     aboutAct->setIconVisibleInMenu(true);
     aboutAct->setShortcuts(QKeySequence::WhatsThis);
     connect(aboutAct, &QAction::triggered, this, &MainWindow::about);
-    infoMenu = menuBar()->addMenu(tr("Info"));
     infoMenu->addAction(aboutAct);
+
+    hw_infoAct = new QAction(QIcon(":/resources/img/icons8-info-48.png"), tr("HW info"), this);
+    hw_infoAct->setIconVisibleInMenu(true);
+    connect(hw_infoAct, &QAction::triggered, this, &MainWindow::hwInfoMsgbox);
+    infoMenu->addAction(hw_infoAct);
+}
+
+void MainWindow::hwInfoMsgbox()
+{
+    HwInfo hwInfo;
+    hwInfo.setHwInfo();
+
+    QMap<QString, QString> hw_info = hwInfo.getHwInfo();
+
+    QString text = qApp->applicationDisplayName() + " " + tr("is running on the following hardware")
+                   + ":\n\n";
+    QString setInformativeText = "<p><b>CPU:</b><br>";
+    setInformativeText.append("Vendor: " + hw_info.value("CPU vendor"));
+    setInformativeText.append("<br>Model: " + hw_info.value("CPU model"));
+    setInformativeText.append("<br>physical Cores: " + hw_info.value("CPU physical cores"));
+    setInformativeText.append("<br>logical Cores: " + hw_info.value("CPU logical cores"));
+    setInformativeText.append("<br>max Frequency: " + hw_info.value("CPU max frequency"));
+
+    setInformativeText.append("<br><br><b>Memory:</b>");
+    setInformativeText.append("<br>Size [MiB]: " + hw_info.value("RAM size [MiB]"));
+    setInformativeText.append("<br>Free [MiB]: " + hw_info.value("RAM free [MiB]"));
+    setInformativeText.append("<br>Available [MiB]: " + hw_info.value("RAM available [MiB]"));
+
+    setInformativeText.append("<br><br><b>Operating System:</b>");
+    setInformativeText.append("<br>OS: " + hw_info.value("Operating System"));
+    setInformativeText.append("<br>Version: " + hw_info.value("OS version"));
+    setInformativeText.append("<br>Kernel: " + hw_info.value("OS kernel"));
+    setInformativeText.append("<br>Architecture: " + hw_info.value("OS architecture"));
+
+    /*
+    QMapIterator<QString, QString> i(hw_info);
+    while (i.hasNext()) {
+        i.next();
+        setInformativeText.append("<li>" + i.key() + ": " + i.value() + "</li>");
+    }
+    */
+    setInformativeText.append("</p>");
+    QMessageBox msgBox(this);
+    msgBox.setWindowTitle(tr("Hardware Info"));
+    msgBox.setIcon(QMessageBox::Information);
+    msgBox.setTextFormat(Qt::RichText);
+    msgBox.setText(text);
+    msgBox.setInformativeText(setInformativeText);
+    msgBox.setFixedWidth(900);
+    msgBox.exec();
 }
 
 void MainWindow::createLanguageMenu()
@@ -517,9 +575,16 @@ void MainWindow::showAlbumLimitMsg(int resultCount)
     QString text = QString::number(resultCount) + " " + tr("pictures found") + " " + tr("but") + " "
                    + tr("Album limit are") + " " + QString::number(ALBUM_LIMIT) + " "
                    + tr("pictures");
-    QString setInformativeText = tr("Please choose folders with lesser picture content.");
+    QString setInformativeText = tr("Please choose folders with a lesser amount of pictures.");
+
+    QString detailedText = tr("Some filesystems like Microsoft FAT have issues with foldercontent "
+                              "bigger than 4096 entries.");
+    detailedText.append("\n"
+                        + tr("Also, if you are planning to do a WebP export, the filecontent will "
+                             "increase (extremly)."));
     msgBox.setText(text);
     msgBox.setInformativeText(setInformativeText);
+    msgBox.setDetailedText(detailedText);
     msgBox.setFixedWidth(900);
     msgBox.exec();
 }
@@ -552,10 +617,20 @@ const void MainWindow::fillSrcListView(QFile &srcFile)
 
 const void MainWindow::fillSrcListViewThread(const QList<QString> &srcFiles)
 {
+    int count{-1};
+    //ui->listView->setUniformItemSizes(true);
+
     QListIterator<QString> i(srcFiles);
     while (i.hasNext()) {
         QFile srcFile(i.next());
         QFileInfo fileInfo(srcFile.fileName());
+
+        count++;
+        if (count == ALBUM_LIMIT) {
+            qDebug() << "reached album limit of " + QString::number(ALBUM_LIMIT)
+                            + "; stopped loading";
+            break;
+        }
 
         if (fileInfo.size() < 1) {
             continue;
@@ -565,9 +640,14 @@ const void MainWindow::fillSrcListViewThread(const QList<QString> &srcFiles)
 
         QString pathToFile = fileInfo.absolutePath() + "/" + fileInfo.fileName();
         QPixmap pixmap(pathToFile);
+        auto thumbnail = new QPixmap(pixmap.scaled(THUMBNAIL_SIZE,
+                                                   THUMBNAIL_SIZE,
+                                                   Qt::KeepAspectRatio,
+                                                   Qt::SmoothTransformation));
+
         QStandardItem *listitem = new QStandardItem();
-        listitem->setIcon(pixmap);
-        listitem->setText(fileInfo.fileName() + "\nschaun wa ma");
+        listitem->setIcon(*thumbnail);
+        listitem->setText(fileInfo.fileName()); // + "\nschaun wa ma");
         listitem->setToolTip(pathToFile);
         listitem->setBackground(Qt::lightGray);
         listitem->setEditable(false);
@@ -583,6 +663,8 @@ const void MainWindow::fillSrcListViewThread(const QList<QString> &srcFiles)
 
     int rowCount = mContentItemModel->rowCount();
     statusBarLabel->setText(QString::number(rowCount) + " " + tr("items"));
+
+    //ui->listView->setUniformItemSizes(false);
 }
 
 void MainWindow::showSinglePicture(QString pathToFile)

@@ -31,9 +31,10 @@ private slots:
     void on_iptcTableWidget_itemDoubleClicked(QTableWidgetItem *item);
 
     void rotateSrcImg(int val);
-    void exportSrcImgToWebP();
     void exportSrcImgToWebpThread();
     void exportSrcImgToWebP(int size);
+
+    void on_tabWidget_tabBarClicked(int index);
 
 private:
     Ui::PictureWidget *ui;
@@ -47,10 +48,15 @@ private:
 
     void createExportMenu();
     QMenu *exportMnu;
+    QAction *webp_oversizeAct;
+    QAction *webp_overwriteWebpAct;
+    QAction *webp_watermarkWebpAct;
     QAction *webp_size_all;
     QAction *webp_size_480;
     QAction *webp_size_640;
     QAction *webp_size_800;
+    QAction *webp_size_1024;
+    QAction *webp_size_1280;
 
     void resizeEvent(QResizeEvent *event);
     void closeEvent(QCloseEvent *event);

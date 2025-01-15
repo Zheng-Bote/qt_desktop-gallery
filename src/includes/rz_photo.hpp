@@ -19,7 +19,7 @@ struct imageStruct
     Exiv2::ExifData exifData;
     QString newFolder{"WebP"};
     QString newSuffix{"webp"};
-    QList<int> webpSizes = {480, 680, 800};
+    QList<int> webpSizes = {480, 680, 800, 1024, 1280};
 };
 
 class Photo
@@ -35,6 +35,9 @@ public:
     QList<int> getWebSizes();
 
     QString getSuffix();
+    void setOversizeSmallerPicture(const bool oversizeSmallerPicture = false);
+    void setOverwriteExistingWebp(const bool overwriteExitingWebp = false);
+    void setWatermarkWebp(const bool watermarkWebp = true);
 
     QList<QString> srcPics(const QString &srcPath);
     QList<QString> srcPicsRecursive(const QString &srcPath);
@@ -46,6 +49,9 @@ private:
     imageStruct imgStruct;
     void setImageStruct(const QString &imageInput);
 
+    bool oversizeSmallerPicture_bool{false};
+    bool overwriteExitingWebp_bool{false};
+    bool watermarkWebp_bool{true};
     bool createWebpPath();
     bool checkImgTargetExists(const QFile &pathToTargetImage);
     bool checkImgWidth(const QImage &imageInput, const int &targetWidth);

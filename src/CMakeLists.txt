@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.23)
 
 project(
   qt_desktop-gallery
-  VERSION 0.8.0
+  VERSION 0.9.0
   DESCRIPTION "Desktop gallery-app to show/edit Exif/IPTC and export to WebP"
   HOMEPAGE_URL "https://github.com/Zheng-Bote/qt_desktop-gallery"
   LANGUAGES CXX)
@@ -36,6 +36,18 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Gui)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Gui)
 find_package(Qt6 REQUIRED COMPONENTS Concurrent)
 
+set(hwinfo_DIR "/usr/local/lib/cmake/hwinfo/")
+find_package(hwinfo REQUIRED CONFIG NAMES lfreist-hwinfo)
+option(HWINFO_OS "Enable OS information" ON)
+option(HWINFO_MAINBOARD "Enable mainboard information" OFF)
+option(HWINFO_CPU "Enable CPU information" ON)
+option(HWINFO_DISK "Enable disk information" OFF)
+option(HWINFO_RAM "Enable RAM information" ON)
+option(HWINFO_GPU "Enable GPU information" OFF)
+option(HWINFO_GPU_OPENCL "Enable OpenCL for more GPU information" OFF)
+option(HWINFO_BATTERY "Enable battery information" OFF)
+option(HWINFO_NETWORK "Enable network information" OFF)
+
 # find_package(exiv2 REQUIRED)
 find_package(exiv2lib REQUIRED CONFIG NAMES exiv2)
 
@@ -48,6 +60,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     ${PROJECT_SOURCES}
     includes/rz_photo.cpp
     includes/rz_photo.hpp
+    includes/rz_hwinfo.h
+    includes/rz_hwinfo.cpp
     picture_widget.h
     picture_widget.cpp
     picture_widget.ui
@@ -68,12 +82,19 @@ endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   target_link_libraries(
-    qt_desktop-gallery PRIVATE Qt${QT_VERSION_MAJOR}::Widgets exiv2lib Qt6::Gui
-                               Qt6::Concurrent)
+    qt_desktop-gallery
+    PRIVATE Qt${QT_VERSION_MAJOR}::Widgets
+            exiv2lib
+            Qt6::Gui
+            Qt6::Concurrent
+            lfreist-hwinfo::hwinfo_cpu
+            lfreist-hwinfo::hwinfo_ram
+            lfreist-hwinfo::hwinfo_os)
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
   target_link_libraries(
-    qt_desktop-gallery PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Exiv2::exiv2lib
-                               Qt6::Concurrent)
+    qt_desktop-gallery
+    PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Exiv2::exiv2lib Qt6::Concurrent
+            hwinfo::cpu hwinfo::ram hwinfo::os)
 endif()
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)

@@ -119,13 +119,18 @@ bool Photo::convertImage(const int &targetSize, const int &quality)
     if (!checkImgWidth(imageInput, targetSize)) {
         qDebug() << "img is < " << targetSize;
         // well, the confused exit gate
-        return true;
+        if (!oversizeSmallerPicture_bool) {
+            return false;
+        }
+        qDebug() << "request: img will be increased";
     }
 
     if (checkImgTargetExists(imgOut)) {
         qDebug() << "target exists: " << imgOut.toStdString();
-        // well, the confused exit gate
-        return true;
+        if (!overwriteExitingWebp_bool) {
+            return false;
+        }
+        qDebug() << "request: existing img will be overwritten";
     } else {
         qDebug() << "target doesn't exists: " << imgOut.toStdString();
         if (!createWebpPath()) {
@@ -134,10 +139,14 @@ bool Photo::convertImage(const int &targetSize, const int &quality)
         }
     }
 
-    QImage reducedCopy{":/images/reduced_copy.png"};
     QImage imageOutput = imageInput.scaledToWidth(targetSize, Qt::SmoothTransformation);
-    QPainter painter(&imageOutput);
-    painter.drawImage(0, 0, reducedCopy);
+
+    if (watermarkWebp_bool) {
+        QImage reducedCopy{":/resources/img/reduced_copy.png"};
+        QPainter painter(&imageOutput);
+        painter.drawImage(0, 0, reducedCopy);
+    }
+
     if (!imageOutput.save(imgOut, "WEBP", quality)) {
         std::cerr << "convertImage failed to save webp image: " << imgOut.toStdString();
         return false;
@@ -191,6 +200,21 @@ QList<int> Photo::getWebSizes()
 QString Photo::getSuffix()
 {
     return imgStruct.fileSuffix;
+}
+
+void Photo::setOversizeSmallerPicture(const bool oversizeSmallerPicture)
+{
+    oversizeSmallerPicture_bool = oversizeSmallerPicture;
+}
+
+void Photo::setOverwriteExistingWebp(const bool overwriteExitingWebp)
+{
+    overwriteExitingWebp_bool = overwriteExitingWebp;
+}
+
+void Photo::setWatermarkWebp(const bool watermarkWebp)
+{
+    watermarkWebp_bool = watermarkWebp;
 }
 
 QList<QString> Photo::srcPics(const QString &srcPath)

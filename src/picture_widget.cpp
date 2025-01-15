@@ -56,6 +56,8 @@ void PictureWidget::setImage(QString pathToFile)
     QFuture<void> futureIptc = QtConcurrent::run(&PictureWidget::readSrcIptc, this);
     //readSrcExif();
     //readSrcIptc();
+
+    ui->tabWidget->adjustSize();
     ui->tabWidget->setCurrentWidget(0);
 }
 
@@ -216,11 +218,13 @@ const void PictureWidget::readSrcExif()
     tlbCol3 = nullptr;
     file.close();
 
+    /*
     ui->exifTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->exifTableWidget->resizeColumnsToContents();
     ui->exifTableWidget->resizeRowsToContents();
 
     ui->tabWidget->adjustSize();
+    */
 }
 
 void PictureWidget::markExif(QString searchFor)
@@ -351,11 +355,13 @@ const void PictureWidget::readSrcIptc()
     tlbCol3 = nullptr;
     file.close();
 
+    /*
     ui->iptcTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->iptcTableWidget->resizeColumnsToContents();
     ui->iptcTableWidget->resizeRowsToContents();
 
     ui->tabWidget->adjustSize();
+    */
 }
 
 void PictureWidget::markIptc(QString searchFor)
@@ -505,6 +511,24 @@ void PictureWidget::createExportMenu()
     });
     exportMnu->addAction(webp_size_800);
 
+    webp_size_1024 = new QAction(QIcon(":/resources/img/icons8-ausgang-48.png"),
+                                 tr("export to size") + " 1024",
+                                 this);
+    webp_size_1024->setIconVisibleInMenu(true);
+    connect(webp_size_1024, &QAction::triggered, this, [this] {
+        PictureWidget::exportSrcImgToWebP(1024);
+    });
+    exportMnu->addAction(webp_size_1024);
+
+    webp_size_1280 = new QAction(QIcon(":/resources/img/icons8-ausgang-48.png"),
+                                 tr("export to size") + " 1280",
+                                 this);
+    webp_size_1280->setIconVisibleInMenu(true);
+    connect(webp_size_1280, &QAction::triggered, this, [this] {
+        PictureWidget::exportSrcImgToWebP(1280);
+    });
+    exportMnu->addAction(webp_size_1280);
+
     exportMnu->addSeparator();
 
     webp_size_all = new QAction(QIcon(":/resources/img/icons8-send-file-50.png"),
@@ -515,6 +539,26 @@ void PictureWidget::createExportMenu()
         PictureWidget::exportSrcImgToWebpThread();
     });
     exportMnu->addAction(webp_size_all);
+
+    exportMnu->addSeparator();
+
+    webp_oversizeAct = new QAction(tr("increase too small picture"), this);
+    webp_oversizeAct->setIconVisibleInMenu(true);
+    webp_oversizeAct->setCheckable(true);
+    webp_oversizeAct->setChecked(true);
+    exportMnu->addAction(webp_oversizeAct);
+
+    webp_overwriteWebpAct = new QAction(tr("overwrite existing WebP"), this);
+    webp_overwriteWebpAct->setIconVisibleInMenu(true);
+    webp_overwriteWebpAct->setCheckable(true);
+    webp_overwriteWebpAct->setChecked(false);
+    exportMnu->addAction(webp_overwriteWebpAct);
+
+    webp_watermarkWebpAct = new QAction(tr("watermark WebP"), this);
+    webp_watermarkWebpAct->setIconVisibleInMenu(true);
+    webp_watermarkWebpAct->setCheckable(true);
+    webp_watermarkWebpAct->setChecked(true);
+    exportMnu->addAction(webp_watermarkWebpAct);
 
     ui->exportSrcToWebp_Btn->setMenu(exportMnu);
 }
@@ -620,35 +664,24 @@ void PictureWidget::rotateSrcImg(int val)
     photo = nullptr;
 }
 
-void PictureWidget::exportSrcImgToWebP()
-{
-    QMessageBox msgBox(this);
-    msgBox.setTextFormat(Qt::RichText);
-    QString text = tr("WebP export to subfolder WebP");
-    /*
-    Photo *photo = new Photo(pathToImage);
-    if (!photo->convertImages()) {
-        msgBox.setWindowTitle(tr("Error"));
-        msgBox.setIcon(QMessageBox::Warning);
-        text += " " + tr("failed");
-    } else {
-        msgBox.setWindowTitle(tr("Success"));
-        msgBox.setIcon(QMessageBox::Information);
-        text += " " + tr("successfull");
-    }
-    msgBox.setText(text);
-    msgBox.setInformativeText("<i>" + pathToImage + "</i>");
-    msgBox.setFixedWidth(900);
-    msgBox.exec();
-    photo = nullptr;
-*/
-}
-
 void PictureWidget::exportSrcImgToWebpThread()
 {
     bool oknok{false};
     //Photo *photo = new Photo(pathToImage);
     Photo phot(pathToImage);
+
+    if (webp_oversizeAct->isChecked()) {
+        phot.setOversizeSmallerPicture(true);
+    }
+
+    if (webp_overwriteWebpAct->isChecked()) {
+        phot.setOverwriteExistingWebp(true);
+    }
+
+    if (webp_watermarkWebpAct->isChecked()) {
+        phot.setWatermarkWebp(true);
+    }
+
     QFuture<bool> future = QtConcurrent::run(&Photo::convertImages, phot, 75);
 
     oknok = future.result();
@@ -678,6 +711,19 @@ void PictureWidget::exportSrcImgToWebP(int size)
     QString text = tr("WebP export to subfolder WebP");
 
     Photo *photo = new Photo(pathToImage);
+
+    if (webp_oversizeAct->isChecked()) {
+        photo->setOversizeSmallerPicture(true);
+    }
+
+    if (webp_overwriteWebpAct->isChecked()) {
+        photo->setOverwriteExistingWebp(true);
+    }
+
+    if (webp_watermarkWebpAct->isChecked()) {
+        photo->setWatermarkWebp(true);
+    }
+
     if (!photo->convertImage(size)) {
         msgBox.setWindowTitle(tr("Error"));
         msgBox.setIcon(QMessageBox::Warning);
@@ -692,4 +738,17 @@ void PictureWidget::exportSrcImgToWebP(int size)
     msgBox.setFixedWidth(900);
     msgBox.exec();
     photo = nullptr;
+}
+
+void PictureWidget::on_tabWidget_tabBarClicked(int index)
+{
+    ui->exifTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->exifTableWidget->resizeColumnsToContents();
+    ui->exifTableWidget->resizeRowsToContents();
+
+    ui->iptcTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->iptcTableWidget->resizeColumnsToContents();
+    ui->iptcTableWidget->resizeRowsToContents();
+
+    ui->tabWidget->adjustSize();
 }

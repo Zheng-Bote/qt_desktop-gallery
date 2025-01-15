@@ -30,7 +30,9 @@ private slots:
     void loadSingleSrcImg();
     void clearSrcAlbum();
     void removeSelectedImageFromAlbum(const QModelIndex &index);
+
     void about();
+    void hwInfoMsgbox();
 
     void selectAllImages();
 
@@ -55,7 +57,7 @@ private:
     QFont *font_12 = new QFont("Times New Roman", 12);
     QLabel *statusBarLabel;
 
-    const int ALBUM_LIMIT = 4000;
+    const int ALBUM_LIMIT = 4096;
     void showAlbumLimitMsg(int resultCount);
 
     QStringListModel *model;
@@ -80,6 +82,7 @@ private:
 
     QMenu *infoMenu;
     QAction *aboutAct;
+    QAction *hw_infoAct;
     void createMenu();
 
     QMenu *i18nMenu;

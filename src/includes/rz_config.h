@@ -2,7 +2,7 @@
 
 #define PROG_EXEC_NAME "qt_desktop-gallery"
 #define PROG_NAME "Desktop-Gallery"
-#define PROG_VERSION "0.8.0"
+#define PROG_VERSION "0.9.0"
 #define PROG_HOMEPAGE "https://github.com/Zheng-Bote/qt_desktop-gallery"
 #define PROG_DESCRIPTION "Desktop gallery-app to show/edit Exif/IPTC and export to WebP"
 #define PROG_ORGANIZATION_NAME "ZHENG Robert"
