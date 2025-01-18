@@ -14,11 +14,10 @@
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
 **Table of Contents**
 
 - [Description](#description)
-  - [Features](#features)
+    - [Features](#features)
   - [Status](#status)
     - [Application / Tool](#application--tool)
 - [Documentation](#documentation)
@@ -169,7 +168,6 @@ SOFTWARE.
 :vulcan_salute:
 
 <!-- readme-tree start -->
-
 ```
 .
 ├── .github
@@ -214,6 +212,8 @@ SOFTWARE.
 │   │   └── rz_config.h.in
 │   ├── includes
 │   │   ├── rz_config.h
+│   │   ├── rz_hwinfo.cpp
+│   │   ├── rz_hwinfo.h
 │   │   ├── rz_photo.cpp
 │   │   └── rz_photo.hpp
 │   ├── main.cpp
@@ -252,11 +252,12 @@ SOFTWARE.
 │   │       ├── icons8-view-50.png
 │   │       ├── qt_desktop-gallery.jpg
 │   │       ├── qt_desktop-gallery.png
-│   │       └── qt_desktop-gallery_32x31.png
+│   │       ├── qt_desktop-gallery_32x31.png
+│   │       ├── reduced_copy.png
+│   │       └── translate.png
 │   └── resources.qrc
 └── tree.bak
 
-13 directories, 71 files
+13 directories, 75 files
 ```
-
 <!-- readme-tree end -->
