@@ -6,6 +6,7 @@
 #include <QMainWindow>
 #include <QStandardItemModel>
 #include <QStringListModel>
+#include <QTranslator>
 
 #include <QMouseEvent>
 
@@ -22,6 +23,9 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
+protected slots:
+    void slotLanguageChanged(QAction *action);
 
 private slots:
     void openReadFolder();
@@ -49,6 +53,9 @@ private slots:
     void clearDefaultExifMeta();
     void showDefaultIptcMeta();
     void clearDefaultIptcMeta();
+
+protected:
+    void changeEvent(QEvent *);
 
 private:
     Ui::MainWindow *ui;
@@ -86,7 +93,13 @@ private:
     void createMenu();
 
     QMenu *i18nMenu;
-    void createLanguageMenu();
+    void createLanguageMenu(void);
+    QTranslator m_translator;
+    QTranslator m_translatorQt;
+    QString m_currLang;
+    QString m_langPath;
+    void loadLanguage(const QString &rLanguage);
+    void switchTranslator(QTranslator &translator, const QString &filename);
 
     void initListview();
     QAction *contextShowPictureDetailsAct;

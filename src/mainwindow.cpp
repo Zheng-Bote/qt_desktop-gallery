@@ -1,3 +1,4 @@
+#include <QActionGroup>
 #include <QDir>
 #include <QDirIterator>
 #include <QFileDialog>
@@ -37,6 +38,29 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::slotLanguageChanged(QAction *action)
+{
+    if (0 != action) {
+        // load the language dependant on the action content
+        loadLanguage(action->data().toString());
+        //setWindowIcon(action->icon());
+    }
+}
+
+void switchTranslator(QTranslator &translator, const QString &filename)
+{
+    // remove the old translator
+    qApp->removeTranslator(&translator);
+
+    // load the new translator
+    QString path = QApplication::applicationDirPath();
+    path.append("/languages/");
+    if (translator.load(
+            path
+            + filename)) //Here Path and Filename has to be entered because the system didn't find the QM Files else
+        qApp->installTranslator(&translator);
 }
 
 void MainWindow::openSrcFolderRekursive()
@@ -192,7 +216,9 @@ void MainWindow::about()
     QString text = tr(qApp->applicationDisplayName().toStdString().c_str()) + "\n\n";
     QString setInformativeText = "<p>" + qApp->applicationName() + " v" + qApp->applicationVersion()
                                  + "</p>";
-    setInformativeText.append("<p>" + tr(PROG_DESCRIPTION) + "<p>");
+
+    setInformativeText.append(
+        "<p>" + tr("Desktop gallery-app to show/edit Exif/IPTC and export to WebP") + "<p>");
     setInformativeText.append("<p>Copyright (c) 2024 ZHENG Robert</p>");
     setInformativeText.append("<br><a href=\"");
     setInformativeText.append(PROG_HOMEPAGE);
@@ -239,74 +265,65 @@ void MainWindow::createMenu()
     connect(ui->actionload_Picture, &QAction::triggered, this, &MainWindow::loadSingleSrcImg);
 
     // Pictures
-    pictureMenu = menuBar()->addMenu(tr("Pictures"));
-    //pictureMenu->addAction(ui->actionload_Picture);
+    //pictureMenu = menuBar()->addMenu(tr("Pictures"));
 
-    showDefaultExifAct = new QAction(QIcon(":/resources/img/icons8-edit-file-50.png"),
-                                     tr("show default Exif meta data"),
-                                     this);
-    //showDefaultExifAct->setDisabled(true);
-    connect(showDefaultExifAct, &QAction::triggered, this, &MainWindow::showDefaultExifMeta);
-    pictureMenu->addAction(showDefaultExifAct);
+    ui->showDefaultExifAct->setIcon(QIcon(":/resources/img/icons8-edit-file-50.png"));
+    ui->showDefaultExifAct->setIconVisibleInMenu(true);
+    connect(ui->showDefaultExifAct, &QAction::triggered, this, &MainWindow::showDefaultExifMeta);
+    //ui->pictureMenu->addAction(showDefaultExifAct);
 
-    clearDefaultExifAct = new QAction(QIcon(":/resources/img/icons8-file-elements-50.png"),
-                                      tr("clear default Exif meta data"),
-                                      this);
-    connect(clearDefaultExifAct, &QAction::triggered, this, &MainWindow::clearDefaultExifMeta);
-    pictureMenu->addAction(clearDefaultExifAct);
+    ui->clearDefaultExifAct->setIcon(QIcon(":/resources/img/icons8-file-elements-50.png"));
+    ui->clearDefaultExifAct->setIconVisibleInMenu(true);
+    connect(ui->clearDefaultExifAct, &QAction::triggered, this, &MainWindow::clearDefaultExifMeta);
+    //pictureMenu->addAction(clearDefaultExifAct);
 
-    pictureMenu->addSeparator();
+    //pictureMenu->addSeparator();
 
-    showDefaultIptcAct = new QAction(QIcon(":/resources/img/icons8-edit-file-50.png"),
-                                     tr("show default IPTC meta data"),
-                                     this);
+    ui->showDefaultIptcAct->setIcon(QIcon(":/resources/img/icons8-edit-file-50.png"));
     //showDefaultIptcAct->setDisabled(true);
-    connect(showDefaultIptcAct, &QAction::triggered, this, &MainWindow::showDefaultIptcMeta);
-    pictureMenu->addAction(showDefaultIptcAct);
+    ui->showDefaultIptcAct->setIconVisibleInMenu(true);
+    connect(ui->showDefaultIptcAct, &QAction::triggered, this, &MainWindow::showDefaultIptcMeta);
+    //pictureMenu->addAction(showDefaultIptcAct);
 
-    clearDefaultIptcAct = new QAction(QIcon(":/resources/img/icons8-file-elements-50.png"),
-                                      tr("clear default Exif meta data"),
-                                      this);
-    connect(clearDefaultIptcAct, &QAction::triggered, this, &MainWindow::clearDefaultIptcMeta);
-    pictureMenu->addAction(clearDefaultIptcAct);
+    ui->clearDefaultIptcAct->setIcon(QIcon(":/resources/img/icons8-file-elements-50.png"));
+    ui->clearDefaultIptcAct->setIconVisibleInMenu(true);
+    connect(ui->clearDefaultIptcAct, &QAction::triggered, this, &MainWindow::clearDefaultIptcMeta);
+    //pictureMenu->addAction(clearDefaultIptcAct);
 
-    pictureMenu->addSeparator();
+    //pictureMenu->addSeparator();
 
-    selectAllImagesAct = new QAction(QIcon(":/resources/img/icons8-image-file-add-50.png"),
-                                     tr("select all Pictures"),
-                                     this);
+    ui->selectAllImagesAct->setIcon(QIcon(":/resources/img/icons8-image-file-add-50.png"));
+    ui->selectAllImagesAct->setIconVisibleInMenu(true);
     //selectAllImagesAct->setDisabled(true);
-    connect(selectAllImagesAct, &QAction::triggered, this, &MainWindow::selectAllImages);
-    pictureMenu->addAction(selectAllImagesAct);
+    connect(ui->selectAllImagesAct, &QAction::triggered, this, &MainWindow::selectAllImages);
+    //pictureMenu->addAction(selectAllImagesAct);
 
-    writeDefaultMetaToSelectedImagesAct
-        = new QAction(QIcon(":/resources/img/icons8-send-file-50.png"),
-                      tr("write default Meta to selected Pictures"),
-                      this);
-    writeDefaultMetaToSelectedImagesAct->setDisabled(true);
-    pictureMenu->addAction(writeDefaultMetaToSelectedImagesAct);
+    ui->writeDefaultMetaToSelectedImagesAct->setIcon(
+        QIcon(":/resources/img/icons8-send-file-50.png"));
+    ui->writeDefaultMetaToSelectedImagesAct->setIconVisibleInMenu(true);
+    ui->writeDefaultMetaToSelectedImagesAct->setDisabled(true);
+    //pictureMenu->addAction(writeDefaultMetaToSelectedImagesAct);
 
-    pictureMenu->addSeparator();
+    //pictureMenu->addSeparator();
 
-    removeImagesAct = new QAction(QIcon(":/resources/img/icons8-image-file-remove-50.png"),
-                                  tr("remove selected Pictures from Album"),
-                                  this);
-    connect(removeImagesAct, &QAction::triggered, this, &MainWindow::removeSelectedImages);
-    pictureMenu->addAction(removeImagesAct);
+    ui->removeImagesAct->setIcon(QIcon(":/resources/img/icons8-image-file-remove-50.png"));
+    ui->removeImagesAct->setIconVisibleInMenu(true);
+    connect(ui->removeImagesAct, &QAction::triggered, this, &MainWindow::removeSelectedImages);
+    //pictureMenu->addAction(removeImagesAct);
 
     // About - Info
-    infoMenu = menuBar()->addMenu(tr("Info"));
+    //infoMenu = menuBar()->addMenu(tr("Info"));
 
-    aboutAct = new QAction(QIcon(":/resources/img/icons8-info-48.png"), tr("About"), this);
-    aboutAct->setIconVisibleInMenu(true);
-    aboutAct->setShortcuts(QKeySequence::WhatsThis);
-    connect(aboutAct, &QAction::triggered, this, &MainWindow::about);
-    infoMenu->addAction(aboutAct);
+    ui->aboutAct->setIcon(QIcon(":/resources/img/icons8-info-48.png"));
+    ui->aboutAct->setIconVisibleInMenu(true);
+    ui->aboutAct->setShortcuts(QKeySequence::WhatsThis);
+    connect(ui->aboutAct, &QAction::triggered, this, &MainWindow::about);
+    //infoMenu->addAction(aboutAct);
 
-    hw_infoAct = new QAction(QIcon(":/resources/img/icons8-info-48.png"), tr("HW info"), this);
-    hw_infoAct->setIconVisibleInMenu(true);
-    connect(hw_infoAct, &QAction::triggered, this, &MainWindow::hwInfoMsgbox);
-    infoMenu->addAction(hw_infoAct);
+    ui->hw_infoAct->setIcon(QIcon(":/resources/img/icons8-info-48.png"));
+    ui->hw_infoAct->setIconVisibleInMenu(true);
+    connect(ui->hw_infoAct, &QAction::triggered, this, &MainWindow::hwInfoMsgbox);
+    //infoMenu->addAction(hw_infoAct);
 }
 
 void MainWindow::hwInfoMsgbox()
@@ -354,11 +371,75 @@ void MainWindow::hwInfoMsgbox()
     msgBox.exec();
 }
 
-void MainWindow::createLanguageMenu()
+void MainWindow::createLanguageMenu(void)
 {
     i18nMenu = menuBar()->addMenu("六A");
     //i18nMenu->setIcon(QIcon(":/resources/img/translate.png"));
-    i18nMenu->setDisabled(true);
+    //i18nMenu->setDisabled(true);
+
+    QActionGroup *langGroup = new QActionGroup(i18nMenu);
+    langGroup->setExclusive(true);
+
+    connect(langGroup, SIGNAL(triggered(QAction *)), this, SLOT(slotLanguageChanged(QAction *)));
+
+    QString defaultLocale = QLocale::system().name();       // e.g. "de_DE"
+    defaultLocale.truncate(defaultLocale.lastIndexOf('_')); // e.g. "de"
+
+    m_langPath = QApplication::applicationDirPath();
+    m_langPath.append("/i18n");
+    QDir dir(m_langPath);
+    QStringList fileNames = dir.entryList(QStringList(qApp->applicationName() + "_*.qm"));
+
+    for (int i = 0; i < fileNames.size(); ++i) {
+        // get locale extracted by filename
+        QString locale;
+        locale = fileNames[i];                         // "TranslationExample_de.qm"
+        locale.truncate(locale.lastIndexOf('.'));      // "TranslationExample_de"
+        locale.remove(0, locale.lastIndexOf('_') + 1); // "de"
+
+        //qDebug() << "locale: " << locale;
+
+        //QString lang = QLocale::languageToString(QLocale(locale).language());
+        QIcon ico(QString("%1/%2.png").arg(m_langPath).arg(locale));
+
+        QAction *action = new QAction(ico, locale.toUpper(), this);
+        action->setCheckable(true);
+        action->setData(locale);
+
+        i18nMenu->addAction(action);
+        langGroup->addAction(action);
+
+        // set default translators and language checked
+        if (defaultLocale == locale) {
+            action->setChecked(true);
+        }
+    }
+}
+
+void MainWindow::loadLanguage(const QString &rLanguage)
+{
+    if (m_currLang != rLanguage) {
+        m_currLang = rLanguage;
+        QLocale locale = QLocale(m_currLang);
+        QLocale::setDefault(locale);
+        QString languageName = QLocale::languageToString(locale.language());
+        switchTranslator(m_translator, QString(qApp->applicationName() + "_%1.qm").arg(rLanguage));
+        switchTranslator(m_translatorQt, QString("qt_%1.qm").arg(rLanguage));
+        statusBar()->showMessage(tr("Current Language changed to") + " " + rLanguage.toUpper());
+    }
+}
+
+void MainWindow::switchTranslator(QTranslator &translator, const QString &filename)
+{
+    qApp->removeTranslator(&translator);
+
+    // load the new translator
+    QString path = QApplication::applicationDirPath();
+    path.append("/i18n/");
+    if (translator.load(
+            path
+            + filename)) //Here Path and Filename has to be entered because the system didn't find the QM Files else
+        qApp->installTranslator(&translator);
 }
 
 void MainWindow::initListview()
@@ -564,6 +645,26 @@ void MainWindow::showDefaultIptcMeta()
 void MainWindow::clearDefaultIptcMeta()
 {
     hasDefaultIptcMeta = false;
+}
+
+void MainWindow::changeEvent(QEvent *event)
+{
+    if (0 != event) {
+        switch (event->type()) {
+        // this event is send if a translator is loaded
+        case QEvent::LanguageChange:
+            ui->retranslateUi(this);
+            break;
+
+            // this event is send, if the system, language changes
+        case QEvent::LocaleChange: {
+            QString locale = QLocale::system().name();
+            locale.truncate(locale.lastIndexOf('_'));
+            loadLanguage(locale);
+        } break;
+        }
+    }
+    QMainWindow::changeEvent(event);
 }
 
 void MainWindow::showAlbumLimitMsg(int resultCount)

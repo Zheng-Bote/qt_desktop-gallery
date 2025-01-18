@@ -78,7 +78,31 @@
     <addaction name="separator"/>
     <addaction name="actionclear_Album"/>
    </widget>
+   <widget class="QMenu" name="pictureMenu">
+    <property name="title">
+     <string>Pictures</string>
+    </property>
+    <addaction name="showDefaultExifAct"/>
+    <addaction name="clearDefaultExifAct"/>
+    <addaction name="separator"/>
+    <addaction name="showDefaultIptcAct"/>
+    <addaction name="clearDefaultIptcAct"/>
+    <addaction name="separator"/>
+    <addaction name="selectAllImagesAct"/>
+    <addaction name="writeDefaultMetaToSelectedImagesAct"/>
+    <addaction name="separator"/>
+    <addaction name="removeImagesAct"/>
+   </widget>
+   <widget class="QMenu" name="infoMenu">
+    <property name="title">
+     <string>Info</string>
+    </property>
+    <addaction name="aboutAct"/>
+    <addaction name="hw_infoAct"/>
+   </widget>
    <addaction name="menuMenu"/>
+   <addaction name="pictureMenu"/>
+   <addaction name="infoMenu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionload_Picture">
@@ -110,6 +134,51 @@
    </property>
    <property name="text">
     <string>clear Album</string>
+   </property>
+  </action>
+  <action name="showDefaultExifAct">
+   <property name="text">
+    <string>show default Exif meta data</string>
+   </property>
+  </action>
+  <action name="clearDefaultExifAct">
+   <property name="text">
+    <string>clear default Exif meta data</string>
+   </property>
+  </action>
+  <action name="showDefaultIptcAct">
+   <property name="text">
+    <string>show default IPTC meta data</string>
+   </property>
+  </action>
+  <action name="clearDefaultIptcAct">
+   <property name="text">
+    <string>clear default Exif meta data</string>
+   </property>
+  </action>
+  <action name="selectAllImagesAct">
+   <property name="text">
+    <string>select all Pictures</string>
+   </property>
+  </action>
+  <action name="writeDefaultMetaToSelectedImagesAct">
+   <property name="text">
+    <string>write default Meta to selected Pictures</string>
+   </property>
+  </action>
+  <action name="removeImagesAct">
+   <property name="text">
+    <string>remove selected Pictures from Album</string>
+   </property>
+  </action>
+  <action name="aboutAct">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+  <action name="hw_infoAct">
+   <property name="text">
+    <string>HW info</string>
    </property>
   </action>
  </widget>
