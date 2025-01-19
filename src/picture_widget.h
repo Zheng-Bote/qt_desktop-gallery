@@ -76,6 +76,8 @@ private:
     void markExif(QString searchFor);
     const void readSrcIptc();
 
+    const void readSrcXmp();
+
     const QMap<QString, QString> exifMetaTags{
         {"Exif.Image.DocumentName",
          "The name of the document from which this image was scanned."
@@ -139,26 +141,6 @@ private:
          "Security classification assigned to the image."
          "\n"
          "(Ascii)"},
-        {"Exif.Image.XPTitle",
-         "Title tag used by Windows, encoded in UCS2."
-         "\n"
-         "(Byte)"},
-        {"Exif.Image.XPComment",
-         "Comment tag used by Windows, encoded in UCS2."
-         "\n"
-         "(Byte)"},
-        {"Exif.Image.XPAuthor",
-         "Author tag used by Windows, encoded in UCS2."
-         "\n"
-         "(Byte)"},
-        {"Exif.Image.XPKeywords",
-         "Keywords tag used by Windows, encoded in UCS2."
-         "\n"
-         "(Byte)"},
-        {"Exif.Image.XPSubject",
-         "Subject tag used by Windows, encoded in UCS2"
-         "\n"
-         "(Byte)"},
         {"Exif.Photo.UserComment",
          "A tag for Exif users to write keywords or comments on the image"
          "\n"
@@ -172,17 +154,13 @@ private:
          "It is recorded as an ASCII string equivalent to hexadecimal notation and 128-bit fixed "
          "length."
          "\n"
-         "(Ascii)"},
-        {"Exif.Photo.ImageTitle",
-         "This tag records the title of the image."
-         "\n"
-         "(Ascii)"},
-        {"Exif.Photo.Photographer",
-         "This tag records the name of the photographer."
-         "\n"
          "(Ascii)"}};
 
     const QMap<QString, QString> iptcMetaTags{
+        {"Iptc.Application2.ObjectName",
+         "Used as a shorthand reference for the object."
+         "\n"
+         "(64B)"},
         {"Iptc.Application2.Subject",
          "The Subject Reference is a structured definition of the subject matter."
          "\n"

@@ -222,6 +222,16 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="tab_3_Xmp">
+      <attribute name="title">
+       <string>XMP</string>
+      </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <item>
+        <widget class="QTableWidget" name="xmpTableWidget"/>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>

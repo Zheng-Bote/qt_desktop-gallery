@@ -54,6 +54,7 @@ void PictureWidget::setImage(QString pathToFile)
 
     QFuture<void> futureExif = QtConcurrent::run(&PictureWidget::readSrcExif, this);
     QFuture<void> futureIptc = QtConcurrent::run(&PictureWidget::readSrcIptc, this);
+    QFuture<void> futureXmp = QtConcurrent::run(&PictureWidget::readSrcXmp, this);
     //readSrcExif();
     //readSrcIptc();
 
@@ -364,6 +365,99 @@ const void PictureWidget::readSrcIptc()
     */
 }
 
+const void PictureWidget::readSrcXmp()
+{
+    if (!checkValidMetaImg()) {
+        disableMetaTabs(3);
+        return;
+    }
+    QFile file(pathToImage);
+    auto xmp_image = Exiv2::ImageFactory::open(file.fileName().toUtf8().toStdString());
+
+    QFont font_11_bold("Times New Roman", 11);
+    font_11_bold.setBold(true);
+
+    ui->xmpTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->xmpTableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    ui->xmpTableWidget->insertRow(0);
+    ui->xmpTableWidget->insertColumn(0);
+    ui->xmpTableWidget->insertColumn(1);
+    ui->xmpTableWidget->insertColumn(2);
+
+    QTableWidgetItem *tlbCol1 = new QTableWidgetItem();
+    tlbCol1->setText("XMP key");
+    tlbCol1->setBackground(Qt::lightGray);
+    tlbCol1->setFont(font_11_bold);
+    tlbCol1->setTextAlignment(Qt::AlignCenter);
+    ui->xmpTableWidget->setHorizontalHeaderItem(0, tlbCol1);
+
+    QTableWidgetItem *tlbCol2 = new QTableWidgetItem();
+    tlbCol2->setText("XMP value");
+    tlbCol2->setBackground(Qt::lightGray);
+    tlbCol2->setFont(font_11_bold);
+    tlbCol2->setTextAlignment(Qt::AlignCenter);
+    ui->xmpTableWidget->setHorizontalHeaderItem(1, tlbCol2);
+
+    QTableWidgetItem *tlbCol3 = new QTableWidgetItem();
+    tlbCol3->setText("XMP description");
+    tlbCol3->setBackground(Qt::lightGray);
+    tlbCol3->setFont(font_11_bold);
+    tlbCol3->setTextAlignment(Qt::AlignCenter);
+    ui->xmpTableWidget->setHorizontalHeaderItem(2, tlbCol3);
+
+    ui->xmpTableWidget->removeRow(0);
+
+    xmp_image->readMetadata();
+
+    Exiv2::XmpData &xmpData = xmp_image->xmpData();
+
+    if (xmpData.empty()) {
+        qDebug() << "No XMP data found in file " << pathToImage;
+        //createIptcCopyrightRow();
+    } else {
+        auto end = xmpData.end();
+        for (auto md = xmpData.begin(); md != end; ++md) {
+            ui->xmpTableWidget->insertRow(ui->xmpTableWidget->rowCount());
+
+            ui->xmpTableWidget->setItem(ui->xmpTableWidget->rowCount() - 1,
+                                        0,
+                                        new QTableWidgetItem(md->key().c_str()));
+
+            QTableWidgetItem *tlbCol2val = new QTableWidgetItem();
+            tlbCol2val->setText(md->value().toString().c_str());
+            //tlbCol2val->setTextAlignment(Qt::AlignRight);
+            //tlbCol2val->setTextAlignment(Qt::AlignVCenter);
+
+            ui->xmpTableWidget->setItem(ui->xmpTableWidget->rowCount() - 1, 1, tlbCol2val);
+            tlbCol2val = nullptr;
+            /*
+            if (iptcMetaTags.contains(md->key().c_str())) {
+                QTableWidgetItem *tlbCol3val = new QTableWidgetItem();
+                tlbCol3val->setText(iptcMetaTags.value(md->key().c_str(), ""));
+                ui->iptcTableWidget->setItem(ui->iptcTableWidget->rowCount() - 1, 2, tlbCol3val);
+                tlbCol3val = nullptr;
+            }*/
+        }
+    }
+
+    /*
+    // check and set default meta tags, if missing
+    for (auto i = iptcMetaTags.cbegin(), end = iptcMetaTags.cend(); i != end; ++i) {
+        markIptc(i.key());
+        //i.value()
+    }*/
+
+    // cleanup
+    tlbCol1 = nullptr;
+    tlbCol2 = nullptr;
+    tlbCol3 = nullptr;
+    file.close();
+
+    ui->xmpTableWidget->resizeColumnsToContents();
+    ui->xmpTableWidget->resizeRowsToContents();
+}
+
 void PictureWidget::markIptc(QString searchFor)
 {
     QList<QTableWidgetItem *> LTempTable = ui->iptcTableWidget->findItems(searchFor,
@@ -601,14 +695,33 @@ void PictureWidget::on_exifTableWidget_itemDoubleClicked(QTableWidgetItem *item)
 
         QFile file(pathToImage);
         std::string key = ui->exifTableWidget->item(row, 0)->text().toStdString();
-        auto exif_image = Exiv2::ImageFactory::open(file.fileName().toUtf8().toStdString());
-        exif_image->readMetadata();
-        Exiv2::ExifData &exifData = exif_image->exifData();
-        exifData[key] = text.toStdString();
-        exif_image->setExifData(exifData);
-        exif_image->writeMetadata();
-        file.close();
-        ui->exifTableWidget->resizeColumnsToContents();
+
+        try {
+            Exiv2::XmpParser::initialize();
+            ::atexit(Exiv2::XmpParser::terminate);
+
+            auto exif_image = Exiv2::ImageFactory::open(file.fileName().toUtf8().toStdString());
+            exif_image->readMetadata();
+            Exiv2::ExifData &exifData = exif_image->exifData();
+            exifData[key] = text.toStdString();
+
+            /*
+            auto v = Exiv2::Value::create(Exiv2::asciiString);
+            qDebug() << "Set the value to a string";
+            v->read(text.toStdString());
+            qDebug() << "Add the value together with its key to the Exif data container";
+            Exiv2::ExifKey key("Exif.Photo.ImageTitle");
+            qDebug() << "add";
+            exifData.add(key, v.get());
+            */
+
+            exif_image->setExifData(exifData);
+            exif_image->writeMetadata();
+            file.close();
+            ui->exifTableWidget->resizeColumnsToContents();
+        } catch (Exiv2::Error &e) {
+            qDebug() << "Caught Exiv2 exception " << e.what() << "\n";
+        }
     }
 }
 
@@ -749,6 +862,10 @@ void PictureWidget::on_tabWidget_tabBarClicked(int index)
     ui->iptcTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->iptcTableWidget->resizeColumnsToContents();
     ui->iptcTableWidget->resizeRowsToContents();
+
+    ui->xmpTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->xmpTableWidget->resizeColumnsToContents();
+    ui->xmpTableWidget->resizeRowsToContents();
 
     ui->tabWidget->adjustSize();
 }
