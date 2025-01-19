@@ -14,10 +14,11 @@
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
 **Table of Contents**
 
 - [Description](#description)
-    - [Features](#features)
+  - [Features](#features)
   - [Status](#status)
     - [Application / Tool](#application--tool)
 - [Documentation](#documentation)
@@ -71,7 +72,7 @@ Optimized for large Albums (multithreaded iterations)
 - \[ ] runs on iOS
 - \[ ] runs on Android
 - \[ ] runs on HarmonyOS
-- \[ ] Muli-Language support (i18n)
+- \[x] Muli-Language support (i18n)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -168,6 +169,7 @@ SOFTWARE.
 :vulcan_salute:
 
 <!-- readme-tree start -->
+
 ```
 .
 ├── .github
@@ -260,4 +262,5 @@ SOFTWARE.
 
 13 directories, 75 files
 ```
+
 <!-- readme-tree end -->
