@@ -29,6 +29,7 @@ private slots:
 
     void on_exifTableWidget_itemDoubleClicked(QTableWidgetItem *item);
     void on_iptcTableWidget_itemDoubleClicked(QTableWidgetItem *item);
+    void on_xmpTableWidget_itemDoubleClicked(QTableWidgetItem *item);
 
     void rotateSrcImg(int val);
     void exportSrcImgToWebpThread();
@@ -77,6 +78,49 @@ private:
     const void readSrcIptc();
 
     const void readSrcXmp();
+    void markXmp(QString searchFor);
+
+    const QMap<QString, QString> xmpMetaTags{
+        {"Xmp.dc.DocumentName", "the original document name."},
+        {"Xmp.dc.ImageID",
+         "full pathname of the original, high-resolution image,"
+         "\n"
+         "or any other uniquely identifying string."},
+        {"Xmp.dc.Title", "lang=\"en\" "},
+        {"Xmp.dc.Subject", "lang=\"en\" "},
+        {"Xmp.dc.Description", "lang=\"en\" "},
+        {"Xmp.dc.Rights", "Copyright Notice"},
+        {"Xmp.dc.CopyrightOwner", "Copyright Owner"},
+        {"Xmp.plus.CopyrightOwner", "Copyright Owner"},
+        {"Xmp.dc.CountryCode",
+         "Indicates the code of the country/primary location where the intellectual property of "
+         "the object data was created,"
+         "\n"
+         "e.g. a photo was taken, an event occurred."
+         "\n"
+         "Where ISO has established an appropriate country code under ISO 3166."},
+        {"Xmp.dc.CountryName",
+         "lang=\"en\" \n"
+         "Provides full, publishable, name of the country/primary location where the intellectual "
+         "property of the object data was created."},
+        {"Xmp.dc.ProvinceState",
+         "lang=\"en\" \n"
+         "Identifies Province/State of origin."},
+        {"Xmp.dc.City", "lang=\"en\" "},
+        {"Xmp.dc.SubLocation",
+         "lang=\"en\" \n"
+         "Identifies the location within a city from which the object data originates."},
+        {"Xmp.dc.ZipCode", ""},
+        {"Xmp.dc.StreetName", "lang=\"en\" "},
+        {"Xmp.dc.LocalAddress", "address in local language and format."},
+        {"Xmp.dc.Language",
+         "Describes the major national language of the object, according to the 2-letter codes of "
+         "ISO 639:1988."
+         "\n"
+         "Does not define or imply any coded character set."},
+        {"Xmp.dc.Category", "Supplemental categories further refine the subject of an object data."},
+        {"Xmp.dc.Keywords", "Used to indicate specific information retrieval words."},
+        {"Xmp.dc.SecurityClassification", "Security classification assigned to the image."}};
 
     const QMap<QString, QString> exifMetaTags{
         {"Exif.Image.DocumentName",
@@ -93,31 +137,6 @@ private:
          "When a 2-bytes code is necessary, the Exif Private tag <UserComment> is to be used."
          "\n"
          "(Ascii)"},
-        {"Exif.Image.Artist",
-         "This tag records the name of the camera owner, photographer or image creator."
-         "\n"
-         "The detailed format is not specified,"
-         "\n"
-         "but it is recommended that the information be written as in the example below for ease "
-         "of Interoperability."
-         "\n"
-         "When the field is left blank, it is treated as unknown."
-         "\n"
-         "Example:"
-         "\n"
-         "'Camera owner, John Smith; "
-         "Photographer, Michael "
-         "Brown; Image creator, Ken James'"
-         "\n"
-         "(Ascii)"},
-        {"Exif.Image.Rating",
-         "Rating tag used by Windows."
-         "\n"
-         "(Short)"},
-        {"Exif.Image.RatingPercent",
-         "Rating tag used by Windows, value in percent."
-         "\n"
-         "(short)"},
         {"Exif.Image.ImageID",
          "ImageID is the full pathname of the original, high-resolution image,"
          "\n"
@@ -154,124 +173,29 @@ private:
          "It is recorded as an ASCII string equivalent to hexadecimal notation and 128-bit fixed "
          "length."
          "\n"
-         "(Ascii)"}};
+         "(Ascii)"},
+        {"Exif.Image.GPSTag", ""},
+        {"Exif.GPSInfo.GPSLatitudeRef", ""},
+        {"Exif.GPSInfo.GPSLatitude", ""},
+        {"Exif.GPSInfo.GPSLongitudeRef", ""},
+        {"Exif.GPSInfo.GPSLongitude", ""},
+        {"Exif.GPSInfo.GPSAltitudeRef", ""},
+        {"Exif.GPSInfo.GPSAltitude", ""},
+        {"Exif.GPSInfo.GPSTimeStamp", ""},
+        {"Exif.GPSInfo.GPSMapDatum", ""},
+        {"Exif.GPSInfo.GPSDateStamp", ""},
+        {"Exif.Photo.DateTimeOriginal", ""}};
 
-    const QMap<QString, QString> iptcMetaTags{
-        {"Iptc.Application2.ObjectName",
-         "Used as a shorthand reference for the object."
-         "\n"
-         "(64B)"},
-        {"Iptc.Application2.Subject",
-         "The Subject Reference is a structured definition of the subject matter."
-         "\n"
-         "(236B)"},
-        {"Iptc.Application2.Category",
-         "Identifies the subject of the object data in the opinion of the provider."
-         "\n"
-         "A list of categories will be maintained by a regional registry, where available,"
-         "\n"
-         "otherwise by the provider."
-         "\n"
-         "(3B)"},
-        {"Iptc.Application2.SuppCategory",
-         "Supplemental categories further refine the subject of an object data."
-         "A supplemental category may include any of the recognised categories as used in tag "
-         "<Category>."
-         "\n"
-         "Otherwise, selection of supplemental categories are left to the provider."
-         "\n"
-         "(32B)"},
-        {"Iptc.Application2.Keywords",
-         "Used to indicate specific information retrieval words."
-         "\n"
-         "It is expected that a provider of various types of data that are related in subject "
-         "matter uses the same keyword,"
-         "\n"
-         "enabling the receiving system or subsystems to search across all types of data for "
-         "related material."
-         "\n"
-         "(64B)"},
-        {"Iptc.Application2.LocationCode",
-         "Indicates the code of a country/geographical location referenced by the content of the "
-         "object."
-         "\n"
-         "Where ISO has established an appropriate country code under ISO 3166, that code will be "
-         "used."
-         "\n"
-         "When ISO 3166 does not adequately provide for identification of a location or a country,"
-         "\n"
-         "e.g. ships at sea, space,"
-         "\n"
-         "IPTC will assign an appropriate three-character code under the provisions of ISO 3166 to "
-         "avoid conflicts."
-         "\n"
-         "(3B)"},
-        {"Iptc.Application2.LocationName",
-         "Provides a full, publishable name of a country/geographical location referenced by the "
-         "content of the object,"
-         "\n"
-         "according to guidelines of the provider."
-         "\n"
-         "(64B)"},
-        {"Iptc.Application2.City",
-         "Identifies city of object data origin according to guidelines established by the "
-         "provider."
-         "\n"
-         "(32B)"},
-        {"Iptc.Application2.SubLocation",
-         "Identifies the location within a city from which the object data originates,"
-         "\n"
-         "according to guidelines established by the provider."
-         "\n"
-         "(32B)"},
-        {"Iptc.Application2.ProvinceState",
-         "Identifies Province/State of origin according to guidelines established by the provider."
-         "\n"
-         "(32B)"},
-        {"Iptc.Application2.CountryCode",
-         "Indicates the code of the country/primary location where the intellectual property of "
-         "the object data was created,"
-         "\n"
-         "e.g. a photo was taken, an event occurred."
-         "\n"
-         "Where ISO has established an appropriate country code under ISO 3166,"
-         "\n"
-         "that code will be used. When ISO 3166 does not adequately provide for identification of "
-         "a location or a new country,"
-         "\n"
-         "e.g. ships at sea, space,"
-         "\n"
-         "IPTC will assign an appropriate three-character code under the "
-         "provisions of ISO 3166 to avoid conflicts."
-         "\n"
-         "(3B)"},
-        {"Iptc.Application2.CountryName",
-         "Provides full, publishable, name of the country/primary location"
-         "\n"
-         "where the intellectual property of the object data was created,"
-         "\n"
-         "according to guidelines of the provider."
-         "\n"
-         "(64B)"},
-        {"Iptc.Application2.Headline",
-         "A publishable entry providing a synopsis of the contents of the object data."
-         "\n"
-         "(256B)"},
-        {"Iptc.Application2.Copyright",
-         "Contains any necessary copyright notice."
-         "\n"
-         "(128B)"},
-        {"Iptc.Application2.Caption",
-         "A textual description of the object data."
-         "\n"
-         "(2000B)"},
-        {"Iptc.Application2.Language",
-         "Describes the major national language of the object, according to the 2-letter codes of "
-         "ISO 639:1988."
-         "\n"
-         "Does not define or imply any coded character set, but is used for internal routing,"
-         "\n"
-         "e.g. to various editorial desks."
-         "\n"
-         "(3B)"}};
+    const QMap<QString, QString> iptcMetaTags{{"Iptc.Application2.ObjectName",
+                                               "Used as a shorthand reference for the object."
+                                               "\n"
+                                               "(64B)"},
+                                              {"Iptc.Application2.Copyright",
+                                               "Contains any necessary copyright notice."
+                                               "\n"
+                                               "(128B)"},
+                                              {"Iptc.Application2.Caption",
+                                               "A textual description of the object data."
+                                               "\n"
+                                               "(2000B)"}};
 };

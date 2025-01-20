@@ -260,11 +260,12 @@ void PictureWidget::markExif(QString searchFor)
         //rowPtr->setBackground(Qt::red);
         int rowNumber = rowPtr->row();
         ui->exifTableWidget->item(rowNumber, 0)->setForeground(Qt::red);
-
+        /*
         if (ui->exifTableWidget->item(rowNumber, 1)->text().length() < 1) {
-            ui->exifTableWidget->item(rowNumber, 1)->setBackground(Qt::red);
-            ui->exifTableWidget->item(rowNumber, 1)->setForeground(Qt::black);
+            //  ui->exifTableWidget->item(rowNumber, 1)->setBackground(Qt::red);
+            //ui->exifTableWidget->item(rowNumber, 1)->setForeground(Qt::black);
         }
+        */
     }
 }
 
@@ -431,22 +432,21 @@ const void PictureWidget::readSrcXmp()
 
             ui->xmpTableWidget->setItem(ui->xmpTableWidget->rowCount() - 1, 1, tlbCol2val);
             tlbCol2val = nullptr;
-            /*
-            if (iptcMetaTags.contains(md->key().c_str())) {
+
+            if (xmpMetaTags.contains(md->key().c_str())) {
                 QTableWidgetItem *tlbCol3val = new QTableWidgetItem();
-                tlbCol3val->setText(iptcMetaTags.value(md->key().c_str(), ""));
-                ui->iptcTableWidget->setItem(ui->iptcTableWidget->rowCount() - 1, 2, tlbCol3val);
+                tlbCol3val->setText(xmpMetaTags.value(md->key().c_str(), ""));
+                ui->xmpTableWidget->setItem(ui->xmpTableWidget->rowCount() - 1, 2, tlbCol3val);
                 tlbCol3val = nullptr;
-            }*/
+            }
         }
     }
 
-    /*
     // check and set default meta tags, if missing
-    for (auto i = iptcMetaTags.cbegin(), end = iptcMetaTags.cend(); i != end; ++i) {
-        markIptc(i.key());
+    for (auto i = xmpMetaTags.cbegin(), end = xmpMetaTags.cend(); i != end; ++i) {
+        markXmp(i.key());
         //i.value()
-    }*/
+    }
 
     // cleanup
     tlbCol1 = nullptr;
@@ -456,6 +456,46 @@ const void PictureWidget::readSrcXmp()
 
     ui->xmpTableWidget->resizeColumnsToContents();
     ui->xmpTableWidget->resizeRowsToContents();
+}
+
+void PictureWidget::markXmp(QString searchFor)
+{
+    QList<QTableWidgetItem *> LTempTable = ui->xmpTableWidget->findItems(searchFor,
+                                                                         Qt::MatchEndsWith);
+
+    if (LTempTable.isEmpty()) {
+        ui->xmpTableWidget->insertRow(ui->xmpTableWidget->rowCount());
+
+        ui->xmpTableWidget->setItem(ui->xmpTableWidget->rowCount() - 1,
+                                    0,
+                                    new QTableWidgetItem(searchFor));
+
+        QTableWidgetItem *tlbCol2val = new QTableWidgetItem();
+        tlbCol2val->setText("");
+        //tlbCol2val->setTextAlignment(Qt::AlignRight);
+        ui->xmpTableWidget->setItem(ui->xmpTableWidget->rowCount() - 1, 1, tlbCol2val);
+        tlbCol2val = nullptr;
+
+        if (xmpMetaTags.contains(searchFor)) {
+            QTableWidgetItem *tlbCol3val = new QTableWidgetItem();
+            tlbCol3val->setText(xmpMetaTags.value(searchFor, ""));
+            ui->xmpTableWidget->setItem(ui->xmpTableWidget->rowCount() - 1, 2, tlbCol3val);
+            tlbCol3val = nullptr;
+        }
+    }
+
+    QTableWidgetItem *rowPtr = new QTableWidgetItem();
+    LTempTable = ui->xmpTableWidget->findItems(searchFor, Qt::MatchEndsWith);
+    foreach (rowPtr, LTempTable) {
+        //rowPtr->setBackground(Qt::red);
+        int rowNumber = rowPtr->row();
+        ui->xmpTableWidget->item(rowNumber, 0)->setForeground(Qt::red);
+
+        if (ui->xmpTableWidget->item(rowNumber, 1)->text().length() < 1) {
+            ui->xmpTableWidget->item(rowNumber, 1)->setBackground(Qt::red);
+            ui->xmpTableWidget->item(rowNumber, 1)->setForeground(Qt::black);
+        }
+    }
 }
 
 void PictureWidget::markIptc(QString searchFor)
@@ -490,11 +530,12 @@ void PictureWidget::markIptc(QString searchFor)
         //rowPtr->setBackground(Qt::red);
         int rowNumber = rowPtr->row();
         ui->iptcTableWidget->item(rowNumber, 0)->setForeground(Qt::red);
-
+        /*
         if (ui->iptcTableWidget->item(rowNumber, 1)->text().length() < 1) {
-            ui->iptcTableWidget->item(rowNumber, 1)->setBackground(Qt::red);
+            //ui->iptcTableWidget->item(rowNumber, 1)->setBackground(Qt::red);
             ui->iptcTableWidget->item(rowNumber, 1)->setForeground(Qt::black);
         }
+        */
     }
 }
 
@@ -760,6 +801,44 @@ void PictureWidget::on_iptcTableWidget_itemDoubleClicked(QTableWidgetItem *item)
         iptc_image->writeMetadata();
         file.close();
         ui->iptcTableWidget->resizeColumnsToContents();
+    }
+}
+
+void PictureWidget::on_xmpTableWidget_itemDoubleClicked(QTableWidgetItem *item)
+{
+    bool ok;
+
+    int row = item->row();
+    qDebug() << "row: " << row << " val 0: " << ui->xmpTableWidget->item(row, 0)->text();
+
+    /* KISS
+    QInputDialog inDialog(this);
+    inDialog.setOkButtonText("save");
+    inDialog.setLabelText(ui->iptcTableWidget->item(row, 0)->text());
+    inDialog.setTextValue(ui->iptcTableWidget->item(row, 1)->text());
+    inDialog.setTextEchoMode(QLineEdit::Normal);
+    */
+
+    QString text = QInputDialog::getText(this,
+                                         tr("Edit Metadata"),
+                                         tr("Please enter the new value for") + " "
+                                             + ui->xmpTableWidget->item(row, 0)->text() + ":",
+                                         QLineEdit::Normal,
+                                         ui->xmpTableWidget->item(row, 1)->text(),
+                                         &ok);
+    if (ok && !text.isEmpty()) {
+        ui->xmpTableWidget->setItem(row, 1, new QTableWidgetItem(text));
+
+        QFile file(pathToImage);
+        std::string key = ui->xmpTableWidget->item(row, 0)->text().toStdString();
+        auto xmp_image = Exiv2::ImageFactory::open(file.fileName().toUtf8().toStdString());
+        xmp_image->readMetadata();
+        Exiv2::XmpData &xmpData = xmp_image->xmpData();
+        xmpData[key] = text.toStdString();
+        xmp_image->setXmpData(xmpData);
+        xmp_image->writeMetadata();
+        file.close();
+        ui->xmpTableWidget->resizeColumnsToContents();
     }
 }
 
