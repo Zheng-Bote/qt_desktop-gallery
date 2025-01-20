@@ -14,11 +14,10 @@
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
 **Table of Contents**
 
 - [Description](#description)
-  - [Features](#features)
+    - [Features](#features)
   - [Status](#status)
     - [Application / Tool](#application--tool)
 - [Documentation](#documentation)
@@ -169,7 +168,6 @@ SOFTWARE.
 :vulcan_salute:
 
 <!-- readme-tree start -->
-
 ```
 .
 ├── .github
@@ -212,6 +210,17 @@ SOFTWARE.
 │   │   ├── Doxygen.cmake
 │   │   ├── extra_headers
 │   │   └── rz_config.h.in
+│   ├── i18n
+│   │   ├── de.png
+│   │   ├── en.png
+│   │   ├── qt_de.qm
+│   │   ├── qt_desktop-gallery_de.qm
+│   │   ├── qt_desktop-gallery_de.ts
+│   │   ├── qt_desktop-gallery_en.qm
+│   │   ├── qt_desktop-gallery_en.ts
+│   │   ├── qt_en.qm
+│   │   ├── qtbase_de.qm
+│   │   └── qtbase_en.qm
 │   ├── includes
 │   │   ├── rz_config.h
 │   │   ├── rz_hwinfo.cpp
@@ -260,7 +269,6 @@ SOFTWARE.
 │   └── resources.qrc
 └── tree.bak
 
-13 directories, 75 files
+14 directories, 85 files
 ```
-
 <!-- readme-tree end -->
