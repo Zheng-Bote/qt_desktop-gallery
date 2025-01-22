@@ -1,7 +1,7 @@
 <div id="top" align="center">
 <h1>qt_desktop-gallery</h1>
 
-<p>Desktop gallery-app for Linux, MacOS, Windows to show/edit Exif/IPTC and export to WebP</p>
+<p>Desktop gallery-app for Linux, MacOS, Windows to show/edit Exif/IPTC/XMP and export to WebP</p>
 
 [Report Issue](https://github.com/Zheng-Bote/qt_desktop-gallery/issues) [Request Feature](https://github.com/Zheng-Bote/qt_desktop-gallery/pulls)
 
@@ -42,7 +42,7 @@
 ![QT](https://img.shields.io/badge/Community-6-41CD52?logo=qt)
 ![CXX](https://img.shields.io/badge/C++-23-blue?logo=cplusplus)
 
-Desktop Gallery-Application for Linux, MacOS and Windows to show/edit Exif/IPTC and export to WebP
+Desktop Gallery-Application for Linux, MacOS and Windows to show/edit Exif-/IPTC-/XMP- Metadata and export to WebP
 
 Optimized for large Albums (multithreaded iterations)
 
@@ -71,7 +71,12 @@ Optimized for large Albums (multithreaded iterations)
 - \[ ] runs on iOS
 - \[ ] runs on Android
 - \[ ] runs on HarmonyOS
+
+<br/>
+
 - \[x] Muli-Language support (i18n)
+- \[x] some Image editing (rotate, export to several WebP sizes)
+- \[x] edit Exif-/IPTC-/XMP- Metadata
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
