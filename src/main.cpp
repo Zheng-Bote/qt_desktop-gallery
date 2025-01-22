@@ -15,6 +15,10 @@ int main(int argc, char *argv[])
     QApplication::setWindowIcon(QIcon(":/resources/img/qt_desktop-gallery_32x31.png"));
     MainWindow w;
 
+    QString locale = QLocale::system().name();
+    locale.truncate(locale.lastIndexOf('_'));
+    w.loadLanguage(locale);
+
     w.show();
     return a.exec();
 }

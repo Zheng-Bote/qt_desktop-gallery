@@ -746,11 +746,37 @@ const void MainWindow::fillSrcListViewThread(const QList<QString> &srcFiles)
                                                    Qt::KeepAspectRatio,
                                                    Qt::SmoothTransformation));
 
+        // Test =>
+        const unsigned int BANNER_HEIGHT = 20;
+        const unsigned int BANNER_COLOR = 0x303030;
+        const unsigned int BANNER_ALPHA = 200;
+        const unsigned int BANNER_TEXT_COLOR = 0xffffff;
+        const unsigned int HIGHLIGHT_ALPHA = 100;
+
+        QImage img(thumbnail->toImage());
+        QPainter paint(&img);
+
+        QRect bannerRect = QRect(0, 0, img.width(), BANNER_HEIGHT);
+        QColor bannerColor = QColor(BANNER_COLOR);
+        bannerColor.setAlpha(BANNER_ALPHA);
+        paint.fillRect(bannerRect, bannerColor);
+        paint.setPen(BANNER_TEXT_COLOR);
+        paint.setFont(*font_10);
+        paint.drawText(bannerRect, Qt::AlignCenter, fileInfo.fileName());
+        QPixmap *px = new QPixmap();
+        px->convertFromImage(img);
+        // Test <=
+
         QStandardItem *listitem = new QStandardItem();
-        listitem->setIcon(*thumbnail);
-        listitem->setText(fileInfo.fileName()); // + "\nschaun wa ma");
+
+        // Test =>
+        //listitem->setIcon(*thumbnail);
+        listitem->setIcon(*px);
+        // Test <=
+
+        //listitem->setText(fileInfo.fileName()); // + "\nschaun wa ma");
         listitem->setToolTip(pathToFile);
-        listitem->setBackground(Qt::lightGray);
+        //listitem->setBackground(Qt::lightGray);
         listitem->setEditable(false);
 
         QList<QStandardItem *> items;

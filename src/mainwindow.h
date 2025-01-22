@@ -24,6 +24,8 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    void loadLanguage(const QString &rLanguage);
+
 protected slots:
     void slotLanguageChanged(QAction *action);
 
@@ -98,7 +100,7 @@ private:
     QTranslator m_translatorQt;
     QString m_currLang;
     QString m_langPath;
-    void loadLanguage(const QString &rLanguage);
+    //void loadLanguage(const QString &rLanguage);
     void switchTranslator(QTranslator &translator, const QString &filename);
 
     void initListview();
