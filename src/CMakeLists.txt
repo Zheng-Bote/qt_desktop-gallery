@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.23)
 
 project(
   qt_desktop-gallery
-  VERSION 0.13.0
+  VERSION 0.14.0
   DESCRIPTION "Desktop gallery-app to show/edit Exif/IPTC and export to WebP"
   HOMEPAGE_URL "https://github.com/Zheng-Bote/qt_desktop-gallery"
   LANGUAGES CXX)
@@ -65,7 +65,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     picture_widget.h
     picture_widget.cpp
     picture_widget.ui
-    resources.qrc)
+    resources.qrc
+    includes/rz_metadata.hpp)
   # Define target properties for Android with Qt 6 as: set_property(TARGET
   # qt_listview APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
   # ${CMAKE_CURRENT_SOURCE_DIR}/android) For more information, see

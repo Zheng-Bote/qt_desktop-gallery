@@ -7,8 +7,10 @@
 #include <QStandardItemModel>
 #include <QStringListModel>
 #include <QTranslator>
-
 #include <QMouseEvent>
+
+//#include "includes/rz_metadata.hpp"
+#include "includes/rz_photo.hpp"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -49,6 +51,8 @@ private slots:
 
     void setDefaultExifMeta(const QModelIndex &index);
     void setDefaultIptcMeta(const QModelIndex &index);
+    void setDefaultXmpCopyRightOwner(const QModelIndex &index);
+    void writeDefaultMetaToSelectedImages();
     void resetDefaultMeta();
 
     void showDefaultExifMeta();
@@ -107,6 +111,7 @@ private:
     QAction *contextShowPictureDetailsAct;
     QAction *contextSetExifAsDefaultAct;
     QAction *contextSetIptcAsDefaultAct;
+    QAction *contextSetXmpCopyRightOwnerAsDefaultAct;
     QAction *contextRemovePictureFromAlbumAct;
 
     void initStatusBar();
@@ -115,6 +120,9 @@ private:
     bool hasDefaultIptcMeta{false};
     QModelIndex rowWithDefaultExifMeta;
     QModelIndex rowWithDefaultIptcMeta;
+
+    bool hasDefaultCopyRightOwner{false};
+    QModelIndex rowWithDefaultCopyRightQwnerMeta;
 
     void refreshStatusBar();
 

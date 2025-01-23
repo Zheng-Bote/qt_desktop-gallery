@@ -246,6 +246,130 @@ QList<QString> Photo::srcPicsRecursive(const QString &srcPath)
     return fileList;
 }
 
+bool Photo::writeXmp(QString &key, QString &value)
+{
+    QString pathToFile = imgStruct.fileAbolutePath + "/" + imgStruct.fileName;
+
+    Exiv2::XmpParser::initialize();
+    ::atexit(Exiv2::XmpParser::terminate);
+#ifdef EXV_ENABLE_BMFF
+    Exiv2::enableBMFF();
+#endif
+    try {
+        auto xmp_image = Exiv2::ImageFactory::open(pathToFile.toStdString());
+        xmp_image->readMetadata();
+        Exiv2::XmpData &xmpData = xmp_image->xmpData();
+        xmpData[key.toStdString()] = value.toStdString();
+        xmp_image->setXmpData(xmpData);
+        xmp_image->writeMetadata();
+        //qDebug() << "writeXmp: write OK";
+        return true;
+    } catch (...) {
+        qCritical() << "writeXmp: write NOK";
+        return false;
+    }
+}
+
+bool Photo::writeExif(QString &key, QString &value)
+{
+    QString pathToFile = imgStruct.fileAbolutePath + "/" + imgStruct.fileName;
+
+    Exiv2::XmpParser::initialize();
+    ::atexit(Exiv2::XmpParser::terminate);
+#ifdef EXV_ENABLE_BMFF
+    Exiv2::enableBMFF();
+#endif
+    try {
+        Exiv2::XmpParser::initialize();
+        ::atexit(Exiv2::XmpParser::terminate);
+
+        auto exif_image = Exiv2::ImageFactory::open(pathToFile.toStdString());
+        exif_image->readMetadata();
+        Exiv2::ExifData &exifData = exif_image->exifData();
+        exifData[key.toStdString()] = value.toStdString();
+
+        /*
+            auto v = Exiv2::Value::create(Exiv2::asciiString);
+            qDebug() << "Set the value to a string";
+            v->read(text.toStdString());
+            qDebug() << "Add the value together with its key to the Exif data container";
+            Exiv2::ExifKey key("Exif.Photo.ImageTitle");
+            qDebug() << "add";
+            exifData.add(key, v.get());
+            */
+
+        exif_image->setExifData(exifData);
+        exif_image->writeMetadata();
+        return true;
+    } catch (Exiv2::Error &e) {
+        qCritical() << "Caught Exiv2 exception " << e.what() << "\n";
+        return false;
+    }
+}
+
+bool Photo::writeIptc(QString &key, QString &value)
+{
+    QString pathToFile = imgStruct.fileAbolutePath + "/" + imgStruct.fileName;
+
+    Exiv2::XmpParser::initialize();
+    ::atexit(Exiv2::XmpParser::terminate);
+#ifdef EXV_ENABLE_BMFF
+    Exiv2::enableBMFF();
+#endif
+    try {
+        Exiv2::XmpParser::initialize();
+        ::atexit(Exiv2::XmpParser::terminate);
+        auto iptc_image = Exiv2::ImageFactory::open(pathToFile.toStdString());
+        iptc_image->readMetadata();
+        Exiv2::IptcData &iptcData = iptc_image->iptcData();
+        iptcData[key.toStdString()] = value.toStdString();
+        iptc_image->setIptcData(iptcData);
+        iptc_image->writeMetadata();
+        return true;
+    } catch (Exiv2::Error &e) {
+        qCritical() << "Caught Exiv2 exception " << e.what() << "\n";
+        return false;
+    }
+}
+
+QString Photo::getXmpCopyrightOwner()
+{
+    QString owner{""};
+    QString pathToFile = imgStruct.fileAbolutePath + "/" + imgStruct.fileName;
+
+    Exiv2::XmpParser::initialize();
+    ::atexit(Exiv2::XmpParser::terminate);
+#ifdef EXV_ENABLE_BMFF
+    Exiv2::enableBMFF();
+#endif
+    try {
+        auto xmp_image = Exiv2::ImageFactory::open(pathToFile.toStdString());
+        xmp_image->readMetadata();
+        Exiv2::XmpData &xmpData = xmp_image->xmpData();
+        if (xmpData.empty()) {
+            qDebug() << "No XMP data found in file " << pathToFile;
+            return owner;
+        } else {
+            auto ret = xmpData["Xmp.dc.CopyrightOwner"];
+            qDebug() << "Owner: " << ret.value().toString();
+            owner = ret.value().toString().c_str();
+        }
+
+    } catch (Exiv2::Error &e) {
+        qCritical() << "Caught Exiv2 exception " << e.what() << "\n";
+        return owner;
+    }
+    return owner;
+}
+
+// TODO
+bool Photo::writeToAllCopyrightOwner(const QString &owner)
+{
+    qDebug() << "TODO: Photo::writeToAllCopyrightOwner " << owner;
+
+    return true;
+}
+
 bool Photo::isValidMetaImageType()
 {
     QString photoExtension = imgStruct.fileSuffix.toLower();

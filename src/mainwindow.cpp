@@ -9,6 +9,7 @@
 #include "./ui_mainwindow.h"
 #include "includes/rz_config.h"
 #include "includes/rz_hwinfo.h"
+
 #include "includes/rz_photo.hpp"
 #include "mainwindow.h"
 
@@ -301,7 +302,11 @@ void MainWindow::createMenu()
     ui->writeDefaultMetaToSelectedImagesAct->setIcon(
         QIcon(":/resources/img/icons8-send-file-50.png"));
     ui->writeDefaultMetaToSelectedImagesAct->setIconVisibleInMenu(true);
-    ui->writeDefaultMetaToSelectedImagesAct->setDisabled(true);
+    ui->writeDefaultMetaToSelectedImagesAct->setDisabled(false);
+    connect(ui->writeDefaultMetaToSelectedImagesAct,
+            &QAction::triggered,
+            this,
+            &MainWindow::writeDefaultMetaToSelectedImages);
     //pictureMenu->addAction(writeDefaultMetaToSelectedImagesAct);
 
     //pictureMenu->addSeparator();
@@ -550,6 +555,14 @@ void MainWindow::showViewContextMenu(const QPoint &pt)
         MainWindow::setDefaultIptcMeta(idx);
     });
 
+    contextSetXmpCopyRightOwnerAsDefaultAct
+        = new QAction(QIcon(":/resources/img/icons8-regular-document-50.png"),
+                      tr("set this Copyright data as default"),
+                      this);
+    connect(contextSetXmpCopyRightOwnerAsDefaultAct, &QAction::triggered, this, [this, idx] {
+        MainWindow::setDefaultXmpCopyRightOwner(idx);
+    });
+
     contextRemovePictureFromAlbumAct = new QAction(QIcon(
                                                        ":/resources/img/icons8-delete-list-50.png"),
                                                    tr("remove this Picture from Album"),
@@ -561,12 +574,14 @@ void MainWindow::showViewContextMenu(const QPoint &pt)
     contextShowPictureDetailsAct->setEnabled(idx.column() == 0);
     contextSetExifAsDefaultAct->setEnabled(idx.column() == 0);
     contextSetIptcAsDefaultAct->setEnabled(idx.column() == 0);
+    contextSetXmpCopyRightOwnerAsDefaultAct->setEnabled(idx.column() == 0);
     contextRemovePictureFromAlbumAct->setEnabled(idx.column() == 0);
 
     menu.addAction(contextShowPictureDetailsAct);
     menu.addSeparator();
     menu.addAction(contextSetExifAsDefaultAct);
     menu.addAction(contextSetIptcAsDefaultAct);
+    menu.addAction(contextSetXmpCopyRightOwnerAsDefaultAct);
     menu.addSeparator();
     menu.addAction(contextRemovePictureFromAlbumAct);
 
@@ -585,12 +600,19 @@ void MainWindow::setDefaultIptcMeta(const QModelIndex &index)
     hasDefaultIptcMeta = true;
 }
 
+void MainWindow::setDefaultXmpCopyRightOwner(const QModelIndex &index)
+{
+    hasDefaultCopyRightOwner = true;
+    rowWithDefaultCopyRightQwnerMeta = index;
+}
+
 void MainWindow::resetDefaultMeta()
 {
     //rowWithDefaultExifMeta = -0;
     //rowWithDefaultIptcMeta = -0;
     hasDefaultExifMeta = false;
     hasDefaultIptcMeta = false;
+    hasDefaultCopyRightOwner = false;
 }
 
 void MainWindow::showDefaultExifMeta()
@@ -830,6 +852,59 @@ void MainWindow::removeSelectedImages()
 
     refreshStatusBar();
     resetDefaultMeta();
+}
+
+// TODO
+void MainWindow::writeDefaultMetaToSelectedImages()
+{
+    qDebug() << "writeDefaultMetaToSelectedImages";
+
+    if (!hasDefaultCopyRightOwner) {
+        QMessageBox msgBox(this);
+        msgBox.setWindowTitle(tr("Default Meta"));
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.setTextFormat(Qt::RichText);
+        QString text = tr("No default meta data set.");
+        QString setInformativeText = tr("In Album view, select a picture and open the context menu "
+                                        "to define the default meta.");
+        msgBox.setText(text);
+        msgBox.setInformativeText(setInformativeText);
+        msgBox.setFixedWidth(900);
+        msgBox.exec();
+    }
+
+    QModelIndexList selected = ui->listView->selectionModel()->selectedIndexes();
+    QList<QString> selectedImages;
+
+    QModelIndex ownerIndex = rowWithDefaultCopyRightQwnerMeta;
+    int row = ownerIndex.row();
+    QModelIndex col2 = mContentItemModel->index(row, 1);
+    QString pathToSRcFile = col2.data(Qt::DisplayRole).toString();
+    Photo photo(pathToSRcFile);
+    QString owner = photo.getXmpCopyrightOwner();
+    qDebug() << "SrcOwner: " << owner;
+
+    /*
+    int row = index.row();
+    QModelIndex col2 = mContentItemModel->index(row, 1);
+    QString itemText2 = col2.data(Qt::DisplayRole).toString();
+    //qDebug() << "doubleclicked: " << itemText2 << " col: " << col2.column();
+    showSinglePicture(itemText2); 
+    */
+
+    for (QModelIndex i : selected) {
+        int row = i.row();
+        QModelIndex col2 = mContentItemModel->index(row, 1);
+        QString pathToFile = col2.data(Qt::DisplayRole).toString();
+        qDebug() << "to update: " << pathToFile;
+
+        Photo photo(pathToFile);
+        QFutureWatcher<bool> watcher;
+        QFuture<bool> future = QtConcurrent::run(&Photo::writeToAllCopyrightOwner, photo, owner);
+        watcher.setFuture(future);
+        watcher.waitForFinished();
+        bool result = future.result();
+    }
 }
 
 void MainWindow::selectAllImages()

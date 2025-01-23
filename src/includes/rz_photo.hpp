@@ -8,6 +8,7 @@
 #include <QPainter>
 #include <QString>
 
+//#include "rz_metadata.hpp"
 #include <exiv2/exiv2.hpp>
 
 struct imageStruct
@@ -42,6 +43,13 @@ public:
     QList<QString> srcPics(const QString &srcPath);
     QList<QString> srcPicsRecursive(const QString &srcPath);
 
+    bool writeXmp(QString &key, QString &value);
+    bool writeExif(QString &key, QString &value);
+    bool writeIptc(QString &key, QString &value);
+
+    QString getXmpCopyrightOwner();
+    bool writeToAllCopyrightOwner(const QString &owner);
+
 private:
     const QList<QString> validMetaImageTypes = {"jpg", "jpeg", "png", "webp", "tiff"};
     bool isValidMetaImageType();
@@ -59,4 +67,166 @@ private:
     bool backupOrigFile();
 
     void readExif();
+
+public:
+    const QMap<QString, QString> exif_to_xmp = {{"Exif.Image.Copyright", "Xmp.dc.CopyrightOwner"},
+                                                {"Exif.Image.DocumentName", "Xmp.dc.DocumentName"},
+                                                {"Exif.Image.ImageDescription",
+                                                 "Xmp.dc.Description"},
+                                                {"Exif.Image.ImageID", "Xmp.dc.ImageID"},
+                                                {"Exif.Image.SecurityClassification",
+                                                 "Xmp.dc.SecurityClassification"},
+                                                {"Exif.Photo.UserComment", "Xmp.dc.Subject"}};
+
+    const QMap<QString, QString> exif_to_iptc = {
+        {"Exif.Image.Copyright", "Iptc.Application2.Copyright"},
+        {"Exif.Image.DocumentName", "Iptc.Application2.ObjectName"},
+        {"Exif.Image.ImageDescription", "Iptc.Application2.Caption"},
+    };
+
+    const QMap<QString, QString> xmp_to_exif = {{"Xmp.dc.CopyrightOwner", "Exif.Image.Copyright"},
+                                                {"Xmp.dc.DocumentName", "Exif.Image.DocumentName"},
+                                                {"Xmp.dc.Description",
+                                                 "Exif.Image.ImageDescription"},
+                                                {"Xmp.dc.ImageID", "Exif.Image.ImageID"},
+                                                {"Xmp.dc.SecurityClassification",
+                                                 "Exif.Image.SecurityClassification"},
+                                                {"Xmp.dc.Subject", "Exif.Photo.UserComment"}};
+
+    const QMap<QString, QString> xmp_to_iptc = {{"Xmp.dc.Description", "Iptc.Application2.Caption"},
+                                                {"Xmp.dc.CopyrightOwner",
+                                                 "Iptc.Application2.Copyright"},
+                                                {"Xmp.dc.DocumentName",
+                                                 "Iptc.Application2.ObjectName"}};
+
+    const QMap<QString, QString> iptc_to_xmp = {{"Iptc.Application2.Caption", "Xmp.dc.Description"},
+                                                {"Iptc.Application2.Copyright",
+                                                 "Xmp.dc.CopyrightOwner"},
+                                                {"Iptc.Application2.ObjectName",
+                                                 "Xmp.dc.DocumentName"}};
+
+    const QMap<QString, QString> iptc_to_exif
+        = {{"Iptc.Application2.Caption", "Exif.Image.ImageDescription"},
+           {"Iptc.Application2.Copyright", "Exif.Image.Copyright"},
+           {"Iptc.Application2.ObjectName", "Exif.Image.DocumentName"}};
+
+    // Meta attributes-values
+    const QMap<QString, QString> xmpMetaTags{
+        {"Xmp.dc.DocumentName", "the original document name."},
+        {"Xmp.dc.ImageID",
+         "full pathname of the original, high-resolution image,"
+         "\n"
+         "or any other uniquely identifying string."},
+        {"Xmp.dc.Title", "lang=\"en\" "},
+        {"Xmp.dc.Subject", "lang=\"en\" "},
+        {"Xmp.dc.Description", "lang=\"en\" "},
+        {"Xmp.dc.Rights", "Copyright Notice"},
+        {"Xmp.dc.CopyrightOwner", "Copyright Owner"},
+        {"Xmp.plus.CopyrightOwner", "Copyright Owner"},
+        {"Xmp.dc.CountryCode",
+         "Indicates the code of the country/primary location where the intellectual property of "
+         "the object data was created,"
+         "\n"
+         "e.g. a photo was taken, an event occurred."
+         "\n"
+         "Where ISO has established an appropriate country code under ISO 3166."},
+        {"Xmp.dc.CountryName",
+         "lang=\"en\" \n"
+         "Provides full, publishable, name of the country/primary location where the intellectual "
+         "property of the object data was created."},
+        {"Xmp.dc.ProvinceState",
+         "lang=\"en\" \n"
+         "Identifies Province/State of origin."},
+        {"Xmp.dc.City", "lang=\"en\" "},
+        {"Xmp.dc.SubLocation",
+         "lang=\"en\" \n"
+         "Identifies the location within a city from which the object data originates."},
+        {"Xmp.dc.ZipCode", ""},
+        {"Xmp.dc.StreetName", "lang=\"en\" "},
+        {"Xmp.dc.LocalAddress", "address in local language and format."},
+        {"Xmp.dc.Language",
+         "Describes the major national language of the object, according to the 2-letter codes of "
+         "ISO 639:1988."
+         "\n"
+         "Does not define or imply any coded character set."},
+        {"Xmp.dc.Category", "Supplemental categories further refine the subject of an object data."},
+        {"Xmp.dc.Keywords", "Used to indicate specific information retrieval words."},
+        {"Xmp.dc.SecurityClassification", "Security classification assigned to the image."}};
+
+    const QMap<QString, QString> exifMetaTags{
+        {"Exif.Image.DocumentName",
+         "The name of the document from which this image was scanned."
+         "\n"
+         "(Ascii)"},
+        {"Exif.Image.ImageDescription",
+         "A character string giving the title of the image."
+         "\n"
+         "It may be a comment such as '1988 company picnic' or the like."
+         "\n"
+         "Two-bytes character codes cannot be used."
+         "\n"
+         "When a 2-bytes code is necessary, the Exif Private tag <UserComment> is to be used."
+         "\n"
+         "(Ascii)"},
+        {"Exif.Image.ImageID",
+         "ImageID is the full pathname of the original, high-resolution image,"
+         "\n"
+         "or any other identifying string that uniquely identifies the original image (Adobe OPI)."
+         "\n"
+         "(Ascii)"},
+        {"Exif.Image.Copyright",
+         "Copyright information."
+         "\n"
+         "In this standard the tag is used to indicate both the photographer and editor copyrights."
+         "\n"
+         "It is the copyright notice of the person or organization claiming rights to the image."
+         "\n"
+         "The Interoperability copyright statement including date and rights should be written in "
+         "this field; e.g.:"
+         "\n"
+         "'Copyright, John Smith, 19xx. All rights reserved.'."
+         "\n"
+         "(Ascii)"},
+        {"Exif.Image.SecurityClassification",
+         "Security classification assigned to the image."
+         "\n"
+         "(Ascii)"},
+        {"Exif.Photo.UserComment",
+         "A tag for Exif users to write keywords or comments on the image"
+         "\n"
+         "besides those in <ImageDescription>, and without the character code limitations of the "
+         "<ImageDescription> tag."
+         "\n"
+         "(Comment)"},
+        {"Exif.Photo.ImageUniqueID",
+         "This tag indicates an identifier assigned uniquely to each image."
+         "\n"
+         "It is recorded as an ASCII string equivalent to hexadecimal notation and 128-bit fixed "
+         "length."
+         "\n"
+         "(Ascii)"},
+        {"Exif.Image.GPSTag", ""},
+        {"Exif.GPSInfo.GPSLatitudeRef", ""},
+        {"Exif.GPSInfo.GPSLatitude", ""},
+        {"Exif.GPSInfo.GPSLongitudeRef", ""},
+        {"Exif.GPSInfo.GPSLongitude", ""},
+        {"Exif.GPSInfo.GPSAltitudeRef", ""},
+        {"Exif.GPSInfo.GPSAltitude", ""},
+        {"Exif.GPSInfo.GPSTimeStamp", ""},
+        {"Exif.GPSInfo.GPSMapDatum", ""},
+        {"Exif.GPSInfo.GPSDateStamp", ""},
+        {"Exif.Photo.DateTimeOriginal", ""}};
+
+    const QMap<QString, QString> iptcMetaTags{{"Iptc.Application2.ObjectName",
+                                               "Used as a shorthand reference for the object."
+                                               "\n"
+                                               "(64B)"},
+                                              {"Iptc.Application2.Copyright",
+                                               "Contains any necessary copyright notice."
+                                               "\n"
+                                               "(128B)"},
+                                              {"Iptc.Application2.Caption",
+                                               "A textual description of the object data."
+                                               "\n"
+                                               "(2000B)"}};
 };

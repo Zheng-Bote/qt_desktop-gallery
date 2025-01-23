@@ -177,6 +177,7 @@ const void PictureWidget::readSrcExif()
     exif_image->readMetadata();
 
     Exiv2::ExifData &exifData = exif_image->exifData();
+    Photo photo;
 
     if (exifData.empty()) {
         qDebug() << "No EXIF data found in file " << pathToImage;
@@ -198,9 +199,9 @@ const void PictureWidget::readSrcExif()
             ui->exifTableWidget->setItem(ui->exifTableWidget->rowCount() - 1, 1, tlbCol2val);
             tlbCol2val = nullptr;
 
-            if (exifMetaTags.contains(md->key().c_str())) {
+            if (photo.exifMetaTags.contains(md->key().c_str())) {
                 QTableWidgetItem *tlbCol3val = new QTableWidgetItem();
-                tlbCol3val->setText(exifMetaTags.value(md->key().c_str(), ""));
+                tlbCol3val->setText(photo.exifMetaTags.value(md->key().c_str(), ""));
                 ui->iptcTableWidget->setItem(ui->iptcTableWidget->rowCount() - 1, 2, tlbCol3val);
                 tlbCol3val = nullptr;
             }
@@ -208,7 +209,7 @@ const void PictureWidget::readSrcExif()
     }
 
     // check and set default meta tags, if missing
-    for (auto i = exifMetaTags.cbegin(), end = exifMetaTags.cend(); i != end; ++i) {
+    for (auto i = photo.exifMetaTags.cbegin(), end = photo.exifMetaTags.cend(); i != end; ++i) {
         markExif(i.key());
         //i.value()
     }
@@ -246,9 +247,10 @@ void PictureWidget::markExif(QString searchFor)
         ui->exifTableWidget->setItem(ui->exifTableWidget->rowCount() - 1, 1, tlbCol2val);
         tlbCol2val = nullptr;
 
-        if (exifMetaTags.contains(searchFor)) {
+        Photo photo;
+        if (photo.exifMetaTags.contains(searchFor)) {
             QTableWidgetItem *tlbCol3val = new QTableWidgetItem();
-            tlbCol3val->setText(exifMetaTags.value(searchFor, ""));
+            tlbCol3val->setText(photo.exifMetaTags.value(searchFor, ""));
             ui->exifTableWidget->setItem(ui->exifTableWidget->rowCount() - 1, 2, tlbCol3val);
             tlbCol3val = nullptr;
         }
@@ -315,6 +317,7 @@ const void PictureWidget::readSrcIptc()
     iptc_image->readMetadata();
 
     Exiv2::IptcData &iptcData = iptc_image->iptcData();
+    Photo photo;
 
     if (iptcData.empty()) {
         qDebug() << "No IPTC data found in file " << pathToImage;
@@ -336,9 +339,9 @@ const void PictureWidget::readSrcIptc()
             ui->iptcTableWidget->setItem(ui->iptcTableWidget->rowCount() - 1, 1, tlbCol2val);
             tlbCol2val = nullptr;
 
-            if (iptcMetaTags.contains(md->key().c_str())) {
+            if (photo.iptcMetaTags.contains(md->key().c_str())) {
                 QTableWidgetItem *tlbCol3val = new QTableWidgetItem();
-                tlbCol3val->setText(iptcMetaTags.value(md->key().c_str(), ""));
+                tlbCol3val->setText(photo.iptcMetaTags.value(md->key().c_str(), ""));
                 ui->iptcTableWidget->setItem(ui->iptcTableWidget->rowCount() - 1, 2, tlbCol3val);
                 tlbCol3val = nullptr;
             }
@@ -346,7 +349,7 @@ const void PictureWidget::readSrcIptc()
     }
 
     // check and set default meta tags, if missing
-    for (auto i = iptcMetaTags.cbegin(), end = iptcMetaTags.cend(); i != end; ++i) {
+    for (auto i = photo.iptcMetaTags.cbegin(), end = photo.iptcMetaTags.cend(); i != end; ++i) {
         markIptc(i.key());
         //i.value()
     }
@@ -412,6 +415,7 @@ const void PictureWidget::readSrcXmp()
     xmp_image->readMetadata();
 
     Exiv2::XmpData &xmpData = xmp_image->xmpData();
+    Photo photo;
 
     if (xmpData.empty()) {
         qDebug() << "No XMP data found in file " << pathToImage;
@@ -433,9 +437,9 @@ const void PictureWidget::readSrcXmp()
             ui->xmpTableWidget->setItem(ui->xmpTableWidget->rowCount() - 1, 1, tlbCol2val);
             tlbCol2val = nullptr;
 
-            if (xmpMetaTags.contains(md->key().c_str())) {
+            if (photo.xmpMetaTags.contains(md->key().c_str())) {
                 QTableWidgetItem *tlbCol3val = new QTableWidgetItem();
-                tlbCol3val->setText(xmpMetaTags.value(md->key().c_str(), ""));
+                tlbCol3val->setText(photo.xmpMetaTags.value(md->key().c_str(), ""));
                 ui->xmpTableWidget->setItem(ui->xmpTableWidget->rowCount() - 1, 2, tlbCol3val);
                 tlbCol3val = nullptr;
             }
@@ -443,7 +447,7 @@ const void PictureWidget::readSrcXmp()
     }
 
     // check and set default meta tags, if missing
-    for (auto i = xmpMetaTags.cbegin(), end = xmpMetaTags.cend(); i != end; ++i) {
+    for (auto i = photo.xmpMetaTags.cbegin(), end = photo.xmpMetaTags.cend(); i != end; ++i) {
         markXmp(i.key());
         //i.value()
     }
@@ -476,9 +480,10 @@ void PictureWidget::markXmp(QString searchFor)
         ui->xmpTableWidget->setItem(ui->xmpTableWidget->rowCount() - 1, 1, tlbCol2val);
         tlbCol2val = nullptr;
 
-        if (xmpMetaTags.contains(searchFor)) {
+        Photo photo;
+        if (photo.xmpMetaTags.contains(searchFor)) {
             QTableWidgetItem *tlbCol3val = new QTableWidgetItem();
-            tlbCol3val->setText(xmpMetaTags.value(searchFor, ""));
+            tlbCol3val->setText(photo.xmpMetaTags.value(searchFor, ""));
             ui->xmpTableWidget->setItem(ui->xmpTableWidget->rowCount() - 1, 2, tlbCol3val);
             tlbCol3val = nullptr;
         }
@@ -494,6 +499,135 @@ void PictureWidget::markXmp(QString searchFor)
         if (ui->xmpTableWidget->item(rowNumber, 1)->text().length() < 1) {
             ui->xmpTableWidget->item(rowNumber, 1)->setBackground(Qt::red);
             ui->xmpTableWidget->item(rowNumber, 1)->setForeground(Qt::black);
+        }
+    }
+}
+
+void PictureWidget::mapMetaData(const QString &pathToFile,
+                                const QString &key,
+                                const QString &_value,
+                                const QString &source)
+{
+    QString targetKey{""};
+    QString value = _value;
+    Photo photo(pathToFile);
+
+    if (source.compare("exif") == 0) {
+        if (photo.exif_to_iptc.contains(key)) {
+            targetKey = photo.exif_to_iptc[key];
+
+            photo.writeIptc(targetKey, value);
+
+            QList<QTableWidgetItem *> LTempTable = ui->iptcTableWidget->findItems(targetKey,
+                                                                                  Qt::MatchEndsWith);
+            QTableWidgetItem *tlbCol2val = new QTableWidgetItem();
+            tlbCol2val->setText(value);
+            QTableWidgetItem *rowPtr = new QTableWidgetItem();
+            foreach (rowPtr, LTempTable) {
+                //rowPtr->setBackground(Qt::red);
+                int rowNumber = rowPtr->row();
+                ui->iptcTableWidget->setItem(rowNumber, 1, tlbCol2val);
+            }
+            ui->iptcTableWidget->resizeColumnsToContents();
+        }
+        if (photo.exif_to_xmp.contains(key)) {
+            targetKey = photo.exif_to_xmp[key];
+
+            photo.writeXmp(targetKey, value);
+
+            QList<QTableWidgetItem *> LTempTable = ui->xmpTableWidget->findItems(targetKey,
+                                                                                 Qt::MatchEndsWith);
+            QTableWidgetItem *tlbCol2val = new QTableWidgetItem();
+            tlbCol2val->setText(value);
+            QTableWidgetItem *rowPtr = new QTableWidgetItem();
+            foreach (rowPtr, LTempTable) {
+                //rowPtr->setBackground(Qt::red);
+                int rowNumber = rowPtr->row();
+                ui->xmpTableWidget->setItem(rowNumber, 1, tlbCol2val);
+            }
+            ui->xmpTableWidget->resizeColumnsToContents();
+        }
+    }
+
+    if (source.compare("iptc") == 0) {
+        if (photo.iptc_to_exif.contains(key)) {
+            targetKey = photo.iptc_to_exif[key];
+
+            photo.writeExif(targetKey, value);
+
+            QList<QTableWidgetItem *> LTempTable = ui->exifTableWidget->findItems(targetKey,
+                                                                                  Qt::MatchEndsWith);
+            QTableWidgetItem *tlbCol2val = new QTableWidgetItem();
+            tlbCol2val->setText(value);
+
+            QTableWidgetItem *rowPtr = new QTableWidgetItem();
+
+            foreach (rowPtr, LTempTable) {
+                //rowPtr->setBackground(Qt::red);
+                int rowNumber = rowPtr->row();
+                ui->exifTableWidget->setItem(rowNumber, 1, tlbCol2val);
+            }
+            ui->exifTableWidget->resizeColumnsToContents();
+        }
+        if (photo.iptc_to_xmp.contains(key)) {
+            targetKey = photo.iptc_to_xmp[key];
+
+            photo.writeXmp(targetKey, value);
+
+            QList<QTableWidgetItem *> LTempTable = ui->xmpTableWidget->findItems(targetKey,
+                                                                                 Qt::MatchEndsWith);
+            QTableWidgetItem *tlbCol2val = new QTableWidgetItem();
+            tlbCol2val->setText(value);
+
+            QTableWidgetItem *rowPtr = new QTableWidgetItem();
+
+            foreach (rowPtr, LTempTable) {
+                //rowPtr->setBackground(Qt::red);
+                int rowNumber = rowPtr->row();
+                ui->xmpTableWidget->setItem(rowNumber, 1, tlbCol2val);
+            }
+            ui->xmpTableWidget->resizeColumnsToContents();
+        }
+    }
+
+    if (source.compare("xmp") == 0) {
+        if (photo.xmp_to_exif.contains(key)) {
+            targetKey = photo.xmp_to_exif[key];
+
+            photo.writeExif(targetKey, value);
+
+            QList<QTableWidgetItem *> LTempTable = ui->exifTableWidget->findItems(targetKey,
+                                                                                  Qt::MatchEndsWith);
+            QTableWidgetItem *tlbCol2val = new QTableWidgetItem();
+            tlbCol2val->setText(value);
+
+            QTableWidgetItem *rowPtr = new QTableWidgetItem();
+
+            foreach (rowPtr, LTempTable) {
+                //rowPtr->setBackground(Qt::red);
+                int rowNumber = rowPtr->row();
+                ui->exifTableWidget->setItem(rowNumber, 1, tlbCol2val);
+            }
+            ui->exifTableWidget->resizeColumnsToContents();
+        }
+        if (photo.xmp_to_iptc.contains(key)) {
+            targetKey = photo.xmp_to_iptc[key];
+
+            photo.writeIptc(targetKey, value);
+
+            QList<QTableWidgetItem *> LTempTable = ui->iptcTableWidget->findItems(targetKey,
+                                                                                  Qt::MatchEndsWith);
+            QTableWidgetItem *tlbCol2val = new QTableWidgetItem();
+            tlbCol2val->setText(value);
+
+            QTableWidgetItem *rowPtr = new QTableWidgetItem();
+
+            foreach (rowPtr, LTempTable) {
+                //rowPtr->setBackground(Qt::red);
+                int rowNumber = rowPtr->row();
+                ui->iptcTableWidget->setItem(rowNumber, 1, tlbCol2val);
+            }
+            ui->iptcTableWidget->resizeColumnsToContents();
         }
     }
 }
@@ -516,9 +650,10 @@ void PictureWidget::markIptc(QString searchFor)
         ui->iptcTableWidget->setItem(ui->iptcTableWidget->rowCount() - 1, 1, tlbCol2val);
         tlbCol2val = nullptr;
 
-        if (iptcMetaTags.contains(searchFor)) {
+        Photo photo;
+        if (photo.iptcMetaTags.contains(searchFor)) {
             QTableWidgetItem *tlbCol3val = new QTableWidgetItem();
-            tlbCol3val->setText(iptcMetaTags.value(searchFor, ""));
+            tlbCol3val->setText(photo.iptcMetaTags.value(searchFor, ""));
             ui->iptcTableWidget->setItem(ui->iptcTableWidget->rowCount() - 1, 2, tlbCol3val);
             tlbCol3val = nullptr;
         }
@@ -721,7 +856,9 @@ void PictureWidget::on_exifTableWidget_itemDoubleClicked(QTableWidgetItem *item)
     bool ok;
 
     int row = item->row();
-    qDebug() << "row: " << row << " val 0: " << ui->exifTableWidget->item(row, 0)->text();
+    //qDebug() << "row: " << row << " val 0: " << ui->exifTableWidget->item(row, 0)->text();
+
+    QString key = ui->exifTableWidget->item(row, 0)->text();
 
     //setOkButtonText("save");
     QString text = QInputDialog::getText(this,
@@ -735,8 +872,20 @@ void PictureWidget::on_exifTableWidget_itemDoubleClicked(QTableWidgetItem *item)
         ui->exifTableWidget->setItem(row, 1, new QTableWidgetItem(text));
 
         QFile file(pathToImage);
-        std::string key = ui->exifTableWidget->item(row, 0)->text().toStdString();
+        QString key = ui->exifTableWidget->item(row, 0)->text();
 
+        // map meta data
+        Photo photo;
+        if (photo.exif_to_xmp.contains(key)) {
+            //qDebug() << "on_exifTableWidget_itemDoubleClicked: exif_to_xmp key found: " << key << " " << rz_metaData::exif_to_xmp[key];
+            mapMetaData(file.fileName(), key, text, "exif");
+        }
+        if (photo.exif_to_iptc.contains(key)) {
+            //qDebug() << "on_exifTableWidget_itemDoubleClicked: exif_to_iptc key found: " << key << " " << rz_metaData::exif_to_iptc[key];
+            mapMetaData(file.fileName(), key, text, "exif");
+        }
+
+        // write meta data
         try {
             Exiv2::XmpParser::initialize();
             ::atexit(Exiv2::XmpParser::terminate);
@@ -744,7 +893,7 @@ void PictureWidget::on_exifTableWidget_itemDoubleClicked(QTableWidgetItem *item)
             auto exif_image = Exiv2::ImageFactory::open(file.fileName().toUtf8().toStdString());
             exif_image->readMetadata();
             Exiv2::ExifData &exifData = exif_image->exifData();
-            exifData[key] = text.toStdString();
+            exifData[key.toStdString()] = text.toStdString();
 
             /*
             auto v = Exiv2::Value::create(Exiv2::asciiString);
@@ -761,7 +910,7 @@ void PictureWidget::on_exifTableWidget_itemDoubleClicked(QTableWidgetItem *item)
             file.close();
             ui->exifTableWidget->resizeColumnsToContents();
         } catch (Exiv2::Error &e) {
-            qDebug() << "Caught Exiv2 exception " << e.what() << "\n";
+            qCritical() << "Caught Exiv2 exception " << e.what() << "\n";
         }
     }
 }
@@ -771,7 +920,7 @@ void PictureWidget::on_iptcTableWidget_itemDoubleClicked(QTableWidgetItem *item)
     bool ok;
 
     int row = item->row();
-    qDebug() << "row: " << row << " val 0: " << ui->iptcTableWidget->item(row, 0)->text();
+    //qDebug() << "row: " << row << " val 0: " << ui->iptcTableWidget->item(row, 0)->text();
 
     /* KISS
     QInputDialog inDialog(this);
@@ -792,15 +941,33 @@ void PictureWidget::on_iptcTableWidget_itemDoubleClicked(QTableWidgetItem *item)
         ui->iptcTableWidget->setItem(row, 1, new QTableWidgetItem(text));
 
         QFile file(pathToImage);
-        std::string key = ui->iptcTableWidget->item(row, 0)->text().toStdString();
-        auto iptc_image = Exiv2::ImageFactory::open(file.fileName().toUtf8().toStdString());
-        iptc_image->readMetadata();
-        Exiv2::IptcData &iptcData = iptc_image->iptcData();
-        iptcData[key] = text.toStdString();
-        iptc_image->setIptcData(iptcData);
-        iptc_image->writeMetadata();
-        file.close();
-        ui->iptcTableWidget->resizeColumnsToContents();
+        QString key = ui->iptcTableWidget->item(row, 0)->text();
+
+        // map meta data
+        Photo photo;
+
+        if (photo.iptc_to_xmp.contains(key)) {
+            //qDebug() << "on_exifTableWidget_itemDoubleClicked: iptc_to_xmp key found: " << key << " " << rz_metaData::iptc_to_xmp[key];
+            mapMetaData(file.fileName(), key, text, "iptc");
+        }
+        if (photo.iptc_to_exif.contains(key)) {
+            // qDebug() << "on_exifTableWidget_itemDoubleClicked: iptc_to_exif key found: " << key << " " << rz_metaData::iptc_to_exif[key];
+            mapMetaData(file.fileName(), key, text, "iptc");
+        }
+
+        // write meta
+        try {
+            auto iptc_image = Exiv2::ImageFactory::open(file.fileName().toUtf8().toStdString());
+            iptc_image->readMetadata();
+            Exiv2::IptcData &iptcData = iptc_image->iptcData();
+            iptcData[key.toStdString()] = text.toStdString();
+            iptc_image->setIptcData(iptcData);
+            iptc_image->writeMetadata();
+            file.close();
+            ui->iptcTableWidget->resizeColumnsToContents();
+        } catch (Exiv2::Error &e) {
+            qCritical() << "Caught Exiv2 exception " << e.what() << "\n";
+        }
     }
 }
 
@@ -809,7 +976,7 @@ void PictureWidget::on_xmpTableWidget_itemDoubleClicked(QTableWidgetItem *item)
     bool ok;
 
     int row = item->row();
-    qDebug() << "row: " << row << " val 0: " << ui->xmpTableWidget->item(row, 0)->text();
+    //qDebug() << "row: " << row << " val 0: " << ui->xmpTableWidget->item(row, 0)->text();
 
     /* KISS
     QInputDialog inDialog(this);
@@ -830,15 +997,33 @@ void PictureWidget::on_xmpTableWidget_itemDoubleClicked(QTableWidgetItem *item)
         ui->xmpTableWidget->setItem(row, 1, new QTableWidgetItem(text));
 
         QFile file(pathToImage);
-        std::string key = ui->xmpTableWidget->item(row, 0)->text().toStdString();
-        auto xmp_image = Exiv2::ImageFactory::open(file.fileName().toUtf8().toStdString());
-        xmp_image->readMetadata();
-        Exiv2::XmpData &xmpData = xmp_image->xmpData();
-        xmpData[key] = text.toStdString();
-        xmp_image->setXmpData(xmpData);
-        xmp_image->writeMetadata();
-        file.close();
-        ui->xmpTableWidget->resizeColumnsToContents();
+        QString key = ui->xmpTableWidget->item(row, 0)->text();
+
+        // map meta data
+        Photo photo;
+
+        if (photo.xmp_to_exif.contains(key)) {
+            //qDebug() << "on_exifTableWidget_itemDoubleClicked: xmp_to_exif key found: " << key << " " << rz_metaData::xmp_to_exif[key];
+            mapMetaData(file.fileName(), key, text, "xmp");
+        }
+        if (photo.xmp_to_iptc.contains(key)) {
+            //qDebug() << "on_exifTableWidget_itemDoubleClicked: xmp_to_iptc key found: " << key << " " << rz_metaData::xmp_to_iptc[key];
+            mapMetaData(file.fileName(), key, text, "xmp");
+        }
+
+        // write meta
+        try {
+            auto xmp_image = Exiv2::ImageFactory::open(file.fileName().toUtf8().toStdString());
+            xmp_image->readMetadata();
+            Exiv2::XmpData &xmpData = xmp_image->xmpData();
+            xmpData[key.toStdString()] = text.toStdString();
+            xmp_image->setXmpData(xmpData);
+            xmp_image->writeMetadata();
+            file.close();
+            ui->xmpTableWidget->resizeColumnsToContents();
+        } catch (Exiv2::Error &e) {
+            qCritical() << "Caught Exiv2 exception " << e.what() << "\n";
+        }
     }
 }
 
