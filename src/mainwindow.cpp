@@ -177,8 +177,12 @@ void MainWindow::loadSingleSrcImg()
                                        tr("Image (*.jpg *.jpeg *.png *.bmp *.tiff)"));
 
     if (pathToFile.isEmpty() == false) {
-        QFile srcFile(pathToFile);
-        fillSrcListView(srcFile);
+        // kiss
+        //QFile srcFile(pathToFile);
+        //fillSrcListView(srcFile);
+        QList<QString> file;
+        file.append(pathToFile);
+        fillSrcListViewThread(file);
     }
 }
 
@@ -219,7 +223,7 @@ void MainWindow::about()
                                  + "</p>";
 
     setInformativeText.append(
-        "<p>" + tr("Desktop gallery-app to show/edit Exif/IPTC and export to WebP") + "<p>");
+        "<p>" + tr("Desktop gallery-app to show/edit Exif/IPTC/XMP and export to WebP") + "<p>");
     setInformativeText.append("<p>Copyright (c) 2024 ZHENG Robert</p>");
     setInformativeText.append("<br><a href=\"");
     setInformativeText.append(PROG_HOMEPAGE);
@@ -291,6 +295,14 @@ void MainWindow::createMenu()
     connect(ui->clearDefaultIptcAct, &QAction::triggered, this, &MainWindow::clearDefaultIptcMeta);
     //pictureMenu->addAction(clearDefaultIptcAct);
 
+    ui->writeDefaultGpsMetaToSelectedImagesAct->setIcon(
+        QIcon(":/resources/img/icons8-send-file-50.png"));
+    ui->writeDefaultGpsMetaToSelectedImagesAct->setIconVisibleInMenu(true);
+    connect(ui->writeDefaultGpsMetaToSelectedImagesAct,
+            &QAction::triggered,
+            this,
+            &MainWindow::writeDefaultExifGpsToSelected);
+
     //pictureMenu->addSeparator();
 
     ui->selectAllImagesAct->setIcon(QIcon(":/resources/img/icons8-image-file-add-50.png"));
@@ -299,14 +311,14 @@ void MainWindow::createMenu()
     connect(ui->selectAllImagesAct, &QAction::triggered, this, &MainWindow::selectAllImages);
     //pictureMenu->addAction(selectAllImagesAct);
 
-    ui->writeDefaultMetaToSelectedImagesAct->setIcon(
+    ui->writeDefaultOwnerToSelectedImagesAct->setIcon(
         QIcon(":/resources/img/icons8-send-file-50.png"));
-    ui->writeDefaultMetaToSelectedImagesAct->setIconVisibleInMenu(true);
-    ui->writeDefaultMetaToSelectedImagesAct->setDisabled(false);
-    connect(ui->writeDefaultMetaToSelectedImagesAct,
+    ui->writeDefaultOwnerToSelectedImagesAct->setIconVisibleInMenu(true);
+    ui->writeDefaultOwnerToSelectedImagesAct->setDisabled(false);
+    connect(ui->writeDefaultOwnerToSelectedImagesAct,
             &QAction::triggered,
             this,
-            &MainWindow::writeDefaultMetaToSelectedImages);
+            &MainWindow::writeDefaultOwnerToSelectedImages);
     //pictureMenu->addAction(writeDefaultMetaToSelectedImagesAct);
 
     //pictureMenu->addSeparator();
@@ -478,6 +490,43 @@ void MainWindow::initStatusBar()
     statusBar()->addWidget(statusBarLabel, 1);
 }
 
+void MainWindow::writeDefaultExifGpsToSelected()
+{
+    if (!hasDefaultExifGpsData) {
+        QMessageBox msgBox(this);
+        msgBox.setWindowTitle(tr("Default GPS Meta"));
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.setTextFormat(Qt::RichText);
+        QString text = tr("No default GPS meta data set.");
+        QString setInformativeText = tr("In Album view, select a picture and open the context menu "
+                                        "to define the default meta.");
+        msgBox.setText(text);
+        msgBox.setInformativeText(setInformativeText);
+        msgBox.setFixedWidth(900);
+        msgBox.exec();
+        return;
+    }
+
+    QModelIndexList selected = ui->listView->selectionModel()->selectedIndexes();
+    QList<QString> selectedImages;
+
+    QModelIndex gpsIndex = rowWithDefaultGpsMeta;
+    int row = gpsIndex.row();
+    QModelIndex col2 = mContentItemModel->index(row, 1);
+    QString pathToSrcFile = col2.data(Qt::DisplayRole).toString();
+    Photo photo(pathToSrcFile);
+    Photo::exifGpsStruct _gpsData;
+    _gpsData = photo.getGpsData();
+
+    for (QModelIndex i : selected) {
+        int row = i.row();
+        QModelIndex col2 = mContentItemModel->index(row, 1);
+        QString pathToFile = col2.data(Qt::DisplayRole).toString();
+        Photo photo(pathToFile);
+        QFuture<void> future = QtConcurrent::run(&Photo::writeDefaultGpsData, photo, _gpsData);
+    }
+}
+
 void MainWindow::refreshStatusBar()
 {
     int rowCount = mContentItemModel->rowCount();
@@ -516,17 +565,17 @@ void MainWindow::on_listView_doubleClicked(const QModelIndex &index)
 
 void MainWindow::showViewContextMenu(const QPoint &pt)
 {
-    qInfo() << "showViewContextMenu";
+    //qInfo() << "showViewContextMenu";
 
     QModelIndex idx = ui->listView->indexAt(pt);
 
     QString itemText = idx.data(Qt::DisplayRole).toString();
-    qDebug() << "clicked: " << itemText << " col: " << idx.column();
+    //qDebug() << "clicked: " << itemText << " col: " << idx.column();
 
     int row = idx.row();
     QModelIndex col2 = mContentItemModel->index(row, 1);
     QString itemText2 = col2.data(Qt::DisplayRole).toString();
-    qDebug() << "clicked: " << itemText2;
+    //qDebug() << "clicked: " << itemText2;
 
     //modelIndexForContextMenu = idx; // optional, to let slots know what index is the base for the context menu
     QMenu menu;
@@ -563,6 +612,14 @@ void MainWindow::showViewContextMenu(const QPoint &pt)
         MainWindow::setDefaultXmpCopyRightOwner(idx);
     });
 
+    contextSetGpsMetaAsDefaultAct
+        = new QAction(QIcon(":/resources/img/icons8-regular-document-50.png"),
+                      tr("set this GPS data as default"),
+                      this);
+    connect(contextSetGpsMetaAsDefaultAct, &QAction::triggered, this, [this, idx] {
+        MainWindow::setDefaultGpsData(idx);
+    });
+
     contextRemovePictureFromAlbumAct = new QAction(QIcon(
                                                        ":/resources/img/icons8-delete-list-50.png"),
                                                    tr("remove this Picture from Album"),
@@ -575,13 +632,16 @@ void MainWindow::showViewContextMenu(const QPoint &pt)
     contextSetExifAsDefaultAct->setEnabled(idx.column() == 0);
     contextSetIptcAsDefaultAct->setEnabled(idx.column() == 0);
     contextSetXmpCopyRightOwnerAsDefaultAct->setEnabled(idx.column() == 0);
+    contextSetGpsMetaAsDefaultAct->setEnabled(idx.column() == 0);
     contextRemovePictureFromAlbumAct->setEnabled(idx.column() == 0);
 
     menu.addAction(contextShowPictureDetailsAct);
     menu.addSeparator();
     menu.addAction(contextSetExifAsDefaultAct);
     menu.addAction(contextSetIptcAsDefaultAct);
+    menu.addSeparator();
     menu.addAction(contextSetXmpCopyRightOwnerAsDefaultAct);
+    menu.addAction(contextSetGpsMetaAsDefaultAct);
     menu.addSeparator();
     menu.addAction(contextRemovePictureFromAlbumAct);
 
@@ -613,6 +673,7 @@ void MainWindow::resetDefaultMeta()
     hasDefaultExifMeta = false;
     hasDefaultIptcMeta = false;
     hasDefaultCopyRightOwner = false;
+    hasDefaultExifGpsData = false;
 }
 
 void MainWindow::showDefaultExifMeta()
@@ -855,9 +916,9 @@ void MainWindow::removeSelectedImages()
 }
 
 // TODO
-void MainWindow::writeDefaultMetaToSelectedImages()
+void MainWindow::writeDefaultOwnerToSelectedImages()
 {
-    qDebug() << "writeDefaultMetaToSelectedImages";
+    //qDebug() << "writeDefaultMetaToSelectedImages";
 
     if (!hasDefaultCopyRightOwner) {
         QMessageBox msgBox(this);
@@ -882,7 +943,6 @@ void MainWindow::writeDefaultMetaToSelectedImages()
     QString pathToSRcFile = col2.data(Qt::DisplayRole).toString();
     Photo photo(pathToSRcFile);
     QString owner = photo.getXmpCopyrightOwner();
-    qDebug() << "SrcOwner: " << owner;
 
     /*
     int row = index.row();
@@ -896,7 +956,6 @@ void MainWindow::writeDefaultMetaToSelectedImages()
         int row = i.row();
         QModelIndex col2 = mContentItemModel->index(row, 1);
         QString pathToFile = col2.data(Qt::DisplayRole).toString();
-        qDebug() << "to update: " << pathToFile;
 
         Photo photo(pathToFile);
         QFutureWatcher<bool> watcher;
@@ -907,6 +966,12 @@ void MainWindow::writeDefaultMetaToSelectedImages()
     }
 }
 
+void MainWindow::setDefaultGpsData(const QModelIndex &index)
+{
+    hasDefaultExifGpsData = true;
+    rowWithDefaultGpsMeta = index;
+}
+
 void MainWindow::selectAllImages()
 {
     ui->listView->selectAll();
@@ -915,19 +980,19 @@ void MainWindow::selectAllImages()
 // TODO
 void MainWindow::_on_listView_clicked(const QModelIndex &index)
 {
-    qInfo() << "on_listView_clicked: " << Qt::MouseButtons().toInt();
+    //qInfo() << "on_listView_clicked: " << Qt::MouseButtons().toInt();
 
     if (QMouseEvent::ContextMenu && Qt::LeftButton) {
-        qInfo() << "on_listView_clicked left contextMenu";
+        //qInfo() << "on_listView_clicked left contextMenu";
     }
     if (Qt::MouseButtons().toInt() & Qt::RightButton) {
-        qInfo() << "on_listView_clicked right context Menu mouse";
+        //qInfo() << "on_listView_clicked right context Menu mouse";
     }
 
     int row = index.row();
     QModelIndex col2 = mContentItemModel->index(row, 1);
     QString itemText2 = col2.data(Qt::DisplayRole).toString();
-    qDebug() << "clicked: " << itemText2;
+    //qDebug() << "clicked: " << itemText2;
 
     /* Create menu and insert some actions */
     QMenu rightClickMenu(ui->listView);

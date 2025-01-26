@@ -362,12 +362,89 @@ QString Photo::getXmpCopyrightOwner()
     return owner;
 }
 
-// TODO
 bool Photo::writeToAllCopyrightOwner(const QString &owner)
 {
-    qDebug() << "TODO: Photo::writeToAllCopyrightOwner " << owner;
+    QString key{""};
+    QString val = owner;
+
+    key = "Xmp.dc.CopyrightOwner";
+    writeXmp(key, val);
+    key = "Exif.Image.Copyright";
+    writeExif(key, val);
+    key = "Iptc.Application2.Copyright";
+    writeIptc(key, val);
 
     return true;
+}
+
+void Photo::writeDefaultGpsData(const exifGpsStruct &gpsData)
+{
+    QString pathToFile = imgStruct.fileAbolutePath + "/" + imgStruct.fileName;
+
+    Exiv2::XmpParser::initialize();
+    ::atexit(Exiv2::XmpParser::terminate);
+#ifdef EXV_ENABLE_BMFF
+    Exiv2::enableBMFF();
+#endif
+    try {
+        Exiv2::XmpParser::initialize();
+        ::atexit(Exiv2::XmpParser::terminate);
+
+        auto exif_image = Exiv2::ImageFactory::open(pathToFile.toStdString());
+        exif_image->readMetadata();
+        Exiv2::ExifData &exifData = exif_image->exifData();
+
+        qDebug() << "Photo::writeDefaultGpsData";
+
+        exifData["Exif.GPSInfo.GPSLatitudeRef"] = gpsData.GPSLatitudeRef.toStdString();
+        exifData["Exif.GPSInfo.GPSLatitude"] = gpsData.GPSLatitude.toStdString();
+        exifData["Exif.GPSInfo.GPSLongitudeRef"] = gpsData.GPSLongitudeRef.toStdString();
+        exifData["Exif.GPSInfo.GPSLongitude"] = gpsData.GPSLongitude.toStdString();
+        exifData["Exif.GPSInfo.GPSAltitudeRef"] = gpsData.GPSAltitudeRef.toStdString();
+        exifData["Exif.GPSInfo.GPSAltitude"] = gpsData.GPSAltitude.toStdString();
+
+        qDebug() << "Photo::writeDefaultGpsData setExifData";
+        exif_image->setExifData(exifData);
+        qDebug() << "Photo::writeDefaultGpsData writeMetaData";
+        exif_image->writeMetadata();
+        return;
+    } catch (Exiv2::Error &e) {
+        qCritical() << "Caught Exiv2 exception " << e.what() << "\n";
+        return;
+    }
+}
+
+Photo::exifGpsStruct Photo::getGpsData() const
+{
+    exifGpsStruct gpsStruct;
+    {
+        QString GPSLatitudeRef{""};
+        QString GPSLatitude{""};
+        QString GPSLongitudeRef{""};
+        QString GPSLongitude{""};
+
+        QString GPSAltitudeRef{""};
+        QString GPSAltitude{""};
+    };
+
+    std::string pathToFile = imgStruct.fileAbolutePath.toStdString() + "/"
+                             + imgStruct.fileName.toStdString();
+
+    auto exif_image = Exiv2::ImageFactory::open(pathToFile);
+    exif_image->readMetadata();
+    Exiv2::ExifData &exifData = exif_image->exifData();
+    if (exifData.empty()) {
+        return gpsStruct;
+    }
+
+    gpsStruct.GPSLatitudeRef = exifData["Exif.GPSInfo.GPSLatitudeRef"].toString().c_str();
+    gpsStruct.GPSLatitude = exifData["Exif.GPSInfo.GPSLatitude"].toString().c_str();
+    gpsStruct.GPSLongitudeRef = exifData["Exif.GPSInfo.GPSLongitudeRef"].toString().c_str();
+    gpsStruct.GPSLongitude = exifData["Exif.GPSInfo.GPSLongitude"].toString().c_str();
+    gpsStruct.GPSAltitudeRef = exifData["Exif.GPSInfo.GPSAltitudeRef"].toString().c_str();
+    gpsStruct.GPSAltitude = exifData["Exif.GPSInfo.GPSAltitude"].toString().c_str();
+
+    return gpsStruct;
 }
 
 bool Photo::isValidMetaImageType()

@@ -88,8 +88,10 @@
     <addaction name="showDefaultIptcAct"/>
     <addaction name="clearDefaultIptcAct"/>
     <addaction name="separator"/>
+    <addaction name="writeDefaultGpsMetaToSelectedImagesAct"/>
+    <addaction name="writeDefaultOwnerToSelectedImagesAct"/>
+    <addaction name="separator"/>
     <addaction name="selectAllImagesAct"/>
-    <addaction name="writeDefaultMetaToSelectedImagesAct"/>
     <addaction name="separator"/>
     <addaction name="removeImagesAct"/>
    </widget>
@@ -153,7 +155,7 @@
   </action>
   <action name="clearDefaultIptcAct">
    <property name="text">
-    <string>clear default Exif meta data</string>
+    <string>clear default IPTC meta data</string>
    </property>
   </action>
   <action name="selectAllImagesAct">
@@ -161,9 +163,9 @@
     <string>select all Pictures</string>
    </property>
   </action>
-  <action name="writeDefaultMetaToSelectedImagesAct">
+  <action name="writeDefaultOwnerToSelectedImagesAct">
    <property name="text">
-    <string>write default Meta to selected Pictures</string>
+    <string>write default Owner to selected Pictures</string>
    </property>
   </action>
   <action name="removeImagesAct">
@@ -179,6 +181,11 @@
   <action name="hw_infoAct">
    <property name="text">
     <string>HW info</string>
+   </property>
+  </action>
+  <action name="writeDefaultGpsMetaToSelectedImagesAct">
+   <property name="text">
+    <string>write default GPS Meta to selected Pictures</string>
    </property>
   </action>
  </widget>

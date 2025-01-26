@@ -72,7 +72,7 @@
     <message>
         <location filename="../mainwindow.cpp" line="174"/>
         <source>Open File</source>
-        <translation>OPen File</translation>
+        <translation>Open File</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="176"/>
@@ -279,7 +279,7 @@
     <message>
         <location filename="../picture_widget.ui" line="115"/>
         <source>rotate Image</source>
-        <translation>Picture Details</translation>
+        <translation>rotate Image</translation>
     </message>
     <message>
         <location filename="../picture_widget.ui" line="134"/>

@@ -25,6 +25,24 @@ struct imageStruct
 
 class Photo
 {
+private:
+    const QList<QString> validMetaImageTypes = {"jpg", "jpeg", "png", "webp", "tiff"};
+    bool isValidMetaImageType();
+
+    imageStruct imgStruct;
+    void setImageStruct(const QString &imageInput);
+
+    bool oversizeSmallerPicture_bool{false};
+    bool overwriteExitingWebp_bool{false};
+    bool watermarkWebp_bool{true};
+    bool createWebpPath();
+    bool checkImgTargetExists(const QFile &pathToTargetImage);
+    bool checkImgWidth(const QImage &imageInput, const int &targetWidth);
+
+    bool backupOrigFile();
+
+    void readExif();
+
 public:
     Photo();
     Photo(const QString &imageInput);
@@ -50,23 +68,18 @@ public:
     QString getXmpCopyrightOwner();
     bool writeToAllCopyrightOwner(const QString &owner);
 
-private:
-    const QList<QString> validMetaImageTypes = {"jpg", "jpeg", "png", "webp", "tiff"};
-    bool isValidMetaImageType();
+    struct exifGpsStruct
+    {
+        QString GPSLatitudeRef{""};
+        QString GPSLatitude{""};
+        QString GPSLongitudeRef{""};
+        QString GPSLongitude{""};
 
-    imageStruct imgStruct;
-    void setImageStruct(const QString &imageInput);
-
-    bool oversizeSmallerPicture_bool{false};
-    bool overwriteExitingWebp_bool{false};
-    bool watermarkWebp_bool{true};
-    bool createWebpPath();
-    bool checkImgTargetExists(const QFile &pathToTargetImage);
-    bool checkImgWidth(const QImage &imageInput, const int &targetWidth);
-
-    bool backupOrigFile();
-
-    void readExif();
+        QString GPSAltitudeRef{""};
+        QString GPSAltitude{""};
+    };
+    exifGpsStruct getGpsData() const;
+    void writeDefaultGpsData(const exifGpsStruct &gpsData);
 
 public:
     const QMap<QString, QString> exif_to_xmp = {{"Exif.Image.Copyright", "Xmp.dc.CopyrightOwner"},

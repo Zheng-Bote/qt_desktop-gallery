@@ -2,8 +2,9 @@ cmake_minimum_required(VERSION 3.23)
 
 project(
   qt_desktop-gallery
-  VERSION 0.14.0
-  DESCRIPTION "Desktop gallery-app to show/edit Exif/IPTC and export to WebP"
+  VERSION 0.15.0
+  DESCRIPTION
+    "Desktop gallery-app to show/edit Exif/IPTC/XMP and export to WebP"
   HOMEPAGE_URL "https://github.com/Zheng-Bote/qt_desktop-gallery"
   LANGUAGES CXX)
 

@@ -52,7 +52,10 @@ private slots:
     void setDefaultExifMeta(const QModelIndex &index);
     void setDefaultIptcMeta(const QModelIndex &index);
     void setDefaultXmpCopyRightOwner(const QModelIndex &index);
-    void writeDefaultMetaToSelectedImages();
+    void writeDefaultOwnerToSelectedImages();
+    void setDefaultGpsData(const QModelIndex &index);
+    void writeDefaultExifGpsToSelected();
+
     void resetDefaultMeta();
 
     void showDefaultExifMeta();
@@ -90,6 +93,7 @@ private:
     QAction *clearDefaultExifAct;
     QAction *clearDefaultIptcAct;
     QAction *writeDefaultMetaToSelectedImagesAct;
+    QAction *writeDefaultGpsMetaToSelectedImagesAct;
     QAction *removeImagesAct;
     void removeSelectedImages();
 
@@ -112,10 +116,12 @@ private:
     QAction *contextSetExifAsDefaultAct;
     QAction *contextSetIptcAsDefaultAct;
     QAction *contextSetXmpCopyRightOwnerAsDefaultAct;
+    QAction *contextSetGpsMetaAsDefaultAct;
     QAction *contextRemovePictureFromAlbumAct;
 
     void initStatusBar();
 
+    // Meta
     bool hasDefaultExifMeta{false};
     bool hasDefaultIptcMeta{false};
     QModelIndex rowWithDefaultExifMeta;
@@ -123,6 +129,9 @@ private:
 
     bool hasDefaultCopyRightOwner{false};
     QModelIndex rowWithDefaultCopyRightQwnerMeta;
+
+    bool hasDefaultExifGpsData{false};
+    QModelIndex rowWithDefaultGpsMeta;
 
     void refreshStatusBar();
 
