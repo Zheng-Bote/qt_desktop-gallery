@@ -43,6 +43,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QProgressBar" name="progressBar">
+        <property name="value">
+         <number>0</number>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QListView" name="listView">
         <property name="contextMenuPolicy">
          <enum>Qt::ContextMenuPolicy::DefaultContextMenu</enum>

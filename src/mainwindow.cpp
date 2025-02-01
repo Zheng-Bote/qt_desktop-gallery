@@ -9,6 +9,7 @@
 #include "./ui_mainwindow.h"
 #include "includes/rz_config.h"
 #include "includes/rz_hwinfo.h"
+#include "includes/rz_myevent.hpp"
 
 #include "includes/rz_photo.hpp"
 #include "mainwindow.h"
@@ -25,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setFont(*font_12);
     ui->album_label->clear();
+    ui->progressBar->hide();
 
     //setWindowTitle(tr(qApp->applicationDisplayName().toStdString().c_str()) + " v"
     //               + qApp->applicationVersion().toStdString().c_str());
@@ -34,6 +36,10 @@ MainWindow::MainWindow(QWidget *parent)
     createLanguageMenu();
     initListview();
     initStatusBar();
+
+    connect(&this->FutureWatcher, SIGNAL(finished()), this, SLOT(slotProgressBarFinished()));
+
+    qApp->installEventFilter(this);
 }
 
 MainWindow::~MainWindow()
@@ -94,9 +100,11 @@ void MainWindow::openSrcFolderRekursive()
                             + tr("items") + "...");
 
     //QThreadPool::globalInstance()->setMaxThreadCount(1);
+    ui->progressBar->show();
     QFuture<void> futureListView = QtConcurrent::run(&MainWindow::fillSrcListViewThread,
                                                      this,
                                                      result);
+    this->FutureWatcher.setFuture(futureListView);
 }
 
 void MainWindow::openSrcFolder()
@@ -127,9 +135,12 @@ void MainWindow::openSrcFolder()
     statusBarLabel->setText(tr("processing") + " " + QString::number(result.size()) + " "
                             + tr("items") + "...");
 
+    ui->progressBar->show();
     QFuture<void> futureListView = QtConcurrent::run(&MainWindow::fillSrcListViewThread,
                                                      this,
                                                      result);
+
+    this->FutureWatcher.setFuture(futureListView);
 
     /*
     QDirIterator srcPics(srcPath,
@@ -442,8 +453,16 @@ void MainWindow::loadLanguage(const QString &rLanguage)
         QString languageName = QLocale::languageToString(locale.language());
         switchTranslator(m_translator, QString(qApp->applicationName() + "_%1.qm").arg(rLanguage));
         switchTranslator(m_translatorQt, QString("qt_%1.qm").arg(rLanguage));
-        statusBar()->showMessage(tr("Current Language changed to") + " " + rLanguage.toUpper());
+
+        statusBar()->showMessage(tr("Current Language changed to") + " " + rLanguage.toUpper(),
+                                 10000);
     }
+}
+
+void MainWindow::slotProgressBarFinished()
+{
+    //qDebug() << "slotProgressBarFinished";
+    ui->progressBar->hide();
 }
 
 void MainWindow::switchTranslator(QTranslator &translator, const QString &filename)
@@ -535,6 +554,11 @@ void MainWindow::refreshStatusBar()
     } else {
         statusBarLabel->setText("v" + qApp->applicationVersion());
     }
+}
+
+void MainWindow::setProgressbar(int val)
+{
+    ui->progressBar->setValue(val);
 }
 
 void MainWindow::on_listView_doubleClicked(const QModelIndex &index)
@@ -730,6 +754,11 @@ void MainWindow::clearDefaultIptcMeta()
     hasDefaultIptcMeta = false;
 }
 
+void MainWindow::on_progressBar_valueChanged(int value)
+{
+    //qDebug() << "on_progressBar_valueChanged " << value;
+}
+
 void MainWindow::changeEvent(QEvent *event)
 {
     if (0 != event) {
@@ -748,6 +777,17 @@ void MainWindow::changeEvent(QEvent *event)
         }
     }
     QMainWindow::changeEvent(event);
+}
+
+bool MainWindow::eventFilter(QObject *sender, QEvent *event)
+{
+    if (event->type() == MyEvent ::myregisteredEventType()) {
+        //qDebug() << "Beep " << totalCount;
+
+        setProgressbar(totalCount);
+    }
+
+    return QMainWindow::eventFilter(sender, event);
 }
 
 void MainWindow::showAlbumLimitMsg(int resultCount)
@@ -804,12 +844,24 @@ const void MainWindow::fillSrcListViewThread(const QList<QString> &srcFiles)
     int count{-1};
     //ui->listView->setUniformItemSizes(true);
 
+    int total = srcFiles.count();
+    totalCount = total;
+    MyEvent *eve;
+    eve = new MyEvent();
+    QApplication::postEvent(qApp, eve);
+
     QListIterator<QString> i(srcFiles);
     while (i.hasNext()) {
         QFile srcFile(i.next());
         QFileInfo fileInfo(srcFile.fileName());
 
         count++;
+        double proz = double(count) / double(total) * 100.0;
+        int val = int(proz);
+        totalCount = val;
+        eve = new MyEvent();
+        QApplication::postEvent(qApp, eve);
+
         if (count == ALBUM_LIMIT) {
             qDebug() << "reached album limit of " + QString::number(ALBUM_LIMIT)
                             + "; stopped loading";
@@ -820,7 +872,7 @@ const void MainWindow::fillSrcListViewThread(const QList<QString> &srcFiles)
             continue;
         }
 
-        statusBarLabel->setText(tr("add") + srcFile.fileName());
+        //statusBarLabel->setText(tr("add") + " " + srcFile.fileName());
 
         QString pathToFile = fileInfo.absolutePath() + "/" + fileInfo.fileName();
         QPixmap pixmap(pathToFile);

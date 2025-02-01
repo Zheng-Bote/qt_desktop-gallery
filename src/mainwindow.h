@@ -1,13 +1,14 @@
 #pragma once
 
 #include <QFile>
+#include <QFutureWatcher>
 #include <QLabel>
 #include <QList>
 #include <QMainWindow>
+#include <QMouseEvent>
 #include <QStandardItemModel>
 #include <QStringListModel>
 #include <QTranslator>
-#include <QMouseEvent>
 
 //#include "includes/rz_metadata.hpp"
 #include "includes/rz_photo.hpp"
@@ -27,6 +28,9 @@ public:
     ~MainWindow();
 
     void loadLanguage(const QString &rLanguage);
+
+public slots:
+    void slotProgressBarFinished();
 
 protected slots:
     void slotLanguageChanged(QAction *action);
@@ -63,11 +67,16 @@ private slots:
     void showDefaultIptcMeta();
     void clearDefaultIptcMeta();
 
+    void on_progressBar_valueChanged(int value);
+
 protected:
     void changeEvent(QEvent *);
+    bool eventFilter(QObject *sender, QEvent *event);
 
 private:
     Ui::MainWindow *ui;
+
+    QFutureWatcher<void> FutureWatcher;
 
     QFont *font_10 = new QFont("Times New Roman", 10);
     QFont *font_12 = new QFont("Times New Roman", 12);
@@ -136,4 +145,7 @@ private:
     void refreshStatusBar();
 
     QAction *readRekFolderTest;
+
+    void setProgressbar(int val);
+    int totalCount{0};
 };
