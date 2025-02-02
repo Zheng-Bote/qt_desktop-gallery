@@ -28,17 +28,12 @@ MainWindow::MainWindow(QWidget *parent)
     ui->album_label->clear();
     ui->progressBar->hide();
 
-    //setWindowTitle(tr(qApp->applicationDisplayName().toStdString().c_str()) + " v"
-    //               + qApp->applicationVersion().toStdString().c_str());
-    //setWindowIcon(QIcon(":/res/images/icon.png"));
-
     createMenu();
     createLanguageMenu();
     initListview();
     initStatusBar();
 
     connect(&this->FutureWatcher, SIGNAL(finished()), this, SLOT(slotProgressBarFinished()));
-
     qApp->installEventFilter(this);
 }
 
@@ -50,29 +45,23 @@ MainWindow::~MainWindow()
 void MainWindow::slotLanguageChanged(QAction *action)
 {
     if (0 != action) {
-        // load the language dependant on the action content
         loadLanguage(action->data().toString());
-        //setWindowIcon(action->icon());
     }
 }
 
 void switchTranslator(QTranslator &translator, const QString &filename)
 {
-    // remove the old translator
     qApp->removeTranslator(&translator);
 
-    // load the new translator
     QString path = QApplication::applicationDirPath();
     path.append("/languages/");
-    if (translator.load(
-            path
-            + filename)) //Here Path and Filename has to be entered because the system didn't find the QM Files else
+    if (translator.load(path + filename)) {
         qApp->installTranslator(&translator);
+    }
 }
 
 void MainWindow::openSrcFolderRekursive()
 {
-    //statusBarLabel->setText("openReadFolder");
     QString dir = QFileDialog::getExistingDirectory(this,
                                                     tr("Open Folder"),
                                                     QDir::homePath(),
@@ -86,12 +75,11 @@ void MainWindow::openSrcFolderRekursive()
     watcher.waitForFinished();
     QList<QString> result = future.result();
 
-    qDebug() << "found: " << result.size();
+    qInfo() << "found: " << result.size();
     if (result.size() > ALBUM_LIMIT) {
         showAlbumLimitMsg(result.size());
         ui->album_label->setText(tr("processing") + " " + QString::number(ALBUM_LIMIT) + " of "
                                  + QString::number(result.size()) + " " + tr("items") + "...");
-        //return;
     } else {
         ui->album_label->setText(tr("processing") + " " + QString::number(result.size()) + " "
                                  + tr("items") + "...");
@@ -99,7 +87,6 @@ void MainWindow::openSrcFolderRekursive()
     statusBarLabel->setText(tr("processing") + " " + QString::number(result.size()) + " "
                             + tr("items") + "...");
 
-    //QThreadPool::globalInstance()->setMaxThreadCount(1);
     ui->progressBar->show();
     QFuture<void> futureListView = QtConcurrent::run(&MainWindow::fillSrcListViewThread,
                                                      this,
@@ -122,12 +109,11 @@ void MainWindow::openSrcFolder()
     watcher.waitForFinished();
     QList<QString> result = future.result();
 
-    qDebug() << "found: " << result.size();
+    qInfo() << "found: " << result.size();
     if (result.size() > ALBUM_LIMIT) {
         showAlbumLimitMsg(result.size());
         ui->album_label->setText(tr("processing") + " " + QString::number(ALBUM_LIMIT) + " of "
                                  + QString::number(result.size()) + " " + tr("items") + "...");
-        //return;
     } else {
         ui->album_label->setText(tr("processing") + " " + QString::number(result.size()) + " "
                                  + tr("items") + "...");
@@ -141,23 +127,10 @@ void MainWindow::openSrcFolder()
                                                      result);
 
     this->FutureWatcher.setFuture(futureListView);
-
-    /*
-    QDirIterator srcPics(srcPath,
-                         {"*.jpg", "*.jpeg", "*.png", "*.bmp", "*.tiff"},
-                         QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Readable);
-
-    while (srcPics.hasNext()) {
-        QFile srcFile(srcPics.next());
-        fillSrcListView(srcFile);
-    }
-    */
 }
 
 void MainWindow::openReadFolder()
 {
-    //    qInfo() << "openSrcFolderRekursive on: " << QThread::currentThread();
-
     QString srcPath = QFileDialog::getExistingDirectory(this,
                                                         tr("Open Folder"),
                                                         QDir::homePath(),
@@ -169,11 +142,8 @@ void MainWindow::openReadFolder()
                          QDir::Files,
                          QDirIterator::Subdirectories);
 
-    qDebug() << "QDiroperator: " << srcPath;
-
     while (srcPics.hasNext()) {
         QFile srcFile(srcPics.next());
-        qDebug() << "while: " << srcFile.fileName();
         statusBarLabel->setText("loading " + srcFile.fileName());
         fillSrcListView(srcFile);
     }
@@ -188,9 +158,6 @@ void MainWindow::loadSingleSrcImg()
                                        tr("Image (*.jpg *.jpeg *.png *.bmp *.tiff)"));
 
     if (pathToFile.isEmpty() == false) {
-        // kiss
-        //QFile srcFile(pathToFile);
-        //fillSrcListView(srcFile);
         QList<QString> file;
         file.append(pathToFile);
         fillSrcListViewThread(file);
@@ -280,31 +247,21 @@ void MainWindow::createMenu()
     ui->actionload_Picture->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_P));
     connect(ui->actionload_Picture, &QAction::triggered, this, &MainWindow::loadSingleSrcImg);
 
-    // Pictures
-    //pictureMenu = menuBar()->addMenu(tr("Pictures"));
-
     ui->showDefaultExifAct->setIcon(QIcon(":/resources/img/icons8-edit-file-50.png"));
     ui->showDefaultExifAct->setIconVisibleInMenu(true);
     connect(ui->showDefaultExifAct, &QAction::triggered, this, &MainWindow::showDefaultExifMeta);
-    //ui->pictureMenu->addAction(showDefaultExifAct);
 
     ui->clearDefaultExifAct->setIcon(QIcon(":/resources/img/icons8-file-elements-50.png"));
     ui->clearDefaultExifAct->setIconVisibleInMenu(true);
     connect(ui->clearDefaultExifAct, &QAction::triggered, this, &MainWindow::clearDefaultExifMeta);
-    //pictureMenu->addAction(clearDefaultExifAct);
-
-    //pictureMenu->addSeparator();
 
     ui->showDefaultIptcAct->setIcon(QIcon(":/resources/img/icons8-edit-file-50.png"));
-    //showDefaultIptcAct->setDisabled(true);
     ui->showDefaultIptcAct->setIconVisibleInMenu(true);
     connect(ui->showDefaultIptcAct, &QAction::triggered, this, &MainWindow::showDefaultIptcMeta);
-    //pictureMenu->addAction(showDefaultIptcAct);
 
     ui->clearDefaultIptcAct->setIcon(QIcon(":/resources/img/icons8-file-elements-50.png"));
     ui->clearDefaultIptcAct->setIconVisibleInMenu(true);
     connect(ui->clearDefaultIptcAct, &QAction::triggered, this, &MainWindow::clearDefaultIptcMeta);
-    //pictureMenu->addAction(clearDefaultIptcAct);
 
     ui->writeDefaultGpsMetaToSelectedImagesAct->setIcon(
         QIcon(":/resources/img/icons8-send-file-50.png"));
@@ -314,13 +271,9 @@ void MainWindow::createMenu()
             this,
             &MainWindow::writeDefaultExifGpsToSelected);
 
-    //pictureMenu->addSeparator();
-
     ui->selectAllImagesAct->setIcon(QIcon(":/resources/img/icons8-image-file-add-50.png"));
     ui->selectAllImagesAct->setIconVisibleInMenu(true);
-    //selectAllImagesAct->setDisabled(true);
     connect(ui->selectAllImagesAct, &QAction::triggered, this, &MainWindow::selectAllImages);
-    //pictureMenu->addAction(selectAllImagesAct);
 
     ui->writeDefaultOwnerToSelectedImagesAct->setIcon(
         QIcon(":/resources/img/icons8-send-file-50.png"));
@@ -330,28 +283,39 @@ void MainWindow::createMenu()
             &QAction::triggered,
             this,
             &MainWindow::writeDefaultOwnerToSelectedImages);
-    //pictureMenu->addAction(writeDefaultMetaToSelectedImagesAct);
 
-    //pictureMenu->addSeparator();
+    //
+    ui->showCopyrightOwnerAct->setIcon(QIcon(":/resources/img/icons8-send-file-50.png"));
+    ui->showCopyrightOwnerAct->setIconVisibleInMenu(true);
+    ui->showCopyrightOwnerAct->setDisabled(false);
+    connect(ui->showCopyrightOwnerAct,
+            &QAction::triggered,
+            this,
+            &MainWindow::showCopyrightOwnerInAlbum);
+
+    ui->showGPSdataAct->setIcon(QIcon(":/resources/img/icons8-send-file-50.png"));
+    ui->showGPSdataAct->setIconVisibleInMenu(true);
+    ui->showGPSdataAct->setDisabled(false);
+    connect(ui->showGPSdataAct, &QAction::triggered, this, &MainWindow::showGpsDataInAlbum);
+
+    ui->clearAlbumDataAct->setIcon(QIcon(":/resources/img/icons8-send-file-50.png"));
+    ui->clearAlbumDataAct->setIconVisibleInMenu(true);
+    ui->clearAlbumDataAct->setDisabled(false);
+    connect(ui->clearAlbumDataAct, &QAction::triggered, this, &MainWindow::clearDataInAlbum);
+    //
 
     ui->removeImagesAct->setIcon(QIcon(":/resources/img/icons8-image-file-remove-50.png"));
     ui->removeImagesAct->setIconVisibleInMenu(true);
     connect(ui->removeImagesAct, &QAction::triggered, this, &MainWindow::removeSelectedImages);
-    //pictureMenu->addAction(removeImagesAct);
-
-    // About - Info
-    //infoMenu = menuBar()->addMenu(tr("Info"));
 
     ui->aboutAct->setIcon(QIcon(":/resources/img/icons8-info-48.png"));
     ui->aboutAct->setIconVisibleInMenu(true);
     ui->aboutAct->setShortcuts(QKeySequence::WhatsThis);
     connect(ui->aboutAct, &QAction::triggered, this, &MainWindow::about);
-    //infoMenu->addAction(aboutAct);
 
     ui->hw_infoAct->setIcon(QIcon(":/resources/img/icons8-info-48.png"));
     ui->hw_infoAct->setIconVisibleInMenu(true);
     connect(ui->hw_infoAct, &QAction::triggered, this, &MainWindow::hwInfoMsgbox);
-    //infoMenu->addAction(hw_infoAct);
 }
 
 void MainWindow::hwInfoMsgbox()
@@ -381,13 +345,6 @@ void MainWindow::hwInfoMsgbox()
     setInformativeText.append("<br>Kernel: " + hw_info.value("OS kernel"));
     setInformativeText.append("<br>Architecture: " + hw_info.value("OS architecture"));
 
-    /*
-    QMapIterator<QString, QString> i(hw_info);
-    while (i.hasNext()) {
-        i.next();
-        setInformativeText.append("<li>" + i.key() + ": " + i.value() + "</li>");
-    }
-    */
     setInformativeText.append("</p>");
     QMessageBox msgBox(this);
     msgBox.setWindowTitle(tr("Hardware Info"));
@@ -402,8 +359,6 @@ void MainWindow::hwInfoMsgbox()
 void MainWindow::createLanguageMenu(void)
 {
     i18nMenu = menuBar()->addMenu("六A");
-    //i18nMenu->setIcon(QIcon(":/resources/img/translate.png"));
-    //i18nMenu->setDisabled(true);
 
     QActionGroup *langGroup = new QActionGroup(i18nMenu);
     langGroup->setExclusive(true);
@@ -419,15 +374,11 @@ void MainWindow::createLanguageMenu(void)
     QStringList fileNames = dir.entryList(QStringList(qApp->applicationName() + "_*.qm"));
 
     for (int i = 0; i < fileNames.size(); ++i) {
-        // get locale extracted by filename
         QString locale;
         locale = fileNames[i];                         // "TranslationExample_de.qm"
         locale.truncate(locale.lastIndexOf('.'));      // "TranslationExample_de"
         locale.remove(0, locale.lastIndexOf('_') + 1); // "de"
 
-        //qDebug() << "locale: " << locale;
-
-        //QString lang = QLocale::languageToString(QLocale(locale).language());
         QIcon ico(QString("%1/%2.png").arg(m_langPath).arg(locale));
 
         QAction *action = new QAction(ico, locale.toUpper(), this);
@@ -437,7 +388,6 @@ void MainWindow::createLanguageMenu(void)
         i18nMenu->addAction(action);
         langGroup->addAction(action);
 
-        // set default translators and language checked
         if (defaultLocale == locale) {
             action->setChecked(true);
         }
@@ -461,7 +411,6 @@ void MainWindow::loadLanguage(const QString &rLanguage)
 
 void MainWindow::slotProgressBarFinished()
 {
-    //qDebug() << "slotProgressBarFinished";
     ui->progressBar->hide();
 }
 
@@ -469,13 +418,11 @@ void MainWindow::switchTranslator(QTranslator &translator, const QString &filena
 {
     qApp->removeTranslator(&translator);
 
-    // load the new translator
     QString path = QApplication::applicationDirPath();
     path.append("/i18n/");
-    if (translator.load(
-            path
-            + filename)) //Here Path and Filename has to be entered because the system didn't find the QM Files else
+    if (translator.load(path + filename)) {
         qApp->installTranslator(&translator);
+    }
 }
 
 void MainWindow::initListview()
@@ -485,7 +432,6 @@ void MainWindow::initListview()
 
     ui->listView->setModel(mContentItemModel);
     ui->listView->clearSelection();
-    //ui->listView->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->listView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     ui->listView->setWrapping(true);
     ui->listView->setSpacing(5);
@@ -561,47 +507,47 @@ void MainWindow::setProgressbar(int val)
     ui->progressBar->setValue(val);
 }
 
+QString MainWindow::getPictureCopyRightOwner(int row)
+{
+    QModelIndex col2 = mContentItemModel->index(row, 1);
+    QString pathToFile = col2.data(Qt::DisplayRole).toString();
+
+    Photo photo(pathToFile);
+    return photo.getXmpCopyrightOwner();
+}
+
+QString MainWindow::getPictureGpsData(int row)
+{
+    QModelIndex col2 = mContentItemModel->index(row, 1);
+    QString pathToFile = col2.data(Qt::DisplayRole).toString();
+
+    Photo photo(pathToFile);
+    Photo::exifGpsStruct gpsData;
+    gpsData = photo.getGpsData();
+
+    QString gps_Data = gpsData.GPSLatitudeRef + " " + gpsData.GPSLatitude + "\n"
+                       + gpsData.GPSLongitudeRef + " " + gpsData.GPSLongitude;
+
+    return gps_Data;
+}
+
 void MainWindow::on_listView_doubleClicked(const QModelIndex &index)
 {
-    // alles OK!!
-
-    /*
-    QString itemText = index.data(Qt::DisplayRole).toString();
-    qDebug() << "doubleclicked: " << itemText << " col: " << index.column();
-    */
-
     int row = index.row();
     QModelIndex col2 = mContentItemModel->index(row, 1);
     QString itemText2 = col2.data(Qt::DisplayRole).toString();
-    //qDebug() << "doubleclicked: " << itemText2 << " col: " << col2.column();
     showSinglePicture(itemText2);
-
-    /*
-    QModelIndexList selected = ui->listView->selectionModel()->selectedIndexes();
-    for (QModelIndex i : selected) {
-        int row = i.row();
-        QModelIndex col2 = mContentItemModel->index(row, 1);
-        QString itemText2 = col2.data(Qt::DisplayRole).toString();
-        //qDebug() << "selected: " << itemText2 << " col: " << col2.column();
-    }
-    */
 }
 
 void MainWindow::showViewContextMenu(const QPoint &pt)
 {
-    //qInfo() << "showViewContextMenu";
-
     QModelIndex idx = ui->listView->indexAt(pt);
 
     QString itemText = idx.data(Qt::DisplayRole).toString();
-    //qDebug() << "clicked: " << itemText << " col: " << idx.column();
 
     int row = idx.row();
     QModelIndex col2 = mContentItemModel->index(row, 1);
     QString itemText2 = col2.data(Qt::DisplayRole).toString();
-    //qDebug() << "clicked: " << itemText2;
-
-    //modelIndexForContextMenu = idx; // optional, to let slots know what index is the base for the context menu
     QMenu menu;
 
     contextShowPictureDetailsAct = new QAction(QIcon(":/resources/img/icons8-view-50.png"),
@@ -676,6 +622,8 @@ void MainWindow::setDefaultExifMeta(const QModelIndex &index)
 {
     rowWithDefaultExifMeta = index;
     hasDefaultExifMeta = true;
+
+    //checkForCopyRight(index.row());
 }
 
 void MainWindow::setDefaultIptcMeta(const QModelIndex &index)
@@ -692,8 +640,6 @@ void MainWindow::setDefaultXmpCopyRightOwner(const QModelIndex &index)
 
 void MainWindow::resetDefaultMeta()
 {
-    //rowWithDefaultExifMeta = -0;
-    //rowWithDefaultIptcMeta = -0;
     hasDefaultExifMeta = false;
     hasDefaultIptcMeta = false;
     hasDefaultCopyRightOwner = false;
@@ -754,6 +700,40 @@ void MainWindow::clearDefaultIptcMeta()
     hasDefaultIptcMeta = false;
 }
 
+void MainWindow::showCopyrightOwnerInAlbum()
+{
+    int countListViewRows = ui->listView->model()->rowCount();
+
+    for (int i = 0; i < countListViewRows; i++) {
+        QString owner = getPictureCopyRightOwner(i);
+        owner.isEmpty() ? mContentItemModel->item(i, 0)->setForeground(Qt::red)
+                        : mContentItemModel->item(i, 0)->setForeground(Qt::black);
+
+        mContentItemModel->item(i, 0)->setText(tr("Copyright Owner") + ":\n" + owner);
+    }
+}
+
+void MainWindow::showGpsDataInAlbum()
+{
+    int countListViewRows = ui->listView->model()->rowCount();
+
+    for (int i = 0; i < countListViewRows; i++) {
+        QString gpsData = getPictureGpsData(i);
+        gpsData.length() <= 10 ? mContentItemModel->item(i, 0)->setForeground(Qt::red)
+                               : mContentItemModel->item(i, 0)->setForeground(Qt::black);
+        mContentItemModel->item(i, 0)->setText(tr("GPS data") + ":\n" + gpsData);
+    }
+}
+
+void MainWindow::clearDataInAlbum()
+{
+    int countListViewRows = ui->listView->model()->rowCount();
+
+    for (int i = 0; i < countListViewRows; i++) {
+        mContentItemModel->item(i, 0)->setText("");
+    }
+}
+
 void MainWindow::on_progressBar_valueChanged(int value)
 {
     //qDebug() << "on_progressBar_valueChanged " << value;
@@ -763,12 +743,9 @@ void MainWindow::changeEvent(QEvent *event)
 {
     if (0 != event) {
         switch (event->type()) {
-        // this event is send if a translator is loaded
         case QEvent::LanguageChange:
             ui->retranslateUi(this);
             break;
-
-            // this event is send, if the system, language changes
         case QEvent::LocaleChange: {
             QString locale = QLocale::system().name();
             locale.truncate(locale.lastIndexOf('_'));
@@ -782,8 +759,6 @@ void MainWindow::changeEvent(QEvent *event)
 bool MainWindow::eventFilter(QObject *sender, QEvent *event)
 {
     if (event->type() == MyEvent ::myregisteredEventType()) {
-        //qDebug() << "Beep " << totalCount;
-
         setProgressbar(totalCount);
     }
 
@@ -842,7 +817,6 @@ const void MainWindow::fillSrcListView(QFile &srcFile)
 const void MainWindow::fillSrcListViewThread(const QList<QString> &srcFiles)
 {
     int count{-1};
-    //ui->listView->setUniformItemSizes(true);
 
     int total = srcFiles.count();
     totalCount = total;
@@ -872,8 +846,6 @@ const void MainWindow::fillSrcListViewThread(const QList<QString> &srcFiles)
             continue;
         }
 
-        //statusBarLabel->setText(tr("add") + " " + srcFile.fileName());
-
         QString pathToFile = fileInfo.absolutePath() + "/" + fileInfo.fileName();
         QPixmap pixmap(pathToFile);
         auto thumbnail = new QPixmap(pixmap.scaled(THUMBNAIL_SIZE,
@@ -881,7 +853,6 @@ const void MainWindow::fillSrcListViewThread(const QList<QString> &srcFiles)
                                                    Qt::KeepAspectRatio,
                                                    Qt::SmoothTransformation));
 
-        // Test =>
         const unsigned int BANNER_HEIGHT = 20;
         const unsigned int BANNER_COLOR = 0x303030;
         const unsigned int BANNER_ALPHA = 200;
@@ -900,18 +871,12 @@ const void MainWindow::fillSrcListViewThread(const QList<QString> &srcFiles)
         paint.drawText(bannerRect, Qt::AlignCenter, fileInfo.fileName());
         QPixmap *px = new QPixmap();
         px->convertFromImage(img);
-        // Test <=
-
         QStandardItem *listitem = new QStandardItem();
-
-        // Test =>
-        //listitem->setIcon(*thumbnail);
         listitem->setIcon(*px);
-        // Test <=
 
         //listitem->setText(fileInfo.fileName()); // + "\nschaun wa ma");
+
         listitem->setToolTip(pathToFile);
-        //listitem->setBackground(Qt::lightGray);
         listitem->setEditable(false);
 
         QList<QStandardItem *> items;
@@ -925,8 +890,6 @@ const void MainWindow::fillSrcListViewThread(const QList<QString> &srcFiles)
 
     int rowCount = mContentItemModel->rowCount();
     statusBarLabel->setText(QString::number(rowCount) + " " + tr("items"));
-
-    //ui->listView->setUniformItemSizes(false);
 }
 
 void MainWindow::showSinglePicture(QString pathToFile)
@@ -939,7 +902,6 @@ void MainWindow::showSinglePicture(QString pathToFile)
 // TODO: clean up
 void MainWindow::removeSelectedImages()
 {
-    // selectedRows() ???
     QModelIndexList selected = ui->listView->selectionModel()->selectedIndexes();
     QList<QString> selectedImages;
 
@@ -947,18 +909,15 @@ void MainWindow::removeSelectedImages()
         int row = i.row();
         QModelIndex col2 = mContentItemModel->index(row, 1);
         QString itemText2 = col2.data(Qt::DisplayRole).toString();
-        //qDebug() << "to remove: " << itemText2 << " col: " << col2.column();
         selectedImages.append(itemText2);
     }
 
-    //mContentItemModel->removeRow(i.row());
     QListIterator<QString> intItem(selectedImages);
     while (intItem.hasNext()) {
         QString item = intItem.next();
         //qInfo() << "has: " << item;
         QList<QStandardItem *> items = mContentItemModel->findItems(item, Qt::MatchExactly, 1);
         foreach (auto i, items) {
-            //  qInfo() << "found: " << i->row();
             mContentItemModel->removeRow(i->row());
         }
     }
@@ -970,7 +929,6 @@ void MainWindow::removeSelectedImages()
 // TODO
 void MainWindow::writeDefaultOwnerToSelectedImages()
 {
-    //qDebug() << "writeDefaultMetaToSelectedImages";
 
     if (!hasDefaultCopyRightOwner) {
         QMessageBox msgBox(this);
@@ -995,14 +953,6 @@ void MainWindow::writeDefaultOwnerToSelectedImages()
     QString pathToSRcFile = col2.data(Qt::DisplayRole).toString();
     Photo photo(pathToSRcFile);
     QString owner = photo.getXmpCopyrightOwner();
-
-    /*
-    int row = index.row();
-    QModelIndex col2 = mContentItemModel->index(row, 1);
-    QString itemText2 = col2.data(Qt::DisplayRole).toString();
-    //qDebug() << "doubleclicked: " << itemText2 << " col: " << col2.column();
-    showSinglePicture(itemText2); 
-    */
 
     for (QModelIndex i : selected) {
         int row = i.row();
@@ -1032,10 +982,7 @@ void MainWindow::selectAllImages()
 // TODO
 void MainWindow::_on_listView_clicked(const QModelIndex &index)
 {
-    //qInfo() << "on_listView_clicked: " << Qt::MouseButtons().toInt();
-
     if (QMouseEvent::ContextMenu && Qt::LeftButton) {
-        //qInfo() << "on_listView_clicked left contextMenu";
     }
     if (Qt::MouseButtons().toInt() & Qt::RightButton) {
         //qInfo() << "on_listView_clicked right context Menu mouse";
@@ -1044,9 +991,7 @@ void MainWindow::_on_listView_clicked(const QModelIndex &index)
     int row = index.row();
     QModelIndex col2 = mContentItemModel->index(row, 1);
     QString itemText2 = col2.data(Qt::DisplayRole).toString();
-    //qDebug() << "clicked: " << itemText2;
 
-    /* Create menu and insert some actions */
     QMenu rightClickMenu(ui->listView);
     rightClickMenu.addAction("context1");
     rightClickMenu.addAction("context2");

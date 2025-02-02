@@ -68,13 +68,19 @@ public:
     QString getXmpCopyrightOwner();
     bool writeToAllCopyrightOwner(const QString &owner);
 
+    struct metaCopyrightStruct
+    {
+        QString xmp{"Xmp.dc.CopyrightOwner"};
+        QString exif = "Exif.Image.Copyright";
+        QString iptc = "Iptc.Application2.Copyright";
+    };
+
     struct exifGpsStruct
     {
         QString GPSLatitudeRef{""};
         QString GPSLatitude{""};
         QString GPSLongitudeRef{""};
         QString GPSLongitude{""};
-
         QString GPSAltitudeRef{""};
         QString GPSAltitude{""};
     };
@@ -85,11 +91,11 @@ public:
     const QMap<QString, QString> exif_to_xmp = {{"Exif.Image.Copyright", "Xmp.dc.CopyrightOwner"},
                                                 {"Exif.Image.DocumentName", "Xmp.dc.DocumentName"},
                                                 {"Exif.Image.ImageDescription",
-                                                 "Xmp.dc.Description"},
+                                                 "Xmp.dc.description"},
                                                 {"Exif.Image.ImageID", "Xmp.dc.ImageID"},
                                                 {"Exif.Image.SecurityClassification",
                                                  "Xmp.dc.SecurityClassification"},
-                                                {"Exif.Photo.UserComment", "Xmp.dc.Subject"}};
+                                                {"Exif.Photo.UserComment", "Xmp.dc.subject"}};
 
     const QMap<QString, QString> exif_to_iptc = {
         {"Exif.Image.Copyright", "Iptc.Application2.Copyright"},
@@ -99,20 +105,20 @@ public:
 
     const QMap<QString, QString> xmp_to_exif = {{"Xmp.dc.CopyrightOwner", "Exif.Image.Copyright"},
                                                 {"Xmp.dc.DocumentName", "Exif.Image.DocumentName"},
-                                                {"Xmp.dc.Description",
+                                                {"Xmp.dc.description",
                                                  "Exif.Image.ImageDescription"},
                                                 {"Xmp.dc.ImageID", "Exif.Image.ImageID"},
                                                 {"Xmp.dc.SecurityClassification",
                                                  "Exif.Image.SecurityClassification"},
-                                                {"Xmp.dc.Subject", "Exif.Photo.UserComment"}};
+                                                {"Xmp.dc.subject", "Exif.Photo.UserComment"}};
 
-    const QMap<QString, QString> xmp_to_iptc = {{"Xmp.dc.Description", "Iptc.Application2.Caption"},
+    const QMap<QString, QString> xmp_to_iptc = {{"Xmp.dc.description", "Iptc.Application2.Caption"},
                                                 {"Xmp.dc.CopyrightOwner",
                                                  "Iptc.Application2.Copyright"},
                                                 {"Xmp.dc.DocumentName",
                                                  "Iptc.Application2.ObjectName"}};
 
-    const QMap<QString, QString> iptc_to_xmp = {{"Iptc.Application2.Caption", "Xmp.dc.Description"},
+    const QMap<QString, QString> iptc_to_xmp = {{"Iptc.Application2.Caption", "Xmp.dc.description"},
                                                 {"Iptc.Application2.Copyright",
                                                  "Xmp.dc.CopyrightOwner"},
                                                 {"Iptc.Application2.ObjectName",
@@ -130,10 +136,10 @@ public:
          "full pathname of the original, high-resolution image,"
          "\n"
          "or any other uniquely identifying string."},
-        {"Xmp.dc.Title", "lang=\"en\" "},
-        {"Xmp.dc.Subject", "lang=\"en\" "},
-        {"Xmp.dc.Description", "lang=\"en\" "},
-        {"Xmp.dc.Rights", "Copyright Notice"},
+        {"Xmp.dc.title", "lang=\"en\" "},
+        {"Xmp.dc.subject", "lang=\"en\" "},
+        {"Xmp.dc.description", "lang=\"en\" "},
+        {"Xmp.dc.rights", "lang=\"en\" Copyright Notice"},
         {"Xmp.dc.CopyrightOwner", "Copyright Owner"},
         {"Xmp.plus.CopyrightOwner", "Copyright Owner"},
         {"Xmp.dc.CountryCode",
@@ -144,18 +150,16 @@ public:
          "\n"
          "Where ISO has established an appropriate country code under ISO 3166."},
         {"Xmp.dc.CountryName",
-         "lang=\"en\" \n"
          "Provides full, publishable, name of the country/primary location where the intellectual "
          "property of the object data was created."},
-        {"Xmp.dc.ProvinceState",
-         "lang=\"en\" \n"
-         "Identifies Province/State of origin."},
-        {"Xmp.dc.City", "lang=\"en\" "},
+        {"Xmp.dc.ProvinceState", "Identifies Province/State of origin."},
+        {"Xmp.dc.City", "City of Origin"},
         {"Xmp.dc.SubLocation",
-         "lang=\"en\" \n"
+         "sublocation of origin"
+         "\n"
          "Identifies the location within a city from which the object data originates."},
         {"Xmp.dc.ZipCode", ""},
-        {"Xmp.dc.StreetName", "lang=\"en\" "},
+        {"Xmp.dc.StreetName", "street of origin"},
         {"Xmp.dc.LocalAddress", "address in local language and format."},
         {"Xmp.dc.Language",
          "Describes the major national language of the object, according to the 2-letter codes of "

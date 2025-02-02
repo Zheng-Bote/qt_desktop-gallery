@@ -220,13 +220,6 @@ const void PictureWidget::readSrcExif()
     tlbCol3 = nullptr;
     file.close();
 
-    /*
-    ui->exifTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui->exifTableWidget->resizeColumnsToContents();
-    ui->exifTableWidget->resizeRowsToContents();
-
-    ui->tabWidget->adjustSize();
-    */
 }
 
 void PictureWidget::markExif(QString searchFor)
@@ -262,12 +255,6 @@ void PictureWidget::markExif(QString searchFor)
         //rowPtr->setBackground(Qt::red);
         int rowNumber = rowPtr->row();
         ui->exifTableWidget->item(rowNumber, 0)->setForeground(Qt::red);
-        /*
-        if (ui->exifTableWidget->item(rowNumber, 1)->text().length() < 1) {
-            //  ui->exifTableWidget->item(rowNumber, 1)->setBackground(Qt::red);
-            //ui->exifTableWidget->item(rowNumber, 1)->setForeground(Qt::black);
-        }
-        */
     }
 }
 
@@ -333,8 +320,6 @@ const void PictureWidget::readSrcIptc()
 
             QTableWidgetItem *tlbCol2val = new QTableWidgetItem();
             tlbCol2val->setText(md->value().toString().c_str());
-            //tlbCol2val->setTextAlignment(Qt::AlignRight);
-            //tlbCol2val->setTextAlignment(Qt::AlignVCenter);
 
             ui->iptcTableWidget->setItem(ui->iptcTableWidget->rowCount() - 1, 1, tlbCol2val);
             tlbCol2val = nullptr;
@@ -360,13 +345,6 @@ const void PictureWidget::readSrcIptc()
     tlbCol3 = nullptr;
     file.close();
 
-    /*
-    ui->iptcTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui->iptcTableWidget->resizeColumnsToContents();
-    ui->iptcTableWidget->resizeRowsToContents();
-
-    ui->tabWidget->adjustSize();
-    */
 }
 
 const void PictureWidget::readSrcXmp()
@@ -665,12 +643,6 @@ void PictureWidget::markIptc(QString searchFor)
         //rowPtr->setBackground(Qt::red);
         int rowNumber = rowPtr->row();
         ui->iptcTableWidget->item(rowNumber, 0)->setForeground(Qt::red);
-        /*
-        if (ui->iptcTableWidget->item(rowNumber, 1)->text().length() < 1) {
-            //ui->iptcTableWidget->item(rowNumber, 1)->setBackground(Qt::red);
-            ui->iptcTableWidget->item(rowNumber, 1)->setForeground(Qt::black);
-        }
-        */
     }
 }
 
@@ -821,7 +793,7 @@ void PictureWidget::createExportMenu()
     webp_overwriteWebpAct = new QAction(tr("overwrite existing WebP"), this);
     webp_overwriteWebpAct->setIconVisibleInMenu(true);
     webp_overwriteWebpAct->setCheckable(true);
-    webp_overwriteWebpAct->setChecked(false);
+    webp_overwriteWebpAct->setChecked(true);
     exportMnu->addAction(webp_overwriteWebpAct);
 
     webp_watermarkWebpAct = new QAction(tr("watermark WebP"), this);
@@ -835,14 +807,6 @@ void PictureWidget::createExportMenu()
 
 void PictureWidget::_on_resizeSmallerImage_Btn_clicked()
 {
-    /*
-    int wSize = ui->picture_label->width();
-    int hSize = ui->picture_label->height();
-
-    ui->picture_label->setPixmap(picture->scaled(QSize(wSize - 200, hSize - 200),
-                                                 Qt::KeepAspectRatio,
-                                                 Qt::SmoothTransformation));
-*/
     resize(width() - 100, height() - 100);
 }
 
@@ -920,15 +884,6 @@ void PictureWidget::on_iptcTableWidget_itemDoubleClicked(QTableWidgetItem *item)
     bool ok;
 
     int row = item->row();
-    //qDebug() << "row: " << row << " val 0: " << ui->iptcTableWidget->item(row, 0)->text();
-
-    /* KISS
-    QInputDialog inDialog(this);
-    inDialog.setOkButtonText("save");
-    inDialog.setLabelText(ui->iptcTableWidget->item(row, 0)->text());
-    inDialog.setTextValue(ui->iptcTableWidget->item(row, 1)->text());
-    inDialog.setTextEchoMode(QLineEdit::Normal);
-    */
 
     QString text = QInputDialog::getText(this,
                                          tr("Edit Metadata"),
@@ -976,16 +931,6 @@ void PictureWidget::on_xmpTableWidget_itemDoubleClicked(QTableWidgetItem *item)
     bool ok;
 
     int row = item->row();
-    //qDebug() << "row: " << row << " val 0: " << ui->xmpTableWidget->item(row, 0)->text();
-
-    /* KISS
-    QInputDialog inDialog(this);
-    inDialog.setOkButtonText("save");
-    inDialog.setLabelText(ui->iptcTableWidget->item(row, 0)->text());
-    inDialog.setTextValue(ui->iptcTableWidget->item(row, 1)->text());
-    inDialog.setTextEchoMode(QLineEdit::Normal);
-    */
-
     QString text = QInputDialog::getText(this,
                                          tr("Edit Metadata"),
                                          tr("Please enter the new value for") + " "

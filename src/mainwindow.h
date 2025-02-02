@@ -67,6 +67,10 @@ private slots:
     void showDefaultIptcMeta();
     void clearDefaultIptcMeta();
 
+    void showCopyrightOwnerInAlbum();
+    void showGpsDataInAlbum();
+    void clearDataInAlbum();
+
     void on_progressBar_valueChanged(int value);
 
 protected:
@@ -105,6 +109,8 @@ private:
     QAction *writeDefaultGpsMetaToSelectedImagesAct;
     QAction *removeImagesAct;
     void removeSelectedImages();
+
+    QAction *separatorAct;
 
     QMenu *infoMenu;
     QAction *aboutAct;
@@ -148,4 +154,7 @@ private:
 
     void setProgressbar(int val);
     int totalCount{0};
+
+    QString getPictureCopyRightOwner(int row);
+    QString getPictureGpsData(int row);
 };

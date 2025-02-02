@@ -101,6 +101,10 @@
     <addaction name="selectAllImagesAct"/>
     <addaction name="separator"/>
     <addaction name="removeImagesAct"/>
+    <addaction name="separator"/>
+    <addaction name="showGPSdataAct"/>
+    <addaction name="showCopyrightOwnerAct"/>
+    <addaction name="clearAlbumDataAct"/>
    </widget>
    <widget class="QMenu" name="infoMenu">
     <property name="title">
@@ -109,8 +113,34 @@
     <addaction name="aboutAct"/>
     <addaction name="hw_infoAct"/>
    </widget>
+   <widget class="QMenu" name="metadataMenu">
+    <property name="title">
+     <string>Metadata</string>
+    </property>
+    <addaction name="actioncheck_Pictures_for_Copyright"/>
+    <addaction name="actioncheck_Pictures_forGPS_data"/>
+    <addaction name="actioncheck_Pictures_for_Metadata"/>
+    <addaction name="separator"/>
+    <addaction name="actionedit_global_Metadata"/>
+   </widget>
+   <widget class="QMenu" name="separatorMenu">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="title">
+     <string>|</string>
+    </property>
+   </widget>
    <addaction name="menuMenu"/>
    <addaction name="pictureMenu"/>
+   <addaction name="metadataMenu"/>
+   <addaction name="separatorMenu"/>
    <addaction name="infoMenu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -193,6 +223,41 @@
   <action name="writeDefaultGpsMetaToSelectedImagesAct">
    <property name="text">
     <string>write default GPS Meta to selected Pictures</string>
+   </property>
+  </action>
+  <action name="actioncheck_Pictures_for_Metadata">
+   <property name="text">
+    <string>check Pictures for Metadata</string>
+   </property>
+  </action>
+  <action name="actioncheck_Pictures_for_Copyright">
+   <property name="text">
+    <string>check Pictures for Copyright</string>
+   </property>
+  </action>
+  <action name="actioncheck_Pictures_forGPS_data">
+   <property name="text">
+    <string>check Pictures for GPS data </string>
+   </property>
+  </action>
+  <action name="actionedit_global_Metadata">
+   <property name="text">
+    <string>edit global Metadata</string>
+   </property>
+  </action>
+  <action name="showCopyrightOwnerAct">
+   <property name="text">
+    <string>show Copyright Owner</string>
+   </property>
+  </action>
+  <action name="showGPSdataAct">
+   <property name="text">
+    <string>show GPS data</string>
+   </property>
+  </action>
+  <action name="clearAlbumDataAct">
+   <property name="text">
+    <string>clear Album data</string>
    </property>
   </action>
  </widget>
