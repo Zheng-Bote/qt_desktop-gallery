@@ -88,49 +88,47 @@ public:
     void writeDefaultGpsData(const exifGpsStruct &gpsData);
 
 public:
-    const QMap<QString, QString> exif_to_xmp = {{"Exif.Image.Copyright", "Xmp.dc.CopyrightOwner"},
-                                                {"Exif.Image.DocumentName", "Xmp.dc.DocumentName"},
-                                                {"Exif.Image.ImageDescription",
-                                                 "Xmp.dc.description"},
-                                                {"Exif.Image.ImageID", "Xmp.dc.ImageID"},
-                                                {"Exif.Image.SecurityClassification",
-                                                 "Xmp.dc.SecurityClassification"},
-                                                {"Exif.Photo.UserComment", "Xmp.dc.subject"}};
+    const QHash<QString, QString> exif_to_xmp = {{"Exif.Image.Copyright", "Xmp.dc.CopyrightOwner"},
+                                                 {"Exif.Image.DocumentName", "Xmp.dc.DocumentName"},
+                                                 {"Exif.Image.ImageDescription",
+                                                  "Xmp.dc.description"},
+                                                 {"Exif.Image.ImageID", "Xmp.dc.ImageID"},
+                                                 {"Exif.Image.SecurityClassification",
+                                                  "Xmp.dc.SecurityClassification"},
+                                                 {"Exif.Photo.UserComment", "Xmp.dc.subject"}};
 
-    const QMap<QString, QString> exif_to_iptc = {
+    const QHash<QString, QString> exif_to_iptc = {
         {"Exif.Image.Copyright", "Iptc.Application2.Copyright"},
         {"Exif.Image.DocumentName", "Iptc.Application2.ObjectName"},
         {"Exif.Image.ImageDescription", "Iptc.Application2.Caption"},
     };
 
-    const QMap<QString, QString> xmp_to_exif = {{"Xmp.dc.CopyrightOwner", "Exif.Image.Copyright"},
-                                                {"Xmp.dc.DocumentName", "Exif.Image.DocumentName"},
-                                                {"Xmp.dc.description",
-                                                 "Exif.Image.ImageDescription"},
-                                                {"Xmp.dc.ImageID", "Exif.Image.ImageID"},
-                                                {"Xmp.dc.SecurityClassification",
-                                                 "Exif.Image.SecurityClassification"},
-                                                {"Xmp.dc.subject", "Exif.Photo.UserComment"}};
+    const QHash<QString, QString> xmp_to_exif = {{"Xmp.dc.CopyrightOwner", "Exif.Image.Copyright"},
+                                                 {"Xmp.dc.DocumentName", "Exif.Image.DocumentName"},
+                                                 {"Xmp.dc.description",
+                                                  "Exif.Image.ImageDescription"},
+                                                 {"Xmp.dc.ImageID", "Exif.Image.ImageID"},
+                                                 {"Xmp.dc.SecurityClassification",
+                                                  "Exif.Image.SecurityClassification"},
+                                                 {"Xmp.dc.subject", "Exif.Photo.UserComment"}};
 
-    const QMap<QString, QString> xmp_to_iptc = {{"Xmp.dc.description", "Iptc.Application2.Caption"},
-                                                {"Xmp.dc.CopyrightOwner",
-                                                 "Iptc.Application2.Copyright"},
-                                                {"Xmp.dc.DocumentName",
-                                                 "Iptc.Application2.ObjectName"}};
+    const QHash<QString, QString> xmp_to_iptc
+        = {{"Xmp.dc.description", "Iptc.Application2.Caption"},
+           {"Xmp.dc.CopyrightOwner", "Iptc.Application2.Copyright"},
+           {"Xmp.dc.DocumentName", "Iptc.Application2.ObjectName"}};
 
-    const QMap<QString, QString> iptc_to_xmp = {{"Iptc.Application2.Caption", "Xmp.dc.description"},
-                                                {"Iptc.Application2.Copyright",
-                                                 "Xmp.dc.CopyrightOwner"},
-                                                {"Iptc.Application2.ObjectName",
-                                                 "Xmp.dc.DocumentName"}};
+    const QHash<QString, QString> iptc_to_xmp
+        = {{"Iptc.Application2.Caption", "Xmp.dc.description"},
+           {"Iptc.Application2.Copyright", "Xmp.dc.CopyrightOwner"},
+           {"Iptc.Application2.ObjectName", "Xmp.dc.DocumentName"}};
 
-    const QMap<QString, QString> iptc_to_exif
+    const QHash<QString, QString> iptc_to_exif
         = {{"Iptc.Application2.Caption", "Exif.Image.ImageDescription"},
            {"Iptc.Application2.Copyright", "Exif.Image.Copyright"},
            {"Iptc.Application2.ObjectName", "Exif.Image.DocumentName"}};
 
     // Meta attributes-values
-    const QMap<QString, QString> xmpMetaTags{
+    const QHash<QString, QString> xmpMetaTags{
         {"Xmp.dc.DocumentName", "the original document name."},
         {"Xmp.dc.ImageID",
          "full pathname of the original, high-resolution image,"
@@ -170,7 +168,18 @@ public:
         {"Xmp.dc.Keywords", "Used to indicate specific information retrieval words."},
         {"Xmp.dc.SecurityClassification", "Security classification assigned to the image."}};
 
-    const QMap<QString, QString> exifMetaTags{
+    const QHash<QString, QString> exifGpsTags{{"Exif.Image.GPSTag", ""},
+                                              {"Exif.GPSInfo.GPSLatitudeRef", ""},
+                                              {"Exif.GPSInfo.GPSLatitude", ""},
+                                              {"Exif.GPSInfo.GPSLongitudeRef", ""},
+                                              {"Exif.GPSInfo.GPSLongitude", ""},
+                                              {"Exif.GPSInfo.GPSAltitudeRef", ""},
+                                              {"Exif.GPSInfo.GPSAltitude", ""},
+                                              {"Exif.GPSInfo.GPSTimeStamp", ""},
+                                              {"Exif.GPSInfo.GPSMapDatum", ""},
+                                              {"Exif.GPSInfo.GPSDateStamp", ""},
+                                              {"Exif.Photo.DateTimeOriginal", ""}};
+    const QHash<QString, QString> exifMetaTags{
         {"Exif.Image.DocumentName",
          "The name of the document from which this image was scanned."
          "\n"
@@ -234,16 +243,16 @@ public:
         {"Exif.GPSInfo.GPSDateStamp", ""},
         {"Exif.Photo.DateTimeOriginal", ""}};
 
-    const QMap<QString, QString> iptcMetaTags{{"Iptc.Application2.ObjectName",
-                                               "Used as a shorthand reference for the object."
-                                               "\n"
-                                               "(64B)"},
-                                              {"Iptc.Application2.Copyright",
-                                               "Contains any necessary copyright notice."
-                                               "\n"
-                                               "(128B)"},
-                                              {"Iptc.Application2.Caption",
-                                               "A textual description of the object data."
-                                               "\n"
-                                               "(2000B)"}};
+    const QHash<QString, QString> iptcMetaTags{{"Iptc.Application2.ObjectName",
+                                                "Used as a shorthand reference for the object."
+                                                "\n"
+                                                "(64B)"},
+                                               {"Iptc.Application2.Copyright",
+                                                "Contains any necessary copyright notice."
+                                                "\n"
+                                                "(128B)"},
+                                               {"Iptc.Application2.Caption",
+                                                "A textual description of the object data."
+                                                "\n"
+                                                "(2000B)"}};
 };

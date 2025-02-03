@@ -5,12 +5,12 @@
 #include <QMessageBox>
 #include <QPushButton>
 
+#include "./defaultmeta_widget.h"
 #include "./picture_widget.h"
 #include "./ui_mainwindow.h"
 #include "includes/rz_config.h"
 #include "includes/rz_hwinfo.h"
 #include "includes/rz_myevent.hpp"
-
 #include "includes/rz_photo.hpp"
 #include "mainwindow.h"
 
@@ -307,6 +307,15 @@ void MainWindow::createMenu()
     ui->removeImagesAct->setIcon(QIcon(":/resources/img/icons8-image-file-remove-50.png"));
     ui->removeImagesAct->setIconVisibleInMenu(true);
     connect(ui->removeImagesAct, &QAction::triggered, this, &MainWindow::removeSelectedImages);
+
+    // DefaultMeta
+    ui->editDefaultMetadataAct->setIcon(QIcon(":/resources/img/icons8-image-file-add-50.png"));
+    ui->editDefaultMetadataAct->setIconVisibleInMenu(true);
+    ui->editDefaultMetadataAct->setDisabled(false);
+    connect(ui->editDefaultMetadataAct,
+            &QAction::triggered,
+            this,
+            &MainWindow::showDefaultMetaWidget);
 
     ui->aboutAct->setIcon(QIcon(":/resources/img/icons8-info-48.png"));
     ui->aboutAct->setIconVisibleInMenu(true);
@@ -698,6 +707,12 @@ void MainWindow::showDefaultIptcMeta()
 void MainWindow::clearDefaultIptcMeta()
 {
     hasDefaultIptcMeta = false;
+}
+
+void MainWindow::showDefaultMetaWidget()
+{
+    DefaultMeta *defaultMetaWidget = new DefaultMeta();
+    defaultMetaWidget->show();
 }
 
 void MainWindow::showCopyrightOwnerInAlbum()

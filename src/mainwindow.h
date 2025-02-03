@@ -66,6 +66,7 @@ private slots:
     void clearDefaultExifMeta();
     void showDefaultIptcMeta();
     void clearDefaultIptcMeta();
+    void showDefaultMetaWidget();
 
     void showCopyrightOwnerInAlbum();
     void showGpsDataInAlbum();

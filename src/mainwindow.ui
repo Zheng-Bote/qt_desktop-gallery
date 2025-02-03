@@ -121,7 +121,7 @@
     <addaction name="actioncheck_Pictures_forGPS_data"/>
     <addaction name="actioncheck_Pictures_for_Metadata"/>
     <addaction name="separator"/>
-    <addaction name="actionedit_global_Metadata"/>
+    <addaction name="editDefaultMetadataAct"/>
    </widget>
    <widget class="QMenu" name="separatorMenu">
     <property name="enabled">
@@ -240,9 +240,9 @@
     <string>check Pictures for GPS data </string>
    </property>
   </action>
-  <action name="actionedit_global_Metadata">
+  <action name="editDefaultMetadataAct">
    <property name="text">
-    <string>edit global Metadata</string>
+    <string>edit default Metadata</string>
    </property>
   </action>
   <action name="showCopyrightOwnerAct">
@@ -257,7 +257,7 @@
   </action>
   <action name="clearAlbumDataAct">
    <property name="text">
-    <string>clear Album data</string>
+    <string>clear Album view</string>
    </property>
   </action>
  </widget>
