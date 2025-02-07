@@ -417,16 +417,6 @@ void Photo::writeDefaultGpsData(const exifGpsStruct &gpsData)
 Photo::exifGpsStruct Photo::getGpsData() const
 {
     exifGpsStruct gpsStruct;
-    {
-        QString GPSLatitudeRef{""};
-        QString GPSLatitude{""};
-        QString GPSLongitudeRef{""};
-        QString GPSLongitude{""};
-
-        QString GPSAltitudeRef{""};
-        QString GPSAltitude{""};
-    };
-
     std::string pathToFile = imgStruct.fileAbolutePath.toStdString() + "/"
                              + imgStruct.fileName.toStdString();
 
@@ -437,12 +427,17 @@ Photo::exifGpsStruct Photo::getGpsData() const
         return gpsStruct;
     }
 
+    gpsStruct.GPSTag = exifData["Exif.Image.GPSTag"].toString().c_str();
     gpsStruct.GPSLatitudeRef = exifData["Exif.GPSInfo.GPSLatitudeRef"].toString().c_str();
     gpsStruct.GPSLatitude = exifData["Exif.GPSInfo.GPSLatitude"].toString().c_str();
     gpsStruct.GPSLongitudeRef = exifData["Exif.GPSInfo.GPSLongitudeRef"].toString().c_str();
     gpsStruct.GPSLongitude = exifData["Exif.GPSInfo.GPSLongitude"].toString().c_str();
     gpsStruct.GPSAltitudeRef = exifData["Exif.GPSInfo.GPSAltitudeRef"].toString().c_str();
     gpsStruct.GPSAltitude = exifData["Exif.GPSInfo.GPSAltitude"].toString().c_str();
+    gpsStruct.GPSMapDatum = exifData["Exif.GPSInfo.GPSMapDatum"].toString().c_str();
+    gpsStruct.GPSTimeStamp = exifData["Exif.GPSInfo.GPSTimeStamp"].toString().c_str();
+    gpsStruct.GPSDateStamp = exifData["Exif.GPSInfo.GPSDateStamp"].toString().c_str();
+    gpsStruct.DateTimeOriginal = exifData["Exif.Photo.DateTimeOriginal"].toString().c_str();
 
     return gpsStruct;
 }

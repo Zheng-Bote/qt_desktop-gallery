@@ -3,7 +3,7 @@
 #include <QMessageBox>
 #include "ui_defaultmeta_widget.h"
 
-#include "includes/rz_photo.hpp"
+#include "includes/rz_metadata.hpp"
 
 DefaultMeta::DefaultMeta(QWidget *parent)
     : QWidget(parent)
@@ -11,12 +11,30 @@ DefaultMeta::DefaultMeta(QWidget *parent)
 {
     ui->setupUi(this);
 
-    createTableWidget();
+    createXmpTableWidget();
+    createExifTableWidget();
 }
 
 DefaultMeta::~DefaultMeta()
 {
     delete ui;
+}
+
+void DefaultMeta::setDefaultMeta(rz_metaDefaultData::defaultMetaStruct &_defaultMetaPtr)
+{
+    defaultMetaPtr = &_defaultMetaPtr;
+
+    QHashIterator<QString, QString> xmp(_defaultMetaPtr.xmpDefault);
+    while (xmp.hasNext()) {
+        xmp.next();
+        markXmp(xmp.key());
+    }
+
+    QHashIterator<QString, QString> exif(_defaultMetaPtr.exifDefault);
+    while (exif.hasNext()) {
+        exif.next();
+        markExif(exif.key());
+    }
 }
 
 void DefaultMeta::closeEvent(QCloseEvent *event)
@@ -43,7 +61,7 @@ void DefaultMeta::closeEvent(QCloseEvent *event)
     //QWidget::closeEvent(event);
 }
 
-void DefaultMeta::createTableWidget()
+void DefaultMeta::createXmpTableWidget()
 {
     QFont font_11_bold("Times New Roman", 11);
     font_11_bold.setBold(true);
@@ -79,8 +97,10 @@ void DefaultMeta::createTableWidget()
 
     ui->tableWidget->removeRow(0);
 
-    Photo photo;
-    for (auto i = photo.xmpMetaTags.cbegin(), end = photo.xmpMetaTags.cend(); i != end; ++i) {
+    for (auto i = rz_metaDefaultData::xmpDefaultTags.cbegin(),
+              end = rz_metaDefaultData::xmpDefaultTags.cend();
+         i != end;
+         ++i) {
         //i.key()
         //i.value()
         ui->tableWidget->insertRow(ui->tableWidget->rowCount());
@@ -104,32 +124,125 @@ void DefaultMeta::createTableWidget()
         tlbCol3val = nullptr;
     }
 
-    for (auto i = photo.exifGpsTags.cbegin(), end = photo.exifGpsTags.cend(); i != end; ++i) {
+    ui->tableWidget->resizeColumnsToContents();
+    ui->tableWidget->resizeRowsToContents();
+}
+
+void DefaultMeta::createExifTableWidget()
+{
+    QFont font_11_bold("Times New Roman", 11);
+    font_11_bold.setBold(true);
+
+    ui->exif_tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->exif_tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    ui->exif_tableWidget->insertRow(0);
+    ui->exif_tableWidget->insertColumn(0);
+    ui->exif_tableWidget->insertColumn(1);
+    ui->exif_tableWidget->insertColumn(2);
+
+    QTableWidgetItem *tlbCol1 = new QTableWidgetItem();
+    tlbCol1->setText(tr("Key"));
+    tlbCol1->setBackground(Qt::lightGray);
+    tlbCol1->setFont(font_11_bold);
+    tlbCol1->setTextAlignment(Qt::AlignCenter);
+    ui->exif_tableWidget->setHorizontalHeaderItem(0, tlbCol1);
+
+    QTableWidgetItem *tlbCol2 = new QTableWidgetItem();
+    tlbCol2->setText(tr("Value"));
+    tlbCol2->setBackground(Qt::lightGray);
+    tlbCol2->setFont(font_11_bold);
+    tlbCol2->setTextAlignment(Qt::AlignCenter);
+    ui->exif_tableWidget->setHorizontalHeaderItem(1, tlbCol2);
+
+    QTableWidgetItem *tlbCol3 = new QTableWidgetItem();
+    tlbCol3->setText(tr("Description"));
+    tlbCol3->setBackground(Qt::lightGray);
+    tlbCol3->setFont(font_11_bold);
+    tlbCol3->setTextAlignment(Qt::AlignCenter);
+    ui->exif_tableWidget->setHorizontalHeaderItem(2, tlbCol3);
+
+    ui->exif_tableWidget->removeRow(0);
+
+    for (auto i = rz_metaDefaultData::exifDefaultTags.cbegin(),
+              end = rz_metaDefaultData::exifDefaultTags.cend();
+         i != end;
+         ++i) {
         //i.key()
         //i.value()
-        ui->tableWidget->insertRow(ui->tableWidget->rowCount());
+        ui->exif_tableWidget->insertRow(ui->exif_tableWidget->rowCount());
 
         QTableWidgetItem *tlbCol1val = new QTableWidgetItem();
         tlbCol1val->setText(i.key());
         tlbCol1val->setFlags(tlbCol1val->flags() ^ Qt::ItemIsEditable);
-        ui->tableWidget->setItem(ui->tableWidget->rowCount() - 1, 0, tlbCol1val);
+        ui->exif_tableWidget->setItem(ui->exif_tableWidget->rowCount() - 1, 0, tlbCol1val);
         tlbCol1val = nullptr;
 
         QTableWidgetItem *tlbCol2val = new QTableWidgetItem();
         tlbCol2val->setText("");
+
         //tlbCol2val->setTextAlignment(Qt::AlignRight);
-        ui->tableWidget->setItem(ui->tableWidget->rowCount() - 1, 1, tlbCol2val);
+        ui->exif_tableWidget->setItem(ui->exif_tableWidget->rowCount() - 1, 1, tlbCol2val);
         tlbCol2val = nullptr;
 
         QTableWidgetItem *tlbCol3val = new QTableWidgetItem();
-        tlbCol3val->setText("");
+        tlbCol3val->setText(i.value());
         tlbCol3val->setFlags(tlbCol3val->flags() ^ Qt::ItemIsEditable);
-        ui->tableWidget->setItem(ui->tableWidget->rowCount() - 1, 2, tlbCol3val);
+        ui->exif_tableWidget->setItem(ui->exif_tableWidget->rowCount() - 1, 2, tlbCol3val);
         tlbCol3val = nullptr;
     }
 
-    ui->tableWidget->resizeColumnsToContents();
-    ui->tableWidget->resizeRowsToContents();
+    ui->exif_tableWidget->resizeColumnsToContents();
+    ui->exif_tableWidget->resizeRowsToContents();
+}
+
+void DefaultMeta::markXmp(QString searchFor)
+{
+    QList<QTableWidgetItem *> LTempTable = ui->tableWidget->findItems(searchFor, Qt::MatchEndsWith);
+
+    if (LTempTable.isEmpty()) {
+        ui->tableWidget->insertRow(ui->tableWidget->rowCount());
+
+        QTableWidgetItem *tlbCol1val = new QTableWidgetItem();
+        tlbCol1val->setText(searchFor);
+        ui->tableWidget->setItem(ui->tableWidget->rowCount() - 1, 1, tlbCol1val);
+        tlbCol1val = nullptr;
+    }
+
+    QTableWidgetItem *rowPtr = new QTableWidgetItem();
+    LTempTable = ui->tableWidget->findItems(searchFor, Qt::MatchEndsWith);
+    foreach (rowPtr, LTempTable) {
+        int rowNumber = rowPtr->row();
+        QTableWidgetItem *tlbCol2val = new QTableWidgetItem();
+        tlbCol2val->setText(defaultMetaPtr->xmpDefault.value(searchFor));
+        ui->tableWidget->setItem(rowNumber, 1, tlbCol2val);
+        tlbCol2val = nullptr;
+    }
+}
+
+void DefaultMeta::markExif(QString searchFor)
+{
+    QList<QTableWidgetItem *> LTempTable = ui->exif_tableWidget->findItems(searchFor,
+                                                                           Qt::MatchEndsWith);
+
+    if (LTempTable.isEmpty()) {
+        ui->exif_tableWidget->insertRow(ui->exif_tableWidget->rowCount());
+
+        QTableWidgetItem *tlbCol1val = new QTableWidgetItem();
+        tlbCol1val->setText(searchFor);
+        ui->exif_tableWidget->setItem(ui->exif_tableWidget->rowCount() - 1, 1, tlbCol1val);
+        tlbCol1val = nullptr;
+    }
+
+    QTableWidgetItem *rowPtr = new QTableWidgetItem();
+    LTempTable = ui->exif_tableWidget->findItems(searchFor, Qt::MatchEndsWith);
+    foreach (rowPtr, LTempTable) {
+        int rowNumber = rowPtr->row();
+        QTableWidgetItem *tlbCol2val = new QTableWidgetItem();
+        tlbCol2val->setText(defaultMetaPtr->exifDefault.value(searchFor));
+        ui->exif_tableWidget->setItem(rowNumber, 1, tlbCol2val);
+        tlbCol2val = nullptr;
+    }
 }
 
 void DefaultMeta::on_close_Btn_clicked()
@@ -157,26 +270,44 @@ void DefaultMeta::on_tableWidget_itemDoubleClicked(QTableWidgetItem *item)
                                          QLineEdit::Normal,
                                          ui->tableWidget->item(row, 1)->text(),
                                          &ok);
-    /*
+
     if (ok && !text.isEmpty()) {
-dataModified_bool = true;
+        dataModified_bool = true;
         ui->tableWidget->setItem(row, 1, new QTableWidgetItem(text));
-
-        //QFile file(pathToImage);
-        QString key = ui->tableWidget->item(row, 0)->text();
-
-        // map meta data
-        Photo photo;
-
-        if (photo.iptc_to_xmp.contains(key)) {
-            //qDebug() << "on_exifTableWidget_itemDoubleClicked: iptc_to_xmp key found: " << key << " " << rz_metaData::iptc_to_xmp[key];
-            mapMetaData(file.fileName(), key, text, "iptc");
-        }
-        if (photo.iptc_to_exif.contains(key)) {
-            // qDebug() << "on_exifTableWidget_itemDoubleClicked: iptc_to_exif key found: " << key << " " << rz_metaData::iptc_to_exif[key];
-            mapMetaData(file.fileName(), key, text, "iptc");
-        }
-
+        defaultMetaPtr->xmpDefault[ui->tableWidget->item(row, 0)->text()] = text;
+        ui->tableWidget->resizeColumnsToContents();
+        ui->tableWidget->resizeRowsToContents();
     }
-*/
+}
+
+void DefaultMeta::on_exif_tableWidget_itemDoubleClicked(QTableWidgetItem *item)
+{
+    bool ok;
+
+    int row = item->row();
+
+    QString text = QInputDialog::getText(this,
+                                         tr("Edit Metadata"),
+                                         tr("Please enter the new value for") + " "
+                                             + ui->exif_tableWidget->item(row, 0)->text() + ":",
+                                         QLineEdit::Normal,
+                                         ui->exif_tableWidget->item(row, 1)->text(),
+                                         &ok);
+    if (ok && !text.isEmpty()) {
+        dataModified_bool = true;
+        ui->exif_tableWidget->setItem(row, 1, new QTableWidgetItem(text));
+        defaultMetaPtr->exifDefault[ui->exif_tableWidget->item(row, 0)->text()] = text;
+
+        ui->exif_tableWidget->resizeColumnsToContents();
+        ui->exif_tableWidget->resizeRowsToContents();
+    }
+}
+
+void DefaultMeta::resizeEvent(QResizeEvent *event)
+{
+    ui->tableWidget->resizeColumnsToContents();
+    ui->tableWidget->resizeRowsToContents();
+
+    ui->exif_tableWidget->resizeColumnsToContents();
+    ui->exif_tableWidget->resizeRowsToContents();
 }

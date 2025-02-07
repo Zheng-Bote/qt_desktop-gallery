@@ -540,6 +540,16 @@ QString MainWindow::getPictureGpsData(int row)
     return gps_Data;
 }
 
+void MainWindow::setDefaultXmpMetaItem(QString &metaKey, QString metaValue)
+{
+    defaultMeta.xmpDefault[metaKey] = metaValue;
+}
+
+void MainWindow::setDefaultExifMetaItem(QString &metaKey, QString metaValue)
+{
+    defaultMeta.exifDefault[metaKey] = metaValue;
+}
+
 void MainWindow::on_listView_doubleClicked(const QModelIndex &index)
 {
     int row = index.row();
@@ -645,6 +655,16 @@ void MainWindow::setDefaultXmpCopyRightOwner(const QModelIndex &index)
 {
     hasDefaultCopyRightOwner = true;
     rowWithDefaultCopyRightQwnerMeta = index;
+
+    int row = index.row();
+    QModelIndex col2 = mContentItemModel->index(row, 1);
+    QString val = col2.data(Qt::DisplayRole).toString();
+
+    Photo photo(val);
+    QString key = "Xmp.dc.CopyrightOwner";
+    setDefaultXmpMetaItem(key, photo.getXmpCopyrightOwner());
+    key = "Xmp.plus.CopyrightOwner";
+    setDefaultXmpMetaItem(key, photo.getXmpCopyrightOwner());
 }
 
 void MainWindow::resetDefaultMeta()
@@ -653,6 +673,8 @@ void MainWindow::resetDefaultMeta()
     hasDefaultIptcMeta = false;
     hasDefaultCopyRightOwner = false;
     hasDefaultExifGpsData = false;
+
+    defaultMeta = {};
 }
 
 void MainWindow::showDefaultExifMeta()
@@ -680,6 +702,8 @@ void MainWindow::showDefaultExifMeta()
 void MainWindow::clearDefaultExifMeta()
 {
     hasDefaultExifMeta = false;
+
+    defaultMeta.exifDefault = {};
 }
 
 void MainWindow::showDefaultIptcMeta()
@@ -712,6 +736,10 @@ void MainWindow::clearDefaultIptcMeta()
 void MainWindow::showDefaultMetaWidget()
 {
     DefaultMeta *defaultMetaWidget = new DefaultMeta();
+
+    qDebug() << "MainWindow::showDefaultMetaWidget: set defaultMeta";
+    defaultMetaWidget->setDefaultMeta(defaultMeta);
+
     defaultMetaWidget->show();
 }
 
@@ -983,10 +1011,52 @@ void MainWindow::writeDefaultOwnerToSelectedImages()
     }
 }
 
+// TODO
 void MainWindow::setDefaultGpsData(const QModelIndex &index)
 {
     hasDefaultExifGpsData = true;
     rowWithDefaultGpsMeta = index;
+
+    int row = index.row();
+    QModelIndex col2 = mContentItemModel->index(row, 1);
+    QString pathToFile = col2.data(Qt::DisplayRole).toString();
+
+    Photo photo(pathToFile);
+    Photo::exifGpsStruct gpsData;
+    gpsData = photo.getGpsData();
+
+    QString key = "Exif.GPSInfo.GPSLatitudeRef";
+    setDefaultExifMetaItem(key, gpsData.GPSLatitudeRef);
+
+    key = "Exif.GPSInfo.GPSLatitude";
+    setDefaultExifMetaItem(key, gpsData.GPSLatitude);
+
+    key = "Exif.GPSInfo.GPSLongitudeRef";
+    setDefaultExifMetaItem(key, gpsData.GPSLongitudeRef);
+
+    key = "Exif.GPSInfo.GPSLongitude";
+    setDefaultExifMetaItem(key, gpsData.GPSLongitude);
+
+    key = "Exif.GPSInfo.GPSAltitudeRef";
+    setDefaultExifMetaItem(key, gpsData.GPSAltitudeRef);
+
+    key = "Exif.GPSInfo.GPSAltitude";
+    setDefaultExifMetaItem(key, gpsData.GPSAltitude);
+
+    key = "Exif.GPSInfo.GPSMapDatum";
+    setDefaultExifMetaItem(key, gpsData.GPSMapDatum);
+
+    key = "Exif.GPSInfo.GPSTimeStamp";
+    setDefaultExifMetaItem(key, gpsData.GPSTimeStamp);
+
+    key = "Exif.GPSInfo.GPSDateStamp";
+    setDefaultExifMetaItem(key, gpsData.GPSDateStamp);
+
+    key = "Exif.Photo.DateTimeOriginal";
+    setDefaultExifMetaItem(key, gpsData.DateTimeOriginal);
+
+    key = "Exif.Image.GPSTag";
+    setDefaultExifMetaItem(key, gpsData.GPSTag);
 }
 
 void MainWindow::selectAllImages()

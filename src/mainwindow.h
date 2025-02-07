@@ -10,6 +10,9 @@
 #include <QStringListModel>
 #include <QTranslator>
 
+#include "includes/rz_metadata.hpp"
+#include <memory>
+
 //#include "includes/rz_metadata.hpp"
 #include "includes/rz_photo.hpp"
 
@@ -158,4 +161,9 @@ private:
 
     QString getPictureCopyRightOwner(int row);
     QString getPictureGpsData(int row);
+
+    void setDefaultXmpMetaItem(QString &metaKey, QString metaValue);
+    void setDefaultExifMetaItem(QString &metaKey, QString metaValue);
+    rz_metaDefaultData::defaultMetaStruct defaultMeta;
+    //rz_metaDefaultData::defaultMetaStruct defaultMeta;
 };

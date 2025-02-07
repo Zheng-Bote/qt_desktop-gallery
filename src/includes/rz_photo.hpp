@@ -77,12 +77,17 @@ public:
 
     struct exifGpsStruct
     {
+        QString GPSTag{""};
         QString GPSLatitudeRef{""};
         QString GPSLatitude{""};
         QString GPSLongitudeRef{""};
         QString GPSLongitude{""};
         QString GPSAltitudeRef{""};
         QString GPSAltitude{""};
+        QString GPSTimeStamp{""};
+        QString GPSMapDatum{""};
+        QString GPSDateStamp{""};
+        QString DateTimeOriginal{""};
     };
     exifGpsStruct getGpsData() const;
     void writeDefaultGpsData(const exifGpsStruct &gpsData);
@@ -134,10 +139,13 @@ public:
          "full pathname of the original, high-resolution image,"
          "\n"
          "or any other uniquely identifying string."},
-        {"Xmp.dc.title", "lang=\"en\" "},
-        {"Xmp.dc.subject", "lang=\"en\" "},
-        {"Xmp.dc.description", "lang=\"en\" "},
-        {"Xmp.dc.rights", "lang=\"en\" Copyright Notice"},
+        {"Xmp.dc.title", "lang=\"x-default\" local language title, lang=\"en\" english title"},
+        {"Xmp.dc.subject",
+         "comma separated\nUsed to indicate specific information retrieval words."},
+        {"Xmp.dc.description",
+         "lang=\"x-default\" local language description, lang=\"en\" english description"},
+        {"Xmp.dc.rights",
+         "lang=\"x-default\" local language Copyright Notice, lang=\"en\" Copyright Notice"},
         {"Xmp.dc.CopyrightOwner", "Copyright Owner"},
         {"Xmp.plus.CopyrightOwner", "Copyright Owner"},
         {"Xmp.dc.CountryCode",
@@ -164,9 +172,14 @@ public:
          "ISO 639:1988."
          "\n"
          "Does not define or imply any coded character set."},
-        {"Xmp.dc.Category", "Supplemental categories further refine the subject of an object data."},
+        {"Xmp.dc.Category",
+         "comma separated\nSupplemental categories further refine the subject of an object data."
+         "\n"
+         "Asia, China, Yunnan, Kunming"},
         {"Xmp.dc.Keywords", "Used to indicate specific information retrieval words."},
-        {"Xmp.dc.SecurityClassification", "Security classification assigned to the image."}};
+        {"Xmp.dc.SecurityClassification",
+         "comma separated\nSecurity classification assigned to the image.\n\"public \", "
+         "\"private\", \"comment_on\", \"rating_on\""}};
 
     const QHash<QString, QString> exifGpsTags{{"Exif.Image.GPSTag", ""},
                                               {"Exif.GPSInfo.GPSLatitudeRef", ""},
