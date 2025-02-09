@@ -377,6 +377,67 @@ bool Photo::writeToAllCopyrightOwner(const QString &owner)
     return true;
 }
 
+QString Photo::getGpsString()
+{
+    std::string pathToFile = imgStruct.fileAbolutePath.toStdString() + "/"
+                             + imgStruct.fileName.toStdString();
+    QString lat{""}, lng{""};
+    auto exif_image = Exiv2::ImageFactory::open(pathToFile);
+
+    exif_image->readMetadata();
+    Exiv2::ExifData &exifData = exif_image->exifData();
+
+    if (exifData.empty()) {
+        return "";
+    }
+
+    std::tie(lat, lng) = getGpsToDecimalString(exifData["Exif.GPSInfo.GPSLatitude"],
+                                               exifData["Exif.GPSInfo.GPSLongitude"]);
+
+    return lat + "," + lng;
+}
+
+std::tuple<QString, QString> Photo::getGpsToDecimalString(Exiv2::Metadatum &lat,
+                                                          Exiv2::Metadatum &lng)
+{
+    QString latDec{""}, lngDec{""};
+    char r[500];
+
+    switch (lat.typeId()) {
+    case Exiv2::unsignedRational: {
+        double decimal = 0;
+        double denom = 1;
+        for (int i = 0; i < lat.count(); i++) {
+            Exiv2::Rational rational = lat.toRational(i);
+            decimal += lat.toFloat(i) / denom;
+            denom *= 60;
+        }
+        latDec = QString::number(decimal, 'f', 6);
+    } break;
+
+    default:
+        break;
+    }
+
+    switch (lng.typeId()) {
+    case Exiv2::unsignedRational: {
+        double decimal = 0;
+        double denom = 1;
+        for (int i = 0; i < lng.count(); i++) {
+            Exiv2::Rational rational = lng.toRational(i);
+            decimal += lng.toFloat(i) / denom;
+            denom *= 60;
+        }
+        lngDec = QString::number(decimal, 'f', 6);
+    } break;
+
+    default:
+        break;
+    }
+
+    return std::make_tuple(latDec, lngDec);
+}
+
 void Photo::writeDefaultGpsData(const exifGpsStruct &gpsData)
 {
     QString pathToFile = imgStruct.fileAbolutePath + "/" + imgStruct.fileName;

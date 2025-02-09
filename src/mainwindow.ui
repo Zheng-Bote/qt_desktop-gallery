@@ -89,21 +89,13 @@
     <property name="title">
      <string>Pictures</string>
     </property>
-    <addaction name="showDefaultExifAct"/>
-    <addaction name="clearDefaultExifAct"/>
-    <addaction name="separator"/>
-    <addaction name="showDefaultIptcAct"/>
-    <addaction name="clearDefaultIptcAct"/>
-    <addaction name="separator"/>
-    <addaction name="writeDefaultGpsMetaToSelectedImagesAct"/>
-    <addaction name="writeDefaultOwnerToSelectedImagesAct"/>
     <addaction name="separator"/>
     <addaction name="selectAllImagesAct"/>
     <addaction name="separator"/>
-    <addaction name="removeImagesAct"/>
-    <addaction name="separator"/>
     <addaction name="showGPSdataAct"/>
     <addaction name="showCopyrightOwnerAct"/>
+    <addaction name="separator"/>
+    <addaction name="removeImagesAct"/>
     <addaction name="clearAlbumDataAct"/>
    </widget>
    <widget class="QMenu" name="infoMenu">
@@ -122,6 +114,10 @@
     <addaction name="actioncheck_Pictures_for_Metadata"/>
     <addaction name="separator"/>
     <addaction name="editDefaultMetadataAct"/>
+    <addaction name="separator"/>
+    <addaction name="writeDefaultOwnerToSelectedImagesAct_2"/>
+    <addaction name="writeDefaultGpsMetaToSelectedImagesAct_2"/>
+    <addaction name="actionwrite_default_Metadata_to_selected_Pictures"/>
    </widget>
    <widget class="QMenu" name="separatorMenu">
     <property name="enabled">
@@ -247,17 +243,32 @@
   </action>
   <action name="showCopyrightOwnerAct">
    <property name="text">
-    <string>show Copyright Owner</string>
+    <string>display Copyright Owner in Albumview</string>
    </property>
   </action>
   <action name="showGPSdataAct">
    <property name="text">
-    <string>show GPS data</string>
+    <string>display GPS data in Albumview</string>
    </property>
   </action>
   <action name="clearAlbumDataAct">
    <property name="text">
-    <string>clear Album view</string>
+    <string>empty Album</string>
+   </property>
+  </action>
+  <action name="writeDefaultOwnerToSelectedImagesAct_2">
+   <property name="text">
+    <string>write default Owner to selected Pictures</string>
+   </property>
+  </action>
+  <action name="writeDefaultGpsMetaToSelectedImagesAct_2">
+   <property name="text">
+    <string>write default GPS Meta to selected Pictures</string>
+   </property>
+  </action>
+  <action name="actionwrite_default_Metadata_to_selected_Pictures">
+   <property name="text">
+    <string>write default Metadata to selected Pictures</string>
    </property>
   </action>
  </widget>

@@ -68,6 +68,9 @@ public:
     QString getXmpCopyrightOwner();
     bool writeToAllCopyrightOwner(const QString &owner);
 
+    QString getGpsString();
+    std::tuple<QString, QString> getGpsToDecimalString(Exiv2::Metadatum &lat, Exiv2::Metadatum &lng);
+
     struct metaCopyrightStruct
     {
         QString xmp{"Xmp.dc.CopyrightOwner"};

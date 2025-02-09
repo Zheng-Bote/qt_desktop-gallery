@@ -61,6 +61,7 @@ private slots:
     void setDefaultXmpCopyRightOwner(const QModelIndex &index);
     void writeDefaultOwnerToSelectedImages();
     void setDefaultGpsData(const QModelIndex &index);
+    void setGpsDecToClipboard(const QModelIndex &index);
     void writeDefaultExifGpsToSelected();
 
     void resetDefaultMeta();
@@ -137,6 +138,7 @@ private:
     QAction *contextSetXmpCopyRightOwnerAsDefaultAct;
     QAction *contextSetGpsMetaAsDefaultAct;
     QAction *contextRemovePictureFromAlbumAct;
+    QAction *contextSetGpsToClipboardAct;
 
     void initStatusBar();
 
@@ -161,6 +163,7 @@ private:
 
     QString getPictureCopyRightOwner(int row);
     QString getPictureGpsData(int row);
+    QString getPictureGpsDecStr(int row);
 
     void setDefaultXmpMetaItem(QString &metaKey, QString metaValue);
     void setDefaultExifMetaItem(QString &metaKey, QString metaValue);

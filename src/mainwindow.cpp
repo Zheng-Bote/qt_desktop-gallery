@@ -1,4 +1,5 @@
 #include <QActionGroup>
+#include <QClipboard>
 #include <QDir>
 #include <QDirIterator>
 #include <QFileDialog>
@@ -247,21 +248,6 @@ void MainWindow::createMenu()
     ui->actionload_Picture->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_P));
     connect(ui->actionload_Picture, &QAction::triggered, this, &MainWindow::loadSingleSrcImg);
 
-    ui->showDefaultExifAct->setIcon(QIcon(":/resources/img/icons8-edit-file-50.png"));
-    ui->showDefaultExifAct->setIconVisibleInMenu(true);
-    connect(ui->showDefaultExifAct, &QAction::triggered, this, &MainWindow::showDefaultExifMeta);
-
-    ui->clearDefaultExifAct->setIcon(QIcon(":/resources/img/icons8-file-elements-50.png"));
-    ui->clearDefaultExifAct->setIconVisibleInMenu(true);
-    connect(ui->clearDefaultExifAct, &QAction::triggered, this, &MainWindow::clearDefaultExifMeta);
-
-    ui->showDefaultIptcAct->setIcon(QIcon(":/resources/img/icons8-edit-file-50.png"));
-    ui->showDefaultIptcAct->setIconVisibleInMenu(true);
-    connect(ui->showDefaultIptcAct, &QAction::triggered, this, &MainWindow::showDefaultIptcMeta);
-
-    ui->clearDefaultIptcAct->setIcon(QIcon(":/resources/img/icons8-file-elements-50.png"));
-    ui->clearDefaultIptcAct->setIconVisibleInMenu(true);
-    connect(ui->clearDefaultIptcAct, &QAction::triggered, this, &MainWindow::clearDefaultIptcMeta);
 
     ui->writeDefaultGpsMetaToSelectedImagesAct->setIcon(
         QIcon(":/resources/img/icons8-send-file-50.png"));
@@ -540,6 +526,15 @@ QString MainWindow::getPictureGpsData(int row)
     return gps_Data;
 }
 
+QString MainWindow::getPictureGpsDecStr(int row)
+{
+    QModelIndex col2 = mContentItemModel->index(row, 1);
+    QString pathToFile = col2.data(Qt::DisplayRole).toString();
+
+    Photo photo(pathToFile);
+    return photo.getGpsString();
+}
+
 void MainWindow::setDefaultXmpMetaItem(QString &metaKey, QString metaValue)
 {
     defaultMeta.xmpDefault[metaKey] = metaValue;
@@ -617,13 +612,24 @@ void MainWindow::showViewContextMenu(const QPoint &pt)
         MainWindow::removeSelectedImageFromAlbum(idx);
     });
 
+    contextSetGpsToClipboardAct = new QAction(QIcon(
+                                                  ":/resources/img/icons8-regular-document-50.png"),
+                                              tr("copy GPS data to clipboard"),
+                                              this);
+    connect(contextSetGpsToClipboardAct, &QAction::triggered, this, [this, idx] {
+        MainWindow::setGpsDecToClipboard(idx);
+    });
+
     contextShowPictureDetailsAct->setEnabled(idx.column() == 0);
     contextSetExifAsDefaultAct->setEnabled(idx.column() == 0);
     contextSetIptcAsDefaultAct->setEnabled(idx.column() == 0);
     contextSetXmpCopyRightOwnerAsDefaultAct->setEnabled(idx.column() == 0);
     contextSetGpsMetaAsDefaultAct->setEnabled(idx.column() == 0);
     contextRemovePictureFromAlbumAct->setEnabled(idx.column() == 0);
+    contextSetGpsToClipboardAct->setEnabled(idx.column() == 0);
 
+    menu.addAction(contextSetGpsToClipboardAct);
+    menu.addSeparator();
     menu.addAction(contextShowPictureDetailsAct);
     menu.addSeparator();
     menu.addAction(contextSetExifAsDefaultAct);
@@ -1057,6 +1063,14 @@ void MainWindow::setDefaultGpsData(const QModelIndex &index)
 
     key = "Exif.Image.GPSTag";
     setDefaultExifMetaItem(key, gpsData.GPSTag);
+}
+
+void MainWindow::setGpsDecToClipboard(const QModelIndex &index)
+{
+    int row = index.row();
+    QClipboard *clipboard = QGuiApplication::clipboard();
+
+    clipboard->setText(getPictureGpsDecStr(row));
 }
 
 void MainWindow::selectAllImages()
