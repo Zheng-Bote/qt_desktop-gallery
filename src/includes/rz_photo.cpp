@@ -351,7 +351,7 @@ QString Photo::getXmpCopyrightOwner()
             return owner;
         } else {
             auto ret = xmpData["Xmp.dc.CopyrightOwner"];
-            qDebug() << "Owner: " << ret.value().toString();
+            //qDebug() << "Owner: " << ret.value().toString();
             owner = ret.value().toString().c_str();
         }
 
@@ -369,6 +369,8 @@ bool Photo::writeToAllCopyrightOwner(const QString &owner)
 
     key = "Xmp.dc.CopyrightOwner";
     writeXmp(key, val);
+    key = "Xmp.plus.CopyrightOwner";
+    writeIptc(key, val);
     key = "Exif.Image.Copyright";
     writeExif(key, val);
     key = "Iptc.Application2.Copyright";
@@ -455,8 +457,6 @@ void Photo::writeDefaultGpsData(const exifGpsStruct &gpsData)
         exif_image->readMetadata();
         Exiv2::ExifData &exifData = exif_image->exifData();
 
-        qDebug() << "Photo::writeDefaultGpsData";
-
         exifData["Exif.GPSInfo.GPSLatitudeRef"] = gpsData.GPSLatitudeRef.toStdString();
         exifData["Exif.GPSInfo.GPSLatitude"] = gpsData.GPSLatitude.toStdString();
         exifData["Exif.GPSInfo.GPSLongitudeRef"] = gpsData.GPSLongitudeRef.toStdString();
@@ -464,9 +464,9 @@ void Photo::writeDefaultGpsData(const exifGpsStruct &gpsData)
         exifData["Exif.GPSInfo.GPSAltitudeRef"] = gpsData.GPSAltitudeRef.toStdString();
         exifData["Exif.GPSInfo.GPSAltitude"] = gpsData.GPSAltitude.toStdString();
 
-        qDebug() << "Photo::writeDefaultGpsData setExifData";
+        //qDebug() << "Photo::writeDefaultGpsData setExifData";
         exif_image->setExifData(exifData);
-        qDebug() << "Photo::writeDefaultGpsData writeMetaData";
+        //qDebug() << "Photo::writeDefaultGpsData writeMetaData";
         exif_image->writeMetadata();
         return;
     } catch (Exiv2::Error &e) {

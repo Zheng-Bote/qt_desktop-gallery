@@ -63,6 +63,7 @@ private slots:
     void setDefaultGpsData(const QModelIndex &index);
     void setGpsDecToClipboard(const QModelIndex &index);
     void writeDefaultExifGpsToSelected();
+    void writeDefaultMetaToSelectedImages();
 
     void resetDefaultMeta();
 

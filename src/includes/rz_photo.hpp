@@ -41,12 +41,15 @@ private:
 
     bool backupOrigFile();
 
-    void readExif();
+    //    void readExif();
 
 public:
     Photo();
     Photo(const QString &imageInput);
     ~Photo();
+
+    // TODOS
+    void readExif();
 
     bool convertImage(const int &targetSize, const int &quality = 75);
     const bool convertImages(const int &quality = 75);
@@ -74,6 +77,7 @@ public:
     struct metaCopyrightStruct
     {
         QString xmp{"Xmp.dc.CopyrightOwner"};
+        QString cmpPlus{"Xmp.plus.CopyrightOwner"};
         QString exif = "Exif.Image.Copyright";
         QString iptc = "Iptc.Application2.Copyright";
     };

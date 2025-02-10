@@ -222,16 +222,25 @@
    </property>
   </action>
   <action name="actioncheck_Pictures_for_Metadata">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>check Pictures for Metadata</string>
    </property>
   </action>
   <action name="actioncheck_Pictures_for_Copyright">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>check Pictures for Copyright</string>
    </property>
   </action>
   <action name="actioncheck_Pictures_forGPS_data">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>check Pictures for GPS data </string>
    </property>
