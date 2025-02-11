@@ -15,7 +15,6 @@ const QHash<QString, QString> xmpDefaultTags{
     {"Xmp.dc.rights",
      "lang=\"x-default\" local language Copyright Notice, lang=\"en\" Copyright Notice"},
     {"Xmp.dc.CopyrightOwner", "Copyright Owner"},
-    {"Xmp.plus.CopyrightOwner", "Copyright Owner"},
     {"Xmp.dc.Category",
      "comma separated\nSupplemental categories further refine the subject of an object data."
      "\n"

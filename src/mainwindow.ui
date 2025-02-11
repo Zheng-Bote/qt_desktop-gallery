@@ -95,8 +95,9 @@
     <addaction name="showGPSdataAct"/>
     <addaction name="showCopyrightOwnerAct"/>
     <addaction name="separator"/>
+    <addaction name="rename_selected_Pictures_to_timestamp_Act"/>
+    <addaction name="separator"/>
     <addaction name="removeImagesAct"/>
-    <addaction name="clearAlbumDataAct"/>
    </widget>
    <widget class="QMenu" name="infoMenu">
     <property name="title">
@@ -133,9 +134,21 @@
      <string>|</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menuExport">
+    <property name="title">
+     <string>Export</string>
+    </property>
+    <addaction name="export_to_all_WebP_sizes_Act"/>
+    <addaction name="separator"/>
+    <addaction name="webp_oversizeAct"/>
+    <addaction name="webp_overwriteWebpAct"/>
+    <addaction name="webp_watermarkWebpAct"/>
+    <addaction name="actionrename_Pictures_to_timestamp"/>
+   </widget>
    <addaction name="menuMenu"/>
    <addaction name="pictureMenu"/>
    <addaction name="metadataMenu"/>
+   <addaction name="menuExport"/>
    <addaction name="separatorMenu"/>
    <addaction name="infoMenu"/>
   </widget>
@@ -164,11 +177,8 @@
    </property>
   </action>
   <action name="actionclear_Album">
-   <property name="icon">
-    <iconset theme="QIcon::ThemeIcon::EditClear"/>
-   </property>
    <property name="text">
-    <string>clear Album</string>
+    <string>empty Album</string>
    </property>
   </action>
   <action name="showDefaultExifAct">
@@ -278,6 +288,57 @@
   <action name="actionwrite_default_Metadata_to_selected_Pictures">
    <property name="text">
     <string>write default Metadata to selected Pictures</string>
+   </property>
+  </action>
+  <action name="export_to_all_WebP_sizes_Act">
+   <property name="text">
+    <string>export selected pictures to all sizes</string>
+   </property>
+  </action>
+  <action name="webp_oversizeAct">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>increase too small WebP pictures</string>
+   </property>
+  </action>
+  <action name="webp_overwriteWebpAct">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>overwrite existing WebP</string>
+   </property>
+  </action>
+  <action name="webp_watermarkWebpAct">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>watermark WebP</string>
+   </property>
+  </action>
+  <action name="rename_selected_Pictures_to_timestamp_Act">
+   <property name="text">
+    <string>rename selected Pictures to timestamp</string>
+   </property>
+  </action>
+  <action name="actionrename_Pictures_to_timestamp">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>rename WebP to timestamp</string>
    </property>
   </action>
  </widget>

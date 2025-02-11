@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.23)
 
 project(
   qt_desktop-gallery
-  VERSION 0.22.0
+  VERSION 0.23.0
   DESCRIPTION
     "Desktop gallery-app to show/edit Exif/IPTC/XMP and export to WebP"
   HOMEPAGE_URL "https://github.com/Zheng-Bote/qt_desktop-gallery"
@@ -14,10 +14,9 @@ set(CMAKE_AUTORCC ON)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_COMPILER clang++)
 
-# set(CMAKE_CXX_CLANG_TIDY
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  set(CMAKE_CXX_COMPILER clang++)
   # set(CMAKE_CXX_CLANG_TIDY clang-tidy; -header-filter=.;
   # -checks=cppcoreguidelines-*)
 endif()
@@ -37,7 +36,9 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Gui)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Gui)
 find_package(Qt6 REQUIRED COMPONENTS Concurrent)
 
-set(hwinfo_DIR "/usr/local/lib/cmake/hwinfo/")
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  set(hwinfo_DIR "/usr/local/lib/cmake/hwinfo/")
+endif()
 find_package(hwinfo REQUIRED CONFIG NAMES lfreist-hwinfo)
 option(HWINFO_OS "Enable OS information" ON)
 option(HWINFO_MAINBOARD "Enable mainboard information" OFF)

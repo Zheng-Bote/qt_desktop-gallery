@@ -60,10 +60,12 @@ private slots:
     void setDefaultIptcMeta(const QModelIndex &index);
     void setDefaultXmpCopyRightOwner(const QModelIndex &index);
     void writeDefaultOwnerToSelectedImages();
+    void renameSelectedPicuresToTimestamp();
     void setDefaultGpsData(const QModelIndex &index);
     void setGpsDecToClipboard(const QModelIndex &index);
     void writeDefaultExifGpsToSelected();
     void writeDefaultMetaToSelectedImages();
+    const void writeDefaultMetaToSelectedImagesThread(const QString &pathToFile);
 
     void resetDefaultMeta();
 
@@ -77,7 +79,10 @@ private slots:
     void showGpsDataInAlbum();
     void clearDataInAlbum();
 
+    void exportSrcImgToWebpThread();
+
     void on_progressBar_valueChanged(int value);
+    void hideProgressBar();
 
 protected:
     void changeEvent(QEvent *);
@@ -87,6 +92,7 @@ private:
     Ui::MainWindow *ui;
 
     QFutureWatcher<void> FutureWatcher;
+    QFutureWatcher<bool> FutureWatcherBool;
 
     QFont *font_10 = new QFont("Times New Roman", 10);
     QFont *font_12 = new QFont("Times New Roman", 12);
@@ -140,6 +146,7 @@ private:
     QAction *contextSetGpsMetaAsDefaultAct;
     QAction *contextRemovePictureFromAlbumAct;
     QAction *contextSetGpsToClipboardAct;
+    QAction *contextRenameToTimestampAct;
 
     void initStatusBar();
 

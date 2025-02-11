@@ -10,6 +10,11 @@
 
 #include <QMessageBox>
 
+#include <QFuture>
+#include <QFutureWatcher>
+#include <QThread>
+#include <QtConcurrent>
+
 Photo::Photo() {}
 
 Photo::Photo(const QString &imageInput)
@@ -42,10 +47,10 @@ bool Photo::createWebpPath()
     QDir path = imgStruct.fileAbolutePath;
     QString newPath = imgStruct.fileAbolutePath + "/" + imgStruct.newFolder;
     if (path.mkpath(newPath)) {
-        qDebug() << "createPath OK: " << newPath.toStdString();
+        //qDebug() << "createPath OK: " << newPath.toStdString();
         return true;
     } else {
-        qDebug() << "createPath NOK: " << newPath.toStdString();
+        qCritical() << "createPath NOK: " << newPath.toStdString();
         return false;
     }
 }
@@ -57,7 +62,7 @@ bool Photo::checkImgTargetExists(const QFile &pathToTargetImage)
 
 bool Photo::checkImgWidth(const QImage &imageInput, const int &targetWidth)
 {
-    qDebug() << "width - target: " << imageInput.width() << " - " << targetWidth;
+    //qDebug() << "width - target: " << imageInput.width() << " - " << targetWidth;
     return imageInput.width() >= targetWidth;
 }
 
@@ -103,36 +108,121 @@ void Photo::readExif()
 
     imgStruct.exifData = exif_image->exifData();
     Exiv2::Exifdatum &tag = imgStruct.exifData["Exif.Image.Model"];
-    qDebug() << "exif: " << tag.toString();
+    //qDebug() << "exif: " << tag.toString();
 }
 
-bool Photo::convertImage(const int &targetSize, const int &quality)
+QString Photo::getPhotoDateTimeHuman()
+{
+    std::string pathToFile = imgStruct.fileAbolutePath.toStdString() + "/"
+                             + imgStruct.fileName.toStdString();
+
+    Exiv2::XmpParser::initialize();
+    ::atexit(Exiv2::XmpParser::terminate);
+#ifdef EXV_ENABLE_BMFF
+    Exiv2::enableBMFF();
+#endif
+    try {
+        auto exif_image = Exiv2::ImageFactory::open(pathToFile);
+
+        exif_image->readMetadata();
+        Exiv2::ExifData &exifData = exif_image->exifData();
+
+        if (exifData.empty()) {
+            auto ftime = std::filesystem::last_write_time(pathToFile);
+            auto datetime = std::format("{0:%Y-%m-%d}_{0:%H%M%S}", ftime);
+            QString dt = datetime.c_str();
+            dt = dt.remove(QRegularExpression("(\\.\\d+)$"));
+            return dt;
+        } else {
+            QString date_time = exifData["Exif.Image.DateTime"].value().toString().c_str();
+            if (!date_time.isEmpty()) {
+                QStringList list = date_time.split(u' ');
+                QString date = list[0];
+                date.replace(":", "-");
+                QString time = list[1];
+                time.replace(":", "");
+                return (date + "_" + time);
+            } else {
+                auto ftime = std::filesystem::last_write_time(pathToFile);
+                auto datetime = std::format("{0:%Y-%m-%d}_{0:%H%M%S}", ftime);
+                QString dt = datetime.c_str();
+                dt = dt.remove(QRegularExpression("(\\.\\d+)$"));
+                return dt;
+            }
+        }
+    } catch (Exiv2::Error &e) {
+        qWarning() << "getPhotoDateTimeHuman Caught Exiv2 exception " << e.what() << "\n";
+        auto ftime = std::filesystem::last_write_time(pathToFile);
+        auto datetime = std::format("{0:%Y-%m-%d}_{0:%H%M%S}", ftime);
+        QString dt = datetime.c_str();
+        dt = dt.remove(QRegularExpression("(\\.\\d+)$"));
+        return dt;
+    }
+    return "";
+}
+
+QString Photo::getImgNewTimestampName()
 {
     QString imgIn = imgStruct.fileAbolutePath + "/" + imgStruct.fileBasename + "."
                     + imgStruct.fileSuffix;
-    QString imgOutName = imgStruct.fileBasename + "__" + QString::number(targetSize) + "."
-                         + imgStruct.newSuffix;
+    QString dt = getPhotoDateTimeHuman();
+    QString imgOut = imgStruct.fileAbolutePath + "/" + dt + "/" + imgStruct.fileSuffix;
+
+    return imgOut;
+}
+
+const bool Photo::renameImageToTimestamp()
+{
+    qDebug() << "Photo::renameImageToTimestamp";
+    QString imgIn = imgStruct.fileAbolutePath + "/" + imgStruct.fileBasename + "."
+                    + imgStruct.fileSuffix;
+    QString dt = getPhotoDateTimeHuman();
+    QString imgOut = imgStruct.fileAbolutePath + "/" + dt + "." + imgStruct.fileSuffix.toLower();
+
+    QFile file(imgIn);
+    if (file.rename(imgOut)) {
+        return true;
+    } else {
+        qWarning() << "Photo::renameImageToTimestamp NOK: " << imgIn;
+        return false;
+    }
+}
+
+const bool Photo::convertImage(const int &targetSize, const int &quality)
+{
+    QString imgIn = imgStruct.fileAbolutePath + "/" + imgStruct.fileBasename + "."
+                    + imgStruct.fileSuffix;
+
+    QString imgOutName{""};
+    if (renameToTimestamp_bool) {
+        imgOutName = getPhotoDateTimeHuman() + "__" + QString::number(targetSize) + "."
+                     + imgStruct.newSuffix;
+    } else {
+        imgOutName = imgStruct.fileBasename + "__" + QString::number(targetSize) + "."
+                     + imgStruct.newSuffix;
+    }
+
     QString imgOut = imgStruct.fileAbolutePath + "/" + imgStruct.newFolder;
     imgOut = imgOut + "/" + imgOutName;
     QImage imageInput{imgIn};
 
     if (!checkImgWidth(imageInput, targetSize)) {
-        qDebug() << "img is < " << targetSize;
+        //qDebug() << "img is < " << targetSize;
         // well, the confused exit gate
         if (!oversizeSmallerPicture_bool) {
             return false;
         }
-        qDebug() << "request: img will be increased";
+        //qDebug() << "request: img will be increased";
     }
 
     if (checkImgTargetExists(imgOut)) {
-        qDebug() << "target exists: " << imgOut.toStdString();
+        //qDebug() << "target exists: " << imgOut.toStdString();
         if (!overwriteExitingWebp_bool) {
             return false;
         }
-        qDebug() << "request: existing img will be overwritten";
+        //qDebug() << "request: existing img will be overwritten";
     } else {
-        qDebug() << "target doesn't exists: " << imgOut.toStdString();
+        //qDebug() << "target doesn't exists: " << imgOut.toStdString();
         if (!createWebpPath()) {
             std::cerr << "convertImage failed to create webp folder: " << imgOut.toStdString();
             return false;
@@ -148,7 +238,8 @@ bool Photo::convertImage(const int &targetSize, const int &quality)
     }
 
     if (!imageOutput.save(imgOut, "WEBP", quality)) {
-        std::cerr << "convertImage failed to save webp image: " << imgOut.toStdString();
+        std::cerr << "convertImage failed to save webp image: " << imgOut.toStdString() << " ";
+        std::filesystem::remove(imgOut.toStdString());
         return false;
     }
     return true;
@@ -158,11 +249,13 @@ const bool Photo::convertImages(const int &quality)
 {
     bool ret{false};
     for (const auto &size : imgStruct.webpSizes) {
-        if (!convertImage(size, quality)) {
+        QFuture<bool> future = QtConcurrent::run(&Photo::convertImage, this, size, quality);
+        ret = future.result();
+        /*if (!convertImage(size, quality)) {
             ret = false;
         } else {
             ret = true;
-        }
+        }*/
     }
     return ret;
 }
@@ -171,7 +264,7 @@ bool Photo::rotateImage(const int &turn)
 {
     QString imgIn = imgStruct.fileAbolutePath + "/" + imgStruct.fileBasename + "."
                     + imgStruct.fileSuffix;
-    qDebug() << "rotateImage: " << imgIn;
+    //qDebug() << "rotateImage: " << imgIn;
 
     backupOrigFile();
 
@@ -215,6 +308,11 @@ void Photo::setOverwriteExistingWebp(const bool overwriteExitingWebp)
 void Photo::setWatermarkWebp(const bool watermarkWebp)
 {
     watermarkWebp_bool = watermarkWebp;
+}
+
+void Photo::setRenameToTimestamp(const bool renameToTimestamp)
+{
+    renameToTimestamp_bool = renameToTimestamp;
 }
 
 QList<QString> Photo::srcPics(const QString &srcPath)
@@ -347,7 +445,7 @@ QString Photo::getXmpCopyrightOwner()
         xmp_image->readMetadata();
         Exiv2::XmpData &xmpData = xmp_image->xmpData();
         if (xmpData.empty()) {
-            qDebug() << "No XMP data found in file " << pathToFile;
+            qInfo() << "No XMP data found in file " << pathToFile;
             return owner;
         } else {
             auto ret = xmpData["Xmp.dc.CopyrightOwner"];
@@ -369,8 +467,6 @@ bool Photo::writeToAllCopyrightOwner(const QString &owner)
 
     key = "Xmp.dc.CopyrightOwner";
     writeXmp(key, val);
-    key = "Xmp.plus.CopyrightOwner";
-    writeIptc(key, val);
     key = "Exif.Image.Copyright";
     writeExif(key, val);
     key = "Iptc.Application2.Copyright";

@@ -59,7 +59,7 @@ void PictureWidget::setImage(QString pathToFile)
     //readSrcIptc();
 
     ui->tabWidget->adjustSize();
-    ui->tabWidget->setCurrentWidget(0);
+    ui->tabWidget->setCurrentWidget(0);    
 }
 
 void PictureWidget::on_closeBtn_clicked()

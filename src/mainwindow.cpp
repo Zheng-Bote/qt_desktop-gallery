@@ -35,6 +35,7 @@ MainWindow::MainWindow(QWidget *parent)
     initStatusBar();
 
     connect(&this->FutureWatcher, SIGNAL(finished()), this, SLOT(slotProgressBarFinished()));
+    connect(&this->FutureWatcherBool, SIGNAL(finished()), this, SLOT(slotProgressBarFinished()));
     qApp->installEventFilter(this);
 }
 
@@ -278,6 +279,14 @@ void MainWindow::createMenu()
             this,
             &MainWindow::showCopyrightOwnerInAlbum);
 
+    ui->rename_selected_Pictures_to_timestamp_Act->setIcon(
+        QIcon(":/resources/img/icons8-send-file-50.png"));
+    ui->rename_selected_Pictures_to_timestamp_Act->setIconVisibleInMenu(true);
+    connect(ui->rename_selected_Pictures_to_timestamp_Act,
+            &QAction::triggered,
+            this,
+            &MainWindow::renameSelectedPicuresToTimestamp);
+
     ui->showGPSdataAct->setIcon(QIcon(":/resources/img/icons8-send-file-50.png"));
     ui->showGPSdataAct->setIconVisibleInMenu(true);
     ui->showGPSdataAct->setDisabled(false);
@@ -310,6 +319,24 @@ void MainWindow::createMenu()
             &QAction::triggered,
             this,
             &MainWindow::writeDefaultMetaToSelectedImages);
+
+    ui->export_to_all_WebP_sizes_Act->setIcon(QIcon(":/resources/img/icons8-send-file-50.png"));
+    ui->export_to_all_WebP_sizes_Act->setIconVisibleInMenu(true);
+    connect(ui->export_to_all_WebP_sizes_Act, &QAction::triggered, this, [this] {
+        MainWindow::exportSrcImgToWebpThread();
+    });
+
+    ui->webp_oversizeAct->setIconVisibleInMenu(true);
+    ui->webp_oversizeAct->setCheckable(true);
+    ui->webp_oversizeAct->setChecked(true);
+
+    ui->webp_overwriteWebpAct->setIconVisibleInMenu(true);
+    ui->webp_overwriteWebpAct->setCheckable(true);
+    ui->webp_overwriteWebpAct->setChecked(true);
+
+    ui->webp_watermarkWebpAct->setIconVisibleInMenu(true);
+    ui->webp_watermarkWebpAct->setCheckable(true);
+    ui->webp_watermarkWebpAct->setChecked(true);
 
     ui->aboutAct->setIcon(QIcon(":/resources/img/icons8-info-48.png"));
     ui->aboutAct->setIconVisibleInMenu(true);
@@ -522,14 +549,15 @@ void MainWindow::writeDefaultExifGpsToSelected()
         QString pathToFile = col2.data(Qt::DisplayRole).toString();
         Photo photo(pathToFile);
         QFuture<void> future = QtConcurrent::run(&Photo::writeDefaultGpsData, photo, _gpsData);
+        FutureWatcher.setFuture(future);
     }
 
     eve = nullptr;
-    ui->progressBar->hide();
 
     statusBar()->showMessage(tr("Default GPS data written to") + " "
                                  + QString::number(selected.size()) + " " + tr("pictures"),
                              5000);
+    QTimer::singleShot(5000, this, &MainWindow::hideProgressBar);
 }
 
 void MainWindow::writeDefaultMetaToSelectedImages()
@@ -555,7 +583,10 @@ void MainWindow::writeDefaultMetaToSelectedImages()
         int row = i.row();
         QModelIndex col2 = mContentItemModel->index(row, 1);
         QString pathToFile = col2.data(Qt::DisplayRole).toString();
-        Photo photo(pathToFile);
+        statusBar()->showMessage(tr("working on") + " " + QString::number(count) + "/"
+                                     + QString::number(selected.size()),
+                                 1000);
+        /*Photo photo(pathToFile);
         for (auto i = defaultMeta.xmpDefault.cbegin(), end = defaultMeta.xmpDefault.cend();
              i != end;
              ++i) {
@@ -571,13 +602,39 @@ void MainWindow::writeDefaultMetaToSelectedImages()
                 targetKey = photo.xmp_to_iptc[key];
                 photo.writeIptc(targetKey, value);
             }
-        }
+        }*/
+        QFuture<void> future = QtConcurrent::run(&MainWindow::writeDefaultMetaToSelectedImagesThread,
+                                                 this,
+                                                 pathToFile);
+        FutureWatcher.setFuture(future);
     }
     eve = nullptr;
-    ui->progressBar->hide();
+    //ui->progressBar->hide();
 
     writeDefaultExifGpsToSelected();
     writeDefaultOwnerToSelectedImages();
+
+    statusBar()->showMessage(tr("writing default Metadata finsihed"), 10000);
+}
+
+const void MainWindow::writeDefaultMetaToSelectedImagesThread(const QString &pathToFile)
+{
+    Photo photo(pathToFile);
+    for (auto i = defaultMeta.xmpDefault.cbegin(), end = defaultMeta.xmpDefault.cend(); i != end;
+         ++i) {
+        QString key = i.key();
+        QString value = i.value();
+        QString targetKey{""};
+        photo.writeXmp(key, value);
+        if (photo.xmp_to_exif.contains(key)) {
+            targetKey = photo.xmp_to_exif[key];
+            photo.writeExif(targetKey, value);
+        }
+        if (photo.xmp_to_iptc.contains(key)) {
+            targetKey = photo.xmp_to_iptc[key];
+            photo.writeIptc(targetKey, value);
+        }
+    }
 }
 
 void MainWindow::refreshStatusBar()
@@ -665,6 +722,14 @@ void MainWindow::showViewContextMenu(const QPoint &pt)
         MainWindow::showSinglePicture(itemText2);
     });
 
+    contextRenameToTimestampAct = new QAction(QIcon(":/resources/img/icons8-send-file-50.png"),
+                                              tr("rename Picture to timestamp"),
+                                              this);
+    contextRenameToTimestampAct->setIconVisibleInMenu(true);
+    connect(contextRenameToTimestampAct, &QAction::triggered, this, [this, itemText2] {
+        MainWindow::renameSelectedPicuresToTimestamp();
+    });
+
     contextSetExifAsDefaultAct = new QAction(QIcon(
                                                  ":/resources/img/icons8-regular-document-50.png"),
                                              tr("set this red Exif data as default"),
@@ -714,6 +779,7 @@ void MainWindow::showViewContextMenu(const QPoint &pt)
     });
 
     contextShowPictureDetailsAct->setEnabled(idx.column() == 0);
+    contextRenameToTimestampAct->setEnabled(idx.column() == 0);
     contextSetExifAsDefaultAct->setEnabled(idx.column() == 0);
     contextSetIptcAsDefaultAct->setEnabled(idx.column() == 0);
     contextSetXmpCopyRightOwnerAsDefaultAct->setEnabled(idx.column() == 0);
@@ -724,6 +790,8 @@ void MainWindow::showViewContextMenu(const QPoint &pt)
     menu.addAction(contextSetGpsToClipboardAct);
     menu.addSeparator();
     menu.addAction(contextShowPictureDetailsAct);
+    menu.addSeparator();
+    menu.addAction(contextRenameToTimestampAct);
     menu.addSeparator();
     menu.addAction(contextSetExifAsDefaultAct);
     menu.addAction(contextSetIptcAsDefaultAct);
@@ -882,9 +950,88 @@ void MainWindow::clearDataInAlbum()
     }
 }
 
+void MainWindow::exportSrcImgToWebpThread()
+{
+    bool oknok{false};
+
+    QModelIndexList selected = ui->listView->selectionModel()->selectedIndexes();
+
+    if (selected.count() == 0) {
+        QMessageBox msgBox(this);
+        msgBox.setWindowTitle(tr("Export to WebP"));
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.setTextFormat(Qt::RichText);
+        QString text = tr("No pictures selected to export.");
+        QString setInformativeText = tr("In Album view, select one or more pictures.");
+        msgBox.setText(text);
+        msgBox.setInformativeText(setInformativeText);
+        msgBox.setFixedWidth(900);
+        msgBox.exec();
+        return;
+    }
+
+    ui->progressBar->show();
+
+    int count{-1};
+    int total = selected.count();
+    totalCount = total;
+    MyEvent *eve;
+    eve = new MyEvent();
+    QApplication::postEvent(qApp, eve);
+
+    for (QModelIndex i : selected) {
+        count++;
+        double proz = double(count) / double(total) * 100.0;
+        int val = int(proz);
+        totalCount = val;
+        //qDebug() << "WebP export " << count << "/" << selected.count();
+
+        eve = new MyEvent();
+        QApplication::postEvent(qApp, eve);
+
+        int row = i.row();
+        QModelIndex col2 = mContentItemModel->index(row, 1);
+        QString pathToFile = col2.data(Qt::DisplayRole).toString();
+        Photo photo(pathToFile);
+
+        if (ui->webp_oversizeAct->isChecked()) {
+            photo.setOversizeSmallerPicture(true);
+        }
+
+        if (ui->webp_overwriteWebpAct->isChecked()) {
+            photo.setOverwriteExistingWebp(true);
+        }
+
+        if (ui->webp_watermarkWebpAct->isChecked()) {
+            photo.setWatermarkWebp(true);
+        }
+
+        QFuture<bool> future = QtConcurrent::run(&Photo::convertImages, photo, 75);
+        FutureWatcherBool.setFuture(future);
+        //FutureWatcherBool.waitForFinished();
+        //future.waitForFinished();
+
+        //oknok = future.result();
+    }
+
+    eve = nullptr;
+    //ui->progressBar->hide();
+
+    statusBar()->showMessage(tr("WebP export to subfolder WebP") + ": "
+                                 + QString::number(selected.size()) + " " + tr("pictures") + " "
+                                 + tr("successful"),
+                             5000);
+    QTimer::singleShot(5000, this, &MainWindow::hideProgressBar);
+}
+
 void MainWindow::on_progressBar_valueChanged(int value)
 {
     //qDebug() << "on_progressBar_valueChanged " << value;
+}
+
+void MainWindow::hideProgressBar()
+{
+    ui->progressBar->hide();
 }
 
 void MainWindow::changeEvent(QEvent *event)
@@ -1077,8 +1224,8 @@ void MainWindow::removeSelectedImages()
 // TODO
 void MainWindow::writeDefaultOwnerToSelectedImages()
 {
-    qDebug() << "writeDefaultOwnerToSelectedImages: "
-             << defaultMeta.xmpDefault.value("Xmp.dc.CopyrightOwner");
+    //qDebug() << "writeDefaultOwnerToSelectedImages: "
+    //<< defaultMeta.xmpDefault.value("Xmp.dc.CopyrightOwner");
     if (defaultMeta.xmpDefault.contains("Xmp.dc.CopyrightOwner") == 0) {
         QMessageBox msgBox(this);
         msgBox.setWindowTitle(tr("Default Meta"));
@@ -1133,17 +1280,66 @@ void MainWindow::writeDefaultOwnerToSelectedImages()
         Photo photo(pathToFile);
         QFutureWatcher<bool> watcher;
         QFuture<bool> future = QtConcurrent::run(&Photo::writeToAllCopyrightOwner, photo, owner);
-        watcher.setFuture(future);
-        watcher.waitForFinished();
-        bool result = future.result();
+        FutureWatcherBool.setFuture(future);
+        //watcher.setFuture(future);
+        //watcher.waitForFinished();
+        //bool result = future.result();
     }
 
     eve = nullptr;
-    ui->progressBar->hide();
+    //ui->progressBar->hide();
 
     statusBar()->showMessage(tr("Default Owner written to") + " " + QString::number(selected.size())
                                  + " " + tr("pictures"),
                              5000);
+    QTimer::singleShot(5000, this, &MainWindow::hideProgressBar);
+}
+
+void MainWindow::renameSelectedPicuresToTimestamp()
+{
+    QModelIndexList selected = ui->listView->selectionModel()->selectedIndexes();
+
+    ui->progressBar->show();
+    int count{-1};
+    int total = selected.count();
+    totalCount = total;
+    MyEvent *eve;
+    eve = new MyEvent();
+    QApplication::postEvent(qApp, eve);
+
+    for (QModelIndex i : selected) {
+        count++;
+        double proz = double(count) / double(total) * 100.0;
+        int val = int(proz);
+        totalCount = val;
+        eve = new MyEvent();
+        QApplication::postEvent(qApp, eve);
+
+        int row = i.row();
+        QModelIndex col2 = mContentItemModel->index(row, 1);
+        QString pathToFile = col2.data(Qt::DisplayRole).toString();
+
+        Photo photo(pathToFile);
+        photo.setRenameToTimestamp(true);
+        QFutureWatcher<bool> watcher;
+        QFuture<bool> future = QtConcurrent::run(&Photo::renameImageToTimestamp, photo);
+        FutureWatcherBool.setFuture(future);
+        //watcher.setFuture(future);
+        //watcher.waitForFinished();
+        bool result = future.result();
+        if (result) {
+            // TODOS
+            // udate album list !!!
+        }
+    }
+
+    eve = nullptr;
+    //ui->progressBar->hide();
+
+    statusBar()->showMessage(tr("renamed") + " " + QString::number(selected.size()) + " "
+                                 + tr("pictures"),
+                             5000);
+    QTimer::singleShot(5000, this, &MainWindow::hideProgressBar);
 }
 
 // TODO
@@ -1200,6 +1396,8 @@ void MainWindow::setGpsDecToClipboard(const QModelIndex &index)
     QClipboard *clipboard = QGuiApplication::clipboard();
 
     clipboard->setText(getPictureGpsDecStr(row));
+
+    statusBar()->showMessage(tr("GPS data copied to clipboard"), 5000);
 }
 
 void MainWindow::selectAllImages()

@@ -35,6 +35,7 @@ private:
     bool oversizeSmallerPicture_bool{false};
     bool overwriteExitingWebp_bool{false};
     bool watermarkWebp_bool{true};
+    bool renameToTimestamp_bool{false};
     bool createWebpPath();
     bool checkImgTargetExists(const QFile &pathToTargetImage);
     bool checkImgWidth(const QImage &imageInput, const int &targetWidth);
@@ -51,7 +52,11 @@ public:
     // TODOS
     void readExif();
 
-    bool convertImage(const int &targetSize, const int &quality = 75);
+    QString getPhotoDateTimeHuman();
+    QString getImgNewTimestampName();
+    const bool renameImageToTimestamp();
+
+    const bool convertImage(const int &targetSize, const int &quality = 75);
     const bool convertImages(const int &quality = 75);
     bool rotateImage(const int &turn);
     QList<int> getWebSizes();
@@ -60,6 +65,7 @@ public:
     void setOversizeSmallerPicture(const bool oversizeSmallerPicture = false);
     void setOverwriteExistingWebp(const bool overwriteExitingWebp = false);
     void setWatermarkWebp(const bool watermarkWebp = true);
+    void setRenameToTimestamp(const bool renameToTimestamp = false);
 
     QList<QString> srcPics(const QString &srcPath);
     QList<QString> srcPicsRecursive(const QString &srcPath);
@@ -77,7 +83,6 @@ public:
     struct metaCopyrightStruct
     {
         QString xmp{"Xmp.dc.CopyrightOwner"};
-        QString cmpPlus{"Xmp.plus.CopyrightOwner"};
         QString exif = "Exif.Image.Copyright";
         QString iptc = "Iptc.Application2.Copyright";
     };
@@ -154,7 +159,6 @@ public:
         {"Xmp.dc.rights",
          "lang=\"x-default\" local language Copyright Notice, lang=\"en\" Copyright Notice"},
         {"Xmp.dc.CopyrightOwner", "Copyright Owner"},
-        {"Xmp.plus.CopyrightOwner", "Copyright Owner"},
         {"Xmp.dc.CountryCode",
          "Indicates the code of the country/primary location where the intellectual property of "
          "the object data was created,"
