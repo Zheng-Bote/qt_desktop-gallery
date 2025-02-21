@@ -42,6 +42,8 @@ private:
 
     bool backupOrigFile();
 
+    QString pathToNewImageFile;
+
     //    void readExif();
 
 public:
@@ -54,7 +56,8 @@ public:
 
     QString getPhotoDateTimeHuman();
     QString getImgNewTimestampName();
-    const bool renameImageToTimestamp();
+    QString getPathToImageName();
+    const std::tuple<bool, QString> renameImageToTimestamp();
 
     const bool convertImage(const int &targetSize, const int &quality = 75);
     const bool convertImages(const int &quality = 75);

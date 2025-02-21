@@ -1295,6 +1295,7 @@ void MainWindow::writeDefaultOwnerToSelectedImages()
     QTimer::singleShot(5000, this, &MainWindow::hideProgressBar);
 }
 
+// TODOS
 void MainWindow::renameSelectedPicuresToTimestamp()
 {
     QModelIndexList selected = ui->listView->selectionModel()->selectedIndexes();
@@ -1321,15 +1322,27 @@ void MainWindow::renameSelectedPicuresToTimestamp()
 
         Photo photo(pathToFile);
         photo.setRenameToTimestamp(true);
-        QFutureWatcher<bool> watcher;
-        QFuture<bool> future = QtConcurrent::run(&Photo::renameImageToTimestamp, photo);
-        FutureWatcherBool.setFuture(future);
-        //watcher.setFuture(future);
-        //watcher.waitForFinished();
-        bool result = future.result();
-        if (result) {
-            // TODOS
-            // udate album list !!!
+        //QFutureWatcher<bool> watcher;
+        //QFuture<std::tuple<bool, QString>> future = QtConcurrent::run(&Photo::renameImageToTimestamp, photo);
+        //FutureWatcherBool.setFuture(future);
+        //future.waitForFinished();
+        //bool result = future.result();
+        bool retBool;
+        QString result;
+        std::tie(retBool, result) = photo.renameImageToTimestamp();
+        if (retBool) {
+            //QString newName = photo.getImgNewTimestampName();
+            //col2.data(Qt::DisplayRole).setValue(result);
+            //mContentItemModel->index(row, 1).data(Qt::DisplayRole).setValue(result);
+            qDebug() << "conMod: " << mContentItemModel->itemData(i).values();
+
+            mContentItemModel->removeRow(row);
+            QList<QString> file;
+            file.append(result);
+            fillSrcListViewThread(file);
+
+            qDebug() << "MainWindow::renameSelectedPicuresToTimestamp: "
+                     << photo.getImgNewTimestampName() << " " << result;
         }
     }
 

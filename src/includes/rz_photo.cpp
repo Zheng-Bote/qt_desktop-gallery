@@ -152,11 +152,15 @@ QString Photo::getPhotoDateTimeHuman()
         }
     } catch (Exiv2::Error &e) {
         qWarning() << "getPhotoDateTimeHuman Caught Exiv2 exception " << e.what() << "\n";
-        auto ftime = std::filesystem::last_write_time(pathToFile);
-        auto datetime = std::format("{0:%Y-%m-%d}_{0:%H%M%S}", ftime);
-        QString dt = datetime.c_str();
-        dt = dt.remove(QRegularExpression("(\\.\\d+)$"));
-        return dt;
+        if (std::filesystem::exists(pathToFile)) {
+            auto ftime = std::filesystem::last_write_time(pathToFile);
+            auto datetime = std::format("{0:%Y-%m-%d}_{0:%H%M%S}", ftime);
+            QString dt = datetime.c_str();
+            dt = dt.remove(QRegularExpression("(\\.\\d+)$"));
+            return dt;
+        } else {
+            return "";
+        }
     }
     return "";
 }
@@ -166,25 +170,47 @@ QString Photo::getImgNewTimestampName()
     QString imgIn = imgStruct.fileAbolutePath + "/" + imgStruct.fileBasename + "."
                     + imgStruct.fileSuffix;
     QString dt = getPhotoDateTimeHuman();
+    if (dt.length() < 2) {
+        return imgIn;
+    }
     QString imgOut = imgStruct.fileAbolutePath + "/" + dt + "/" + imgStruct.fileSuffix;
 
     return imgOut;
 }
 
-const bool Photo::renameImageToTimestamp()
+QString Photo::getPathToImageName()
 {
-    qDebug() << "Photo::renameImageToTimestamp";
+    //return imgStruct.fileAbolutePath + "/" + imgStruct.fileBasename + "." + imgStruct.fileSuffix;
+    qDebug() << "Photo::getPathToImageName : " << pathToNewImageFile;
+    return pathToNewImageFile;
+}
+
+const std::tuple<bool, QString> Photo::renameImageToTimestamp()
+{
     QString imgIn = imgStruct.fileAbolutePath + "/" + imgStruct.fileBasename + "."
                     + imgStruct.fileSuffix;
+    qDebug() << "Photo::renameImageToTimestamp imgIn: " << imgIn;
     QString dt = getPhotoDateTimeHuman();
+    qDebug() << "Photo::renameImageToTimestamp renameImageToTimestamp: " << dt;
     QString imgOut = imgStruct.fileAbolutePath + "/" + dt + "." + imgStruct.fileSuffix.toLower();
+    qDebug() << "Photo::renameImageToTimestamp imgOut: " << imgOut;
+
+    pathToNewImageFile = imgOut;
 
     QFile file(imgIn);
-    if (file.rename(imgOut)) {
-        return true;
+    if (file.rename(imgOut) == true) {
+        qDebug() << "Photo::renameImageToTimestamp rename true: " << dt;
+        //imgStruct.fileBasename = dt;
+        pathToNewImageFile = imgOut;
+        qDebug() << "Photo::renameImageToTimestamp rename true pathToNewImageFile: "
+                 << pathToNewImageFile;
+        return std::make_tuple(true, imgOut);
     } else {
-        qWarning() << "Photo::renameImageToTimestamp NOK: " << imgIn;
-        return false;
+        qWarning() << "Photo::renameImageToTimestamp NOK: " << imgIn << " " << dt;
+        qWarning() << "Photo::renameImageToTimestamp NOK: " << imgOut << " "
+                   << imgStruct.fileBasename;
+        pathToNewImageFile = "";
+        return std::make_tuple(false, "");
     }
 }
 
