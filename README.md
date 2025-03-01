@@ -14,11 +14,10 @@
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
 **Table of Contents**
 
 - [Description](#description)
-  - [Features](#features)
+    - [Features](#features)
   - [Status](#status)
     - [Application / Tool](#application--tool)
 - [Documentation](#documentation)
@@ -27,8 +26,9 @@
     - [Image detail view](#image-detail-view)
       - [Image rotate](#image-rotate)
       - [Image export to WebP](#image-export-to-webp)
-      - [Image Exif data show/edit _(double click a row to edit/modify value)_](#image-exif-data-showedit-double-click-a-row-to-editmodify-value)
-      - [Image IPTC data show/edit _(double click a row to edit/modify value)_](#image-iptc-data-showedit-double-click-a-row-to-editmodify-value)
+      - [Image Exif data show/edit](#image-exif-data-showedit)
+      - [Image IPTC data show/edit](#image-iptc-data-showedit)
+      - [Image XMP data show/edit](#image-xmp-data-showedit)
 - [Authors and License](#authors-and-license)
   - [License](#license)
   - [Authors](#authors)
@@ -228,7 +228,6 @@ SOFTWARE.
 **Github structure**
 
 <!-- readme-tree start -->
-
 ```
 .
 ├── .github
@@ -254,16 +253,28 @@ SOFTWARE.
 ├── LICENSE
 ├── README.md
 ├── docs
-│   └── img
-│       ├── 00_en.png
-│       ├── 00_en_linux.png
-│       ├── 01_en.png
-│       ├── exif_en.png
-│       ├── exif_en_2.png
-│       ├── exif_meta_edit.png
-│       ├── iptc_en_1.png
-│       ├── rotate_en.png
-│       └── webp_en.png
+│   ├── img
+│   │   ├── 00_en.png
+│   │   ├── 01_en.png
+│   │   ├── album-context_en_01.png
+│   │   ├── album-export_en_01.png
+│   │   ├── album-i18n_en_01.png
+│   │   ├── album-info_en_01.png
+│   │   ├── album-metadata_en_01.png
+│   │   ├── album-pictures_en_01.png
+│   │   ├── album_show_gps.png
+│   │   ├── album_show_owner.png
+│   │   ├── details_rotate_en.png
+│   │   ├── details_webp_en.png
+│   │   ├── exif_en.png
+│   │   ├── exif_en_2.png
+│   │   ├── exif_meta_edit.png
+│   │   ├── import.png
+│   │   ├── iptc_en_1.png
+│   │   ├── rotate_en.png
+│   │   ├── webp_en.png
+│   │   └── xmp_en_1.png
+│   └── sbom_v0.23.0.json
 ├── src
 │   ├── CMakeLists.txt
 │   ├── configure
@@ -271,6 +282,9 @@ SOFTWARE.
 │   │   ├── Doxygen.cmake
 │   │   ├── extra_headers
 │   │   └── rz_config.h.in
+│   ├── defaultmeta_widget.cpp
+│   ├── defaultmeta_widget.h
+│   ├── defaultmeta_widget.ui
 │   ├── i18n
 │   │   ├── de.png
 │   │   ├── en.png
@@ -286,6 +300,8 @@ SOFTWARE.
 │   │   ├── rz_config.h
 │   │   ├── rz_hwinfo.cpp
 │   │   ├── rz_hwinfo.h
+│   │   ├── rz_metadata.hpp
+│   │   ├── rz_myevent.hpp
 │   │   ├── rz_photo.cpp
 │   │   └── rz_photo.hpp
 │   ├── main.cpp
@@ -330,9 +346,8 @@ SOFTWARE.
 │   └── resources.qrc
 └── tree.bak
 
-14 directories, 85 files
+14 directories, 102 files
 ```
-
 <!-- readme-tree end -->
 
 <hr>
