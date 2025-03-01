@@ -14,10 +14,11 @@
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
 **Table of Contents**
 
 - [Description](#description)
-    - [Features](#features)
+  - [Features](#features)
   - [Status](#status)
     - [Application / Tool](#application--tool)
 - [Documentation](#documentation)
@@ -84,7 +85,7 @@ Optimized for large Albums (multithreaded iterations)
 
 ### Application / Tool
 
-![Status](https://img.shields.io/badge/Status-under_construction-red)
+![Status](https://img.shields.io/badge/Status-useable-green)
 ![GitHub Release Date](https://img.shields.io/github/release-date/Zheng-Bote/qt_desktop-gallery)
 
 ![GitHub Issues](https://img.shields.io/github/issues/Zheng-Bote/qt_desktop-gallery)
@@ -96,23 +97,69 @@ Optimized for large Albums (multithreaded iterations)
 
 ### Album view
 
+MacOS (older screenshot)
+
 ![App Screenshot](./docs/img/00_en.png)
+
+import pictures (MacOS, older screenshot)
 
 ![App Screenshot](./docs/img/01_en.png)
 
-![App Screenshot](./docs/img/00_en_linux.png)
+import pictures (Linux)
+
+![App Screenshot](./docs/img/import.png)
+
+Album context menu
+
+![App Screenshot](./docs/img/album-context_en_01.png)
+
+Album menu
+
+![App Screenshot](./docs/img/album-pictures_en_01.png)
+
+show GPS main data in Album
+
+![App Screenshot](./docs/img/album_show_gps.png)
+
+show Picture Owner in Album
+
+![App Screenshot](./docs/img/album_show_owner.png)
+
+![App Screenshot](./docs/img/album-export_en_01.png)
+
+Languages and flags are loaded from external i18n folder, so adding additional languages / translations would be easy
+
+![App Screenshot](./docs/img/album-i18n_en_01.png)
+
+![App Screenshot](./docs/img/album-metadata_en_01.png)
+
+![App Screenshot](./docs/img/album-info_en_01.png)
 
 ### Image detail view
 
+_double click a picture to open picture details view_
+
 #### Image rotate
+
+MacOS (older screenshot)
 
 ![App Screenshot](./docs/img/rotate_en.png)
 
 #### Image export to WebP
 
+MacOS (older screenshot)
+
 ![App Screenshot](./docs/img/webp_en.png)
 
-#### Image Exif data show/edit _(double click a row to edit/modify value)_
+Linux
+
+![App Screenshot](./docs/img/details_webp_en.png)
+
+#### Image Exif data show/edit
+
+_(double click a row to edit/modify value)_
+
+MacOS (older screenshot)
 
 ![App Screenshot](./docs/img/exif_en.png)
 
@@ -120,13 +167,21 @@ Optimized for large Albums (multithreaded iterations)
 
 ![App Screenshot](./docs/img/exif_en_2.png)
 
-#### Image IPTC data show/edit _(double click a row to edit/modify value)_
+#### Image IPTC data show/edit
+
+_(double click a row to edit/modify value)_
 
 ![App Screenshot](./docs/img/exif_meta_edit.png)
 
 **mark important fields, with explanation** _(double click a row to edit/modify value)_
 
 ![App Screenshot](./docs/img/iptc_en_1.png)
+
+#### Image XMP data show/edit
+
+_(double click a row to edit/modify value)_
+
+![App Screenshot](./docs/img/xmp_en_1.png)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -173,6 +228,7 @@ SOFTWARE.
 :vulcan_salute:
 
 <!-- readme-tree start -->
+
 ```
 .
 ├── .github
@@ -276,4 +332,5 @@ SOFTWARE.
 
 14 directories, 85 files
 ```
+
 <!-- readme-tree end -->
