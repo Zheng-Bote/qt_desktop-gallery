@@ -14,11 +14,10 @@
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
 **Table of Contents**
 
 - [Description](#description)
-  - [Features](#features)
+    - [Features](#features)
   - [Status](#status)
     - [Application / Tool](#application--tool)
 - [Documentation](#documentation)
@@ -27,8 +26,9 @@
     - [Image detail view](#image-detail-view)
       - [Image rotate](#image-rotate)
       - [Image export to WebP](#image-export-to-webp)
-      - [Image Exif data show/edit _(double click a row to edit/modify value)_](#image-exif-data-showedit-double-click-a-row-to-editmodify-value)
-      - [Image IPTC data show/edit _(double click a row to edit/modify value)_](#image-iptc-data-showedit-double-click-a-row-to-editmodify-value)
+      - [Image Exif data show/edit](#image-exif-data-showedit)
+      - [Image IPTC data show/edit](#image-iptc-data-showedit)
+      - [Image XMP data show/edit](#image-xmp-data-showedit)
 - [Authors and License](#authors-and-license)
   - [License](#license)
   - [Authors](#authors)
