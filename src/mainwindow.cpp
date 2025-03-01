@@ -1,3 +1,14 @@
+/**
+ * @file mainwindow.cpp
+ * @author ZHENG Robert (robert.hase-zheng.net)
+ * @brief main ui class for the desktop gallery-app
+ * @version 0.1
+ * @date 2025-03-01
+ *
+ * @copyright Copyright (c) 2025 ZHENG Robert
+ *
+ */
+
 #include <QActionGroup>
 #include <QClipboard>
 #include <QDir>
@@ -21,8 +32,7 @@
 #include <QtConcurrent>
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+    : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     setFont(*font_12);
@@ -46,7 +56,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::slotLanguageChanged(QAction *action)
 {
-    if (0 != action) {
+    if (0 != action)
+    {
         loadLanguage(action->data().toString());
     }
 }
@@ -57,7 +68,8 @@ void switchTranslator(QTranslator &translator, const QString &filename)
 
     QString path = QApplication::applicationDirPath();
     path.append("/languages/");
-    if (translator.load(path + filename)) {
+    if (translator.load(path + filename))
+    {
         qApp->installTranslator(&translator);
     }
 }
@@ -67,8 +79,7 @@ void MainWindow::openSrcFolderRekursive()
     QString dir = QFileDialog::getExistingDirectory(this,
                                                     tr("Open Folder"),
                                                     QDir::homePath(),
-                                                    QFileDialog::ShowDirsOnly
-                                                        | QFileDialog::DontResolveSymlinks);
+                                                    QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
     Photo phot;
     QFutureWatcher<QList<QString>> watcher;
@@ -78,16 +89,16 @@ void MainWindow::openSrcFolderRekursive()
     QList<QString> result = future.result();
 
     qInfo() << "found: " << result.size();
-    if (result.size() > ALBUM_LIMIT) {
+    if (result.size() > ALBUM_LIMIT)
+    {
         showAlbumLimitMsg(result.size());
-        ui->album_label->setText(tr("processing") + " " + QString::number(ALBUM_LIMIT) + " of "
-                                 + QString::number(result.size()) + " " + tr("items") + "...");
-    } else {
-        ui->album_label->setText(tr("processing") + " " + QString::number(result.size()) + " "
-                                 + tr("items") + "...");
+        ui->album_label->setText(tr("processing") + " " + QString::number(ALBUM_LIMIT) + " of " + QString::number(result.size()) + " " + tr("items") + "...");
     }
-    statusBarLabel->setText(tr("processing") + " " + QString::number(result.size()) + " "
-                            + tr("items") + "...");
+    else
+    {
+        ui->album_label->setText(tr("processing") + " " + QString::number(result.size()) + " " + tr("items") + "...");
+    }
+    statusBarLabel->setText(tr("processing") + " " + QString::number(result.size()) + " " + tr("items") + "...");
 
     ui->progressBar->show();
     QFuture<void> futureListView = QtConcurrent::run(&MainWindow::fillSrcListViewThread,
@@ -101,8 +112,7 @@ void MainWindow::openSrcFolder()
     QString srcPath = QFileDialog::getExistingDirectory(this,
                                                         tr("Open Folder"),
                                                         QDir::homePath(),
-                                                        QFileDialog::ShowDirsOnly
-                                                            | QFileDialog::DontResolveSymlinks);
+                                                        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
     Photo phot;
     QFutureWatcher<QList<QString>> watcher;
@@ -112,16 +122,16 @@ void MainWindow::openSrcFolder()
     QList<QString> result = future.result();
 
     qInfo() << "found: " << result.size();
-    if (result.size() > ALBUM_LIMIT) {
+    if (result.size() > ALBUM_LIMIT)
+    {
         showAlbumLimitMsg(result.size());
-        ui->album_label->setText(tr("processing") + " " + QString::number(ALBUM_LIMIT) + " of "
-                                 + QString::number(result.size()) + " " + tr("items") + "...");
-    } else {
-        ui->album_label->setText(tr("processing") + " " + QString::number(result.size()) + " "
-                                 + tr("items") + "...");
+        ui->album_label->setText(tr("processing") + " " + QString::number(ALBUM_LIMIT) + " of " + QString::number(result.size()) + " " + tr("items") + "...");
     }
-    statusBarLabel->setText(tr("processing") + " " + QString::number(result.size()) + " "
-                            + tr("items") + "...");
+    else
+    {
+        ui->album_label->setText(tr("processing") + " " + QString::number(result.size()) + " " + tr("items") + "...");
+    }
+    statusBarLabel->setText(tr("processing") + " " + QString::number(result.size()) + " " + tr("items") + "...");
 
     ui->progressBar->show();
     QFuture<void> futureListView = QtConcurrent::run(&MainWindow::fillSrcListViewThread,
@@ -136,15 +146,15 @@ void MainWindow::openReadFolder()
     QString srcPath = QFileDialog::getExistingDirectory(this,
                                                         tr("Open Folder"),
                                                         QDir::homePath(),
-                                                        QFileDialog::ShowDirsOnly
-                                                            | QFileDialog::DontResolveSymlinks);
+                                                        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
     QDirIterator srcPics(srcPath,
                          {"*.jpg", "*.jpeg", "*.png", "*.bmp", "*.tiff"},
                          QDir::Files,
                          QDirIterator::Subdirectories);
 
-    while (srcPics.hasNext()) {
+    while (srcPics.hasNext())
+    {
         QFile srcFile(srcPics.next());
         statusBarLabel->setText("loading " + srcFile.fileName());
         fillSrcListView(srcFile);
@@ -153,13 +163,13 @@ void MainWindow::openReadFolder()
 
 void MainWindow::loadSingleSrcImg()
 {
-    QString pathToFile
-        = QFileDialog::getOpenFileName(this,
-                                       tr("Open File"),
-                                       QDir::homePath(),
-                                       tr("Image (*.jpg *.jpeg *.png *.bmp *.tiff)"));
+    QString pathToFile = QFileDialog::getOpenFileName(this,
+                                                      tr("Open File"),
+                                                      QDir::homePath(),
+                                                      tr("Image (*.jpg *.jpeg *.png *.bmp *.tiff)"));
 
-    if (pathToFile.isEmpty() == false) {
+    if (pathToFile.isEmpty() == false)
+    {
         QList<QString> file;
         file.append(pathToFile);
         fillSrcListViewThread(file);
@@ -168,7 +178,8 @@ void MainWindow::loadSingleSrcImg()
 
 void MainWindow::clearSrcAlbum()
 {
-    if (mContentItemModel->rowCount() < 1) {
+    if (mContentItemModel->rowCount() < 1)
+    {
         return;
     }
     QMessageBox::StandardButton response = QMessageBox::Cancel;
@@ -178,12 +189,16 @@ void MainWindow::clearSrcAlbum()
                                      tr("Are you sure you want to clear the album?"),
                                      QMessageBox::Yes | QMessageBox::Cancel);
 
-    if (response == QMessageBox::Yes) {
-        try {
+    if (response == QMessageBox::Yes)
+    {
+        try
+        {
             mContentItemModel->clear();
             resetDefaultMeta();
             refreshStatusBar();
-        } catch (...) {
+        }
+        catch (...)
+        {
             qDebug() << "clearSrcAlbum: something went wrong";
         }
     }
@@ -199,8 +214,7 @@ void MainWindow::removeSelectedImageFromAlbum(const QModelIndex &index)
 void MainWindow::about()
 {
     QString text = tr(qApp->applicationDisplayName().toStdString().c_str()) + "\n\n";
-    QString setInformativeText = "<p>" + qApp->applicationName() + " v" + qApp->applicationVersion()
-                                 + "</p>";
+    QString setInformativeText = "<p>" + qApp->applicationName() + " v" + qApp->applicationVersion() + "</p>";
 
     setInformativeText.append(
         "<p>" + tr("Desktop gallery-app to show/edit Exif/IPTC/XMP and export to WebP") + "<p>");
@@ -208,8 +222,7 @@ void MainWindow::about()
     setInformativeText.append("<br><a href=\"");
     setInformativeText.append(PROG_HOMEPAGE);
     setInformativeText.append("\" alt=\"Github repository\">");
-    setInformativeText.append(qApp->applicationName() + " v" + qApp->applicationVersion() + " "
-                              + tr("at") + " Github</a>");
+    setInformativeText.append(qApp->applicationName() + " v" + qApp->applicationVersion() + " " + tr("at") + " Github</a>");
 
     QMessageBox msgBox(this);
     msgBox.setWindowTitle(tr("About") + " " + qApp->applicationDisplayName());
@@ -322,9 +335,8 @@ void MainWindow::createMenu()
 
     ui->export_to_all_WebP_sizes_Act->setIcon(QIcon(":/resources/img/icons8-send-file-50.png"));
     ui->export_to_all_WebP_sizes_Act->setIconVisibleInMenu(true);
-    connect(ui->export_to_all_WebP_sizes_Act, &QAction::triggered, this, [this] {
-        MainWindow::exportSrcImgToWebpThread();
-    });
+    connect(ui->export_to_all_WebP_sizes_Act, &QAction::triggered, this, [this]
+            { MainWindow::exportSrcImgToWebpThread(); });
 
     ui->webp_oversizeAct->setIconVisibleInMenu(true);
     ui->webp_oversizeAct->setCheckable(true);
@@ -355,8 +367,7 @@ void MainWindow::hwInfoMsgbox()
 
     QMap<QString, QString> hw_info = hwInfo.getHwInfo();
 
-    QString text = qApp->applicationDisplayName() + " " + tr("is running on the following hardware")
-                   + ":\n\n";
+    QString text = qApp->applicationDisplayName() + " " + tr("is running on the following hardware") + ":\n\n";
     QString setInformativeText = "<p><b>CPU:</b><br>";
     setInformativeText.append("Vendor: " + hw_info.value("CPU vendor"));
     setInformativeText.append("<br>Model: " + hw_info.value("CPU model"));
@@ -403,7 +414,8 @@ void MainWindow::createLanguageMenu(void)
     QDir dir(m_langPath);
     QStringList fileNames = dir.entryList(QStringList(qApp->applicationName() + "_*.qm"));
 
-    for (int i = 0; i < fileNames.size(); ++i) {
+    for (int i = 0; i < fileNames.size(); ++i)
+    {
         QString locale;
         locale = fileNames[i];                         // "TranslationExample_de.qm"
         locale.truncate(locale.lastIndexOf('.'));      // "TranslationExample_de"
@@ -418,7 +430,8 @@ void MainWindow::createLanguageMenu(void)
         i18nMenu->addAction(action);
         langGroup->addAction(action);
 
-        if (defaultLocale == locale) {
+        if (defaultLocale == locale)
+        {
             action->setChecked(true);
         }
     }
@@ -426,7 +439,8 @@ void MainWindow::createLanguageMenu(void)
 
 void MainWindow::loadLanguage(const QString &rLanguage)
 {
-    if (m_currLang != rLanguage) {
+    if (m_currLang != rLanguage)
+    {
         m_currLang = rLanguage;
         QLocale locale = QLocale(m_currLang);
         QLocale::setDefault(locale);
@@ -450,7 +464,8 @@ void MainWindow::switchTranslator(QTranslator &translator, const QString &filena
 
     QString path = QApplication::applicationDirPath();
     path.append("/i18n/");
-    if (translator.load(path + filename)) {
+    if (translator.load(path + filename))
+    {
         qApp->installTranslator(&translator);
     }
 }
@@ -487,7 +502,8 @@ void MainWindow::initStatusBar()
 
 void MainWindow::writeDefaultExifGpsToSelected()
 {
-    if (defaultMeta.exifDefault.contains("Exif.GPSInfo.GPSLatitude") == 0) {
+    if (defaultMeta.exifDefault.contains("Exif.GPSInfo.GPSLatitude") == 0)
+    {
         QMessageBox msgBox(this);
         msgBox.setWindowTitle(tr("Default GPS Meta"));
         msgBox.setIcon(QMessageBox::Information);
@@ -514,8 +530,8 @@ void MainWindow::writeDefaultExifGpsToSelected()
     eve = new MyEvent();
     QApplication::postEvent(qApp, eve);
 
-    if (defaultMeta.exifDefault.contains("Exif.GPSInfo.GPSLatitude")
-        && defaultMeta.exifDefault.contains("Exif.GPSInfo.GPSLongitude")) {
+    if (defaultMeta.exifDefault.contains("Exif.GPSInfo.GPSLatitude") && defaultMeta.exifDefault.contains("Exif.GPSInfo.GPSLongitude"))
+    {
         _gpsData.GPSTag = defaultMeta.exifDefault.value("Exif.Image.GPSTag");
         _gpsData.GPSLatitudeRef = defaultMeta.exifDefault.value("Exif.GPSInfo.GPSLatitudeRef");
         _gpsData.GPSLatitude = defaultMeta.exifDefault.value("Exif.GPSInfo.GPSLatitude");
@@ -527,7 +543,9 @@ void MainWindow::writeDefaultExifGpsToSelected()
         _gpsData.GPSMapDatum = defaultMeta.exifDefault.value("Exif.GPSInfo.GPSMapDatum");
         _gpsData.GPSDateStamp = defaultMeta.exifDefault.value("Exif.GPSInfo.GPSDateStamp");
         _gpsData.DateTimeOriginal = defaultMeta.exifDefault.value("Exif.Photo.DateTimeOriginal");
-    } else {
+    }
+    else
+    {
         QModelIndex gpsIndex = rowWithDefaultGpsMeta;
         int row = gpsIndex.row();
         QModelIndex col2 = mContentItemModel->index(row, 1);
@@ -536,7 +554,8 @@ void MainWindow::writeDefaultExifGpsToSelected()
         _gpsData = photo.getGpsData();
     }
 
-    for (QModelIndex i : selected) {
+    for (QModelIndex i : selected)
+    {
         count++;
         double proz = double(count) / double(total) * 100.0;
         int val = int(proz);
@@ -554,8 +573,7 @@ void MainWindow::writeDefaultExifGpsToSelected()
 
     eve = nullptr;
 
-    statusBar()->showMessage(tr("Default GPS data written to") + " "
-                                 + QString::number(selected.size()) + " " + tr("pictures"),
+    statusBar()->showMessage(tr("Default GPS data written to") + " " + QString::number(selected.size()) + " " + tr("pictures"),
                              5000);
     QTimer::singleShot(5000, this, &MainWindow::hideProgressBar);
 }
@@ -572,7 +590,8 @@ void MainWindow::writeDefaultMetaToSelectedImages()
     eve = new MyEvent();
     QApplication::postEvent(qApp, eve);
 
-    for (QModelIndex i : selected) {
+    for (QModelIndex i : selected)
+    {
         count++;
         double proz = double(count) / double(total) * 100.0;
         int val = int(proz);
@@ -583,8 +602,7 @@ void MainWindow::writeDefaultMetaToSelectedImages()
         int row = i.row();
         QModelIndex col2 = mContentItemModel->index(row, 1);
         QString pathToFile = col2.data(Qt::DisplayRole).toString();
-        statusBar()->showMessage(tr("working on") + " " + QString::number(count) + "/"
-                                     + QString::number(selected.size()),
+        statusBar()->showMessage(tr("working on") + " " + QString::number(count) + "/" + QString::number(selected.size()),
                                  1000);
         /*Photo photo(pathToFile);
         for (auto i = defaultMeta.xmpDefault.cbegin(), end = defaultMeta.xmpDefault.cend();
@@ -609,7 +627,7 @@ void MainWindow::writeDefaultMetaToSelectedImages()
         FutureWatcher.setFuture(future);
     }
     eve = nullptr;
-    //ui->progressBar->hide();
+    // ui->progressBar->hide();
 
     writeDefaultExifGpsToSelected();
     writeDefaultOwnerToSelectedImages();
@@ -621,16 +639,19 @@ const void MainWindow::writeDefaultMetaToSelectedImagesThread(const QString &pat
 {
     Photo photo(pathToFile);
     for (auto i = defaultMeta.xmpDefault.cbegin(), end = defaultMeta.xmpDefault.cend(); i != end;
-         ++i) {
+         ++i)
+    {
         QString key = i.key();
         QString value = i.value();
         QString targetKey{""};
         photo.writeXmp(key, value);
-        if (photo.xmp_to_exif.contains(key)) {
+        if (photo.xmp_to_exif.contains(key))
+        {
             targetKey = photo.xmp_to_exif[key];
             photo.writeExif(targetKey, value);
         }
-        if (photo.xmp_to_iptc.contains(key)) {
+        if (photo.xmp_to_iptc.contains(key))
+        {
             targetKey = photo.xmp_to_iptc[key];
             photo.writeIptc(targetKey, value);
         }
@@ -640,9 +661,12 @@ const void MainWindow::writeDefaultMetaToSelectedImagesThread(const QString &pat
 void MainWindow::refreshStatusBar()
 {
     int rowCount = mContentItemModel->rowCount();
-    if (rowCount > 0) {
+    if (rowCount > 0)
+    {
         statusBarLabel->setText(QString::number(rowCount) + " " + tr("items"));
-    } else {
+    }
+    else
+    {
         statusBarLabel->setText("v" + qApp->applicationVersion());
     }
 }
@@ -670,8 +694,7 @@ QString MainWindow::getPictureGpsData(int row)
     Photo::exifGpsStruct gpsData;
     gpsData = photo.getGpsData();
 
-    QString gps_Data = gpsData.GPSLatitudeRef + " " + gpsData.GPSLatitude + "\n"
-                       + gpsData.GPSLongitudeRef + " " + gpsData.GPSLongitude;
+    QString gps_Data = gpsData.GPSLatitudeRef + " " + gpsData.GPSLatitude + "\n" + gpsData.GPSLongitudeRef + " " + gpsData.GPSLongitude;
 
     return gps_Data;
 }
@@ -718,65 +741,55 @@ void MainWindow::showViewContextMenu(const QPoint &pt)
                                                tr("show Picture details"),
                                                this);
     contextShowPictureDetailsAct->setIconVisibleInMenu(true);
-    connect(contextShowPictureDetailsAct, &QAction::triggered, this, [this, itemText2] {
-        MainWindow::showSinglePicture(itemText2);
-    });
+    connect(contextShowPictureDetailsAct, &QAction::triggered, this, [this, itemText2]
+            { MainWindow::showSinglePicture(itemText2); });
 
     contextRenameToTimestampAct = new QAction(QIcon(":/resources/img/icons8-send-file-50.png"),
                                               tr("rename Picture to timestamp"),
                                               this);
     contextRenameToTimestampAct->setIconVisibleInMenu(true);
-    connect(contextRenameToTimestampAct, &QAction::triggered, this, [this, itemText2] {
-        MainWindow::renameSelectedPicuresToTimestamp();
-    });
+    connect(contextRenameToTimestampAct, &QAction::triggered, this, [this, itemText2]
+            { MainWindow::renameSelectedPicuresToTimestamp(); });
 
     contextSetExifAsDefaultAct = new QAction(QIcon(
                                                  ":/resources/img/icons8-regular-document-50.png"),
                                              tr("set this red Exif data as default"),
                                              this);
-    connect(contextSetExifAsDefaultAct, &QAction::triggered, this, [this, idx] {
-        MainWindow::setDefaultExifMeta(idx);
-    });
+    connect(contextSetExifAsDefaultAct, &QAction::triggered, this, [this, idx]
+            { MainWindow::setDefaultExifMeta(idx); });
 
     contextSetIptcAsDefaultAct = new QAction(QIcon(
                                                  ":/resources/img/icons8-regular-document-50.png"),
                                              tr("set this red IPTC data as default"),
                                              this);
-    connect(contextSetIptcAsDefaultAct, &QAction::triggered, this, [this, idx] {
-        MainWindow::setDefaultIptcMeta(idx);
-    });
+    connect(contextSetIptcAsDefaultAct, &QAction::triggered, this, [this, idx]
+            { MainWindow::setDefaultIptcMeta(idx); });
 
-    contextSetXmpCopyRightOwnerAsDefaultAct
-        = new QAction(QIcon(":/resources/img/icons8-regular-document-50.png"),
-                      tr("set this Copyright data as default"),
-                      this);
-    connect(contextSetXmpCopyRightOwnerAsDefaultAct, &QAction::triggered, this, [this, idx] {
-        MainWindow::setDefaultXmpCopyRightOwner(idx);
-    });
+    contextSetXmpCopyRightOwnerAsDefaultAct = new QAction(QIcon(":/resources/img/icons8-regular-document-50.png"),
+                                                          tr("set this Copyright data as default"),
+                                                          this);
+    connect(contextSetXmpCopyRightOwnerAsDefaultAct, &QAction::triggered, this, [this, idx]
+            { MainWindow::setDefaultXmpCopyRightOwner(idx); });
 
-    contextSetGpsMetaAsDefaultAct
-        = new QAction(QIcon(":/resources/img/icons8-regular-document-50.png"),
-                      tr("set this GPS data as default"),
-                      this);
-    connect(contextSetGpsMetaAsDefaultAct, &QAction::triggered, this, [this, idx] {
-        MainWindow::setDefaultGpsData(idx);
-    });
+    contextSetGpsMetaAsDefaultAct = new QAction(QIcon(":/resources/img/icons8-regular-document-50.png"),
+                                                tr("set this GPS data as default"),
+                                                this);
+    connect(contextSetGpsMetaAsDefaultAct, &QAction::triggered, this, [this, idx]
+            { MainWindow::setDefaultGpsData(idx); });
 
     contextRemovePictureFromAlbumAct = new QAction(QIcon(
                                                        ":/resources/img/icons8-delete-list-50.png"),
                                                    tr("remove this Picture from Album"),
                                                    this);
-    connect(contextRemovePictureFromAlbumAct, &QAction::triggered, this, [this, idx] {
-        MainWindow::removeSelectedImageFromAlbum(idx);
-    });
+    connect(contextRemovePictureFromAlbumAct, &QAction::triggered, this, [this, idx]
+            { MainWindow::removeSelectedImageFromAlbum(idx); });
 
     contextSetGpsToClipboardAct = new QAction(QIcon(
                                                   ":/resources/img/icons8-regular-document-50.png"),
                                               tr("copy GPS data to clipboard"),
                                               this);
-    connect(contextSetGpsToClipboardAct, &QAction::triggered, this, [this, idx] {
-        MainWindow::setGpsDecToClipboard(idx);
-    });
+    connect(contextSetGpsToClipboardAct, &QAction::triggered, this, [this, idx]
+            { MainWindow::setGpsDecToClipboard(idx); });
 
     contextShowPictureDetailsAct->setEnabled(idx.column() == 0);
     contextRenameToTimestampAct->setEnabled(idx.column() == 0);
@@ -852,7 +865,8 @@ void MainWindow::resetDefaultMeta()
 
 void MainWindow::showDefaultExifMeta()
 {
-    if (!hasDefaultExifMeta) {
+    if (!hasDefaultExifMeta)
+    {
         QMessageBox msgBox(this);
         msgBox.setWindowTitle(tr("Exif Meta"));
         msgBox.setIcon(QMessageBox::Information);
@@ -864,7 +878,9 @@ void MainWindow::showDefaultExifMeta()
         msgBox.setInformativeText(setInformativeText);
         msgBox.setFixedWidth(900);
         msgBox.exec();
-    } else {
+    }
+    else
+    {
         int row = rowWithDefaultExifMeta.row();
         QModelIndex col2 = mContentItemModel->index(row, 1);
         QString itemText2 = col2.data(Qt::DisplayRole).toString();
@@ -881,7 +897,8 @@ void MainWindow::clearDefaultExifMeta()
 
 void MainWindow::showDefaultIptcMeta()
 {
-    if (!hasDefaultIptcMeta) {
+    if (!hasDefaultIptcMeta)
+    {
         QMessageBox msgBox(this);
         msgBox.setWindowTitle(tr("IPTC Meta"));
         msgBox.setIcon(QMessageBox::Information);
@@ -893,7 +910,9 @@ void MainWindow::showDefaultIptcMeta()
         msgBox.setInformativeText(setInformativeText);
         msgBox.setFixedWidth(900);
         msgBox.exec();
-    } else {
+    }
+    else
+    {
         int row = rowWithDefaultIptcMeta.row();
         QModelIndex col2 = mContentItemModel->index(row, 1);
         QString itemText2 = col2.data(Qt::DisplayRole).toString();
@@ -910,7 +929,7 @@ void MainWindow::showDefaultMetaWidget()
 {
     DefaultMeta *defaultMetaWidget = new DefaultMeta();
 
-    //qDebug() << "MainWindow::showDefaultMetaWidget: set defaultMeta";
+    // qDebug() << "MainWindow::showDefaultMetaWidget: set defaultMeta";
     defaultMetaWidget->setDefaultMeta(defaultMeta);
 
     defaultMetaWidget->show();
@@ -920,7 +939,8 @@ void MainWindow::showCopyrightOwnerInAlbum()
 {
     int countListViewRows = ui->listView->model()->rowCount();
 
-    for (int i = 0; i < countListViewRows; i++) {
+    for (int i = 0; i < countListViewRows; i++)
+    {
         QString owner = getPictureCopyRightOwner(i);
         owner.isEmpty() ? mContentItemModel->item(i, 0)->setForeground(Qt::red)
                         : mContentItemModel->item(i, 0)->setForeground(Qt::black);
@@ -933,7 +953,8 @@ void MainWindow::showGpsDataInAlbum()
 {
     int countListViewRows = ui->listView->model()->rowCount();
 
-    for (int i = 0; i < countListViewRows; i++) {
+    for (int i = 0; i < countListViewRows; i++)
+    {
         QString gpsData = getPictureGpsData(i);
         gpsData.length() <= 10 ? mContentItemModel->item(i, 0)->setForeground(Qt::red)
                                : mContentItemModel->item(i, 0)->setForeground(Qt::black);
@@ -945,7 +966,8 @@ void MainWindow::clearDataInAlbum()
 {
     int countListViewRows = ui->listView->model()->rowCount();
 
-    for (int i = 0; i < countListViewRows; i++) {
+    for (int i = 0; i < countListViewRows; i++)
+    {
         mContentItemModel->item(i, 0)->setText("");
     }
 }
@@ -956,7 +978,8 @@ void MainWindow::exportSrcImgToWebpThread()
 
     QModelIndexList selected = ui->listView->selectionModel()->selectedIndexes();
 
-    if (selected.count() == 0) {
+    if (selected.count() == 0)
+    {
         QMessageBox msgBox(this);
         msgBox.setWindowTitle(tr("Export to WebP"));
         msgBox.setIcon(QMessageBox::Information);
@@ -979,12 +1002,13 @@ void MainWindow::exportSrcImgToWebpThread()
     eve = new MyEvent();
     QApplication::postEvent(qApp, eve);
 
-    for (QModelIndex i : selected) {
+    for (QModelIndex i : selected)
+    {
         count++;
         double proz = double(count) / double(total) * 100.0;
         int val = int(proz);
         totalCount = val;
-        //qDebug() << "WebP export " << count << "/" << selected.count();
+        // qDebug() << "WebP export " << count << "/" << selected.count();
 
         eve = new MyEvent();
         QApplication::postEvent(qApp, eve);
@@ -994,39 +1018,40 @@ void MainWindow::exportSrcImgToWebpThread()
         QString pathToFile = col2.data(Qt::DisplayRole).toString();
         Photo photo(pathToFile);
 
-        if (ui->webp_oversizeAct->isChecked()) {
+        if (ui->webp_oversizeAct->isChecked())
+        {
             photo.setOversizeSmallerPicture(true);
         }
 
-        if (ui->webp_overwriteWebpAct->isChecked()) {
+        if (ui->webp_overwriteWebpAct->isChecked())
+        {
             photo.setOverwriteExistingWebp(true);
         }
 
-        if (ui->webp_watermarkWebpAct->isChecked()) {
+        if (ui->webp_watermarkWebpAct->isChecked())
+        {
             photo.setWatermarkWebp(true);
         }
 
         QFuture<bool> future = QtConcurrent::run(&Photo::convertImages, photo, 75);
         FutureWatcherBool.setFuture(future);
-        //FutureWatcherBool.waitForFinished();
-        //future.waitForFinished();
+        // FutureWatcherBool.waitForFinished();
+        // future.waitForFinished();
 
-        //oknok = future.result();
+        // oknok = future.result();
     }
 
     eve = nullptr;
-    //ui->progressBar->hide();
+    // ui->progressBar->hide();
 
-    statusBar()->showMessage(tr("WebP export to subfolder WebP") + ": "
-                                 + QString::number(selected.size()) + " " + tr("pictures") + " "
-                                 + tr("successful"),
+    statusBar()->showMessage(tr("WebP export to subfolder WebP") + ": " + QString::number(selected.size()) + " " + tr("pictures") + " " + tr("successful"),
                              5000);
     QTimer::singleShot(5000, this, &MainWindow::hideProgressBar);
 }
 
 void MainWindow::on_progressBar_valueChanged(int value)
 {
-    //qDebug() << "on_progressBar_valueChanged " << value;
+    // qDebug() << "on_progressBar_valueChanged " << value;
 }
 
 void MainWindow::hideProgressBar()
@@ -1036,16 +1061,20 @@ void MainWindow::hideProgressBar()
 
 void MainWindow::changeEvent(QEvent *event)
 {
-    if (0 != event) {
-        switch (event->type()) {
+    if (0 != event)
+    {
+        switch (event->type())
+        {
         case QEvent::LanguageChange:
             ui->retranslateUi(this);
             break;
-        case QEvent::LocaleChange: {
+        case QEvent::LocaleChange:
+        {
             QString locale = QLocale::system().name();
             locale.truncate(locale.lastIndexOf('_'));
             loadLanguage(locale);
-        } break;
+        }
+        break;
         }
     }
     QMainWindow::changeEvent(event);
@@ -1053,7 +1082,8 @@ void MainWindow::changeEvent(QEvent *event)
 
 bool MainWindow::eventFilter(QObject *sender, QEvent *event)
 {
-    if (event->type() == MyEvent ::myregisteredEventType()) {
+    if (event->type() == MyEvent ::myregisteredEventType())
+    {
         setProgressbar(totalCount);
     }
 
@@ -1066,16 +1096,13 @@ void MainWindow::showAlbumLimitMsg(int resultCount)
     msgBox.setWindowTitle(tr("Critical"));
     msgBox.setIcon(QMessageBox::Information);
     msgBox.setTextFormat(Qt::RichText);
-    QString text = QString::number(resultCount) + " " + tr("pictures found") + " " + tr("but") + " "
-                   + tr("Album limit are") + " " + QString::number(ALBUM_LIMIT) + " "
-                   + tr("pictures");
+    QString text = QString::number(resultCount) + " " + tr("pictures found") + " " + tr("but") + " " + tr("Album limit are") + " " + QString::number(ALBUM_LIMIT) + " " + tr("pictures");
     QString setInformativeText = tr("Please choose folders with a lesser amount of pictures.");
 
     QString detailedText = tr("Some filesystems like Microsoft FAT have issues with foldercontent "
                               "bigger than 4096 entries.");
-    detailedText.append("\n"
-                        + tr("Also, if you are planning to do a WebP export, the filecontent will "
-                             "increase (extremly)."));
+    detailedText.append("\n" + tr("Also, if you are planning to do a WebP export, the filecontent will "
+                                  "increase (extremly)."));
     msgBox.setText(text);
     msgBox.setInformativeText(setInformativeText);
     msgBox.setDetailedText(detailedText);
@@ -1120,7 +1147,8 @@ const void MainWindow::fillSrcListViewThread(const QList<QString> &srcFiles)
     QApplication::postEvent(qApp, eve);
 
     QListIterator<QString> i(srcFiles);
-    while (i.hasNext()) {
+    while (i.hasNext())
+    {
         QFile srcFile(i.next());
         QFileInfo fileInfo(srcFile.fileName());
 
@@ -1131,13 +1159,14 @@ const void MainWindow::fillSrcListViewThread(const QList<QString> &srcFiles)
         eve = new MyEvent();
         QApplication::postEvent(qApp, eve);
 
-        if (count == ALBUM_LIMIT) {
-            qDebug() << "reached album limit of " + QString::number(ALBUM_LIMIT)
-                            + "; stopped loading";
+        if (count == ALBUM_LIMIT)
+        {
+            qDebug() << "reached album limit of " + QString::number(ALBUM_LIMIT) + "; stopped loading";
             break;
         }
 
-        if (fileInfo.size() < 1) {
+        if (fileInfo.size() < 1)
+        {
             continue;
         }
 
@@ -1169,7 +1198,7 @@ const void MainWindow::fillSrcListViewThread(const QList<QString> &srcFiles)
         QStandardItem *listitem = new QStandardItem();
         listitem->setIcon(*px);
 
-        //listitem->setText(fileInfo.fileName()); // + "\nschaun wa ma");
+        // listitem->setText(fileInfo.fileName()); // + "\nschaun wa ma");
 
         listitem->setToolTip(pathToFile);
         listitem->setEditable(false);
@@ -1200,7 +1229,8 @@ void MainWindow::removeSelectedImages()
     QModelIndexList selected = ui->listView->selectionModel()->selectedIndexes();
     QList<QString> selectedImages;
 
-    for (QModelIndex i : selected) {
+    for (QModelIndex i : selected)
+    {
         int row = i.row();
         QModelIndex col2 = mContentItemModel->index(row, 1);
         QString itemText2 = col2.data(Qt::DisplayRole).toString();
@@ -1208,11 +1238,13 @@ void MainWindow::removeSelectedImages()
     }
 
     QListIterator<QString> intItem(selectedImages);
-    while (intItem.hasNext()) {
+    while (intItem.hasNext())
+    {
         QString item = intItem.next();
-        //qInfo() << "has: " << item;
+        // qInfo() << "has: " << item;
         QList<QStandardItem *> items = mContentItemModel->findItems(item, Qt::MatchExactly, 1);
-        foreach (auto i, items) {
+        foreach (auto i, items)
+        {
             mContentItemModel->removeRow(i->row());
         }
     }
@@ -1224,9 +1256,10 @@ void MainWindow::removeSelectedImages()
 // TODO
 void MainWindow::writeDefaultOwnerToSelectedImages()
 {
-    //qDebug() << "writeDefaultOwnerToSelectedImages: "
+    // qDebug() << "writeDefaultOwnerToSelectedImages: "
     //<< defaultMeta.xmpDefault.value("Xmp.dc.CopyrightOwner");
-    if (defaultMeta.xmpDefault.contains("Xmp.dc.CopyrightOwner") == 0) {
+    if (defaultMeta.xmpDefault.contains("Xmp.dc.CopyrightOwner") == 0)
+    {
         QMessageBox msgBox(this);
         msgBox.setWindowTitle(tr("Default Meta"));
         msgBox.setIcon(QMessageBox::Information);
@@ -1254,9 +1287,12 @@ void MainWindow::writeDefaultOwnerToSelectedImages()
     QList<QString> selectedImages;
     QString owner{""};
 
-    if (defaultMeta.xmpDefault.contains("Xmp.dc.CopyrightOwner")) {
+    if (defaultMeta.xmpDefault.contains("Xmp.dc.CopyrightOwner"))
+    {
         owner = defaultMeta.xmpDefault.value("Xmp.dc.CopyrightOwner");
-    } else {
+    }
+    else
+    {
         QModelIndex ownerIndex = rowWithDefaultCopyRightQwnerMeta;
         int row = ownerIndex.row();
         QModelIndex col2 = mContentItemModel->index(row, 1);
@@ -1265,7 +1301,8 @@ void MainWindow::writeDefaultOwnerToSelectedImages()
         owner = photo.getXmpCopyrightOwner();
     }
 
-    for (QModelIndex i : selected) {
+    for (QModelIndex i : selected)
+    {
         count++;
         double proz = double(count) / double(total) * 100.0;
         int val = int(proz);
@@ -1281,16 +1318,15 @@ void MainWindow::writeDefaultOwnerToSelectedImages()
         QFutureWatcher<bool> watcher;
         QFuture<bool> future = QtConcurrent::run(&Photo::writeToAllCopyrightOwner, photo, owner);
         FutureWatcherBool.setFuture(future);
-        //watcher.setFuture(future);
-        //watcher.waitForFinished();
-        //bool result = future.result();
+        // watcher.setFuture(future);
+        // watcher.waitForFinished();
+        // bool result = future.result();
     }
 
     eve = nullptr;
-    //ui->progressBar->hide();
+    // ui->progressBar->hide();
 
-    statusBar()->showMessage(tr("Default Owner written to") + " " + QString::number(selected.size())
-                                 + " " + tr("pictures"),
+    statusBar()->showMessage(tr("Default Owner written to") + " " + QString::number(selected.size()) + " " + tr("pictures"),
                              5000);
     QTimer::singleShot(5000, this, &MainWindow::hideProgressBar);
 }
@@ -1308,7 +1344,8 @@ void MainWindow::renameSelectedPicuresToTimestamp()
     eve = new MyEvent();
     QApplication::postEvent(qApp, eve);
 
-    for (QModelIndex i : selected) {
+    for (QModelIndex i : selected)
+    {
         count++;
         double proz = double(count) / double(total) * 100.0;
         int val = int(proz);
@@ -1322,18 +1359,19 @@ void MainWindow::renameSelectedPicuresToTimestamp()
 
         Photo photo(pathToFile);
         photo.setRenameToTimestamp(true);
-        //QFutureWatcher<bool> watcher;
-        //QFuture<std::tuple<bool, QString>> future = QtConcurrent::run(&Photo::renameImageToTimestamp, photo);
-        //FutureWatcherBool.setFuture(future);
-        //future.waitForFinished();
-        //bool result = future.result();
+        // QFutureWatcher<bool> watcher;
+        // QFuture<std::tuple<bool, QString>> future = QtConcurrent::run(&Photo::renameImageToTimestamp, photo);
+        // FutureWatcherBool.setFuture(future);
+        // future.waitForFinished();
+        // bool result = future.result();
         bool retBool;
         QString result;
         std::tie(retBool, result) = photo.renameImageToTimestamp();
-        if (retBool) {
-            //QString newName = photo.getImgNewTimestampName();
-            //col2.data(Qt::DisplayRole).setValue(result);
-            //mContentItemModel->index(row, 1).data(Qt::DisplayRole).setValue(result);
+        if (retBool)
+        {
+            // QString newName = photo.getImgNewTimestampName();
+            // col2.data(Qt::DisplayRole).setValue(result);
+            // mContentItemModel->index(row, 1).data(Qt::DisplayRole).setValue(result);
             qDebug() << "conMod: " << mContentItemModel->itemData(i).values();
 
             mContentItemModel->removeRow(row);
@@ -1347,10 +1385,9 @@ void MainWindow::renameSelectedPicuresToTimestamp()
     }
 
     eve = nullptr;
-    //ui->progressBar->hide();
+    // ui->progressBar->hide();
 
-    statusBar()->showMessage(tr("renamed") + " " + QString::number(selected.size()) + " "
-                                 + tr("pictures"),
+    statusBar()->showMessage(tr("renamed") + " " + QString::number(selected.size()) + " " + tr("pictures"),
                              5000);
     QTimer::singleShot(5000, this, &MainWindow::hideProgressBar);
 }
@@ -1421,10 +1458,12 @@ void MainWindow::selectAllImages()
 // TODO
 void MainWindow::_on_listView_clicked(const QModelIndex &index)
 {
-    if (QMouseEvent::ContextMenu && Qt::LeftButton) {
+    if (QMouseEvent::ContextMenu && Qt::LeftButton)
+    {
     }
-    if (Qt::MouseButtons().toInt() & Qt::RightButton) {
-        //qInfo() << "on_listView_clicked right context Menu mouse";
+    if (Qt::MouseButtons().toInt() & Qt::RightButton)
+    {
+        // qInfo() << "on_listView_clicked right context Menu mouse";
     }
 
     int row = index.row();

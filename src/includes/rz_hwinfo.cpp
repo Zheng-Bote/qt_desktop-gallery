@@ -1,3 +1,13 @@
+/**
+ * @file rz_hwinfo.cpp
+ * @author ZHENG Robert (robert.hase-zheng.net)
+ * @brief Main class for the hardware information
+ * @version 0.1
+ * @date 2025-03-01
+ *
+ * @copyright Copyright (c) 2025 ZHENG Robert
+ *
+ */
 #include "rz_hwinfo.h"
 
 using hwinfo::unit::bytes_to_MiB;
@@ -7,7 +17,8 @@ HwInfo::HwInfo() {}
 void HwInfo::setHwInfo()
 {
     const auto cpus = hwinfo::getAllCPUs();
-    for (const auto &cpu : cpus) {
+    for (const auto &cpu : cpus)
+    {
         hw_info.insert("CPU vendor", cpu.vendor().c_str());
         hw_info.insert("CPU model", cpu.modelName().c_str());
         hw_info.insert("CPU physical cores", QString::number(cpu.numPhysicalCores()));

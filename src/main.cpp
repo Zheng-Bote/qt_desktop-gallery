@@ -1,3 +1,13 @@
+/**
+ * @file main.cpp
+ * @author ZHENG Robert (robert.hase-zheng.net)
+ * @brief Desktop gallery-app for Linux, MacOS, Windows to show/edit Exif/IPTC/XMP and export to WebP
+ * @version 0.23.0
+ * @date 2025-01-01
+ *
+ * @copyright Copyright (c) 2025 ZHENG Robert
+ *
+ */
 #include <QApplication>
 
 #include "includes/rz_config.h"
